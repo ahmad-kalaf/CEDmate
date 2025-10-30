@@ -2,7 +2,7 @@ import 'package:cedmate/models/app_user.dart';
 import 'package:cedmate/services/anamnese_service.dart';
 import 'package:cedmate/widgets/anamnese_screen.dart';
 import 'package:cedmate/widgets/ausloggen_button.dart';
-import 'package:cedmate/widgets/datum_rad.dart';
+import 'package:cedmate/widgets/kalender_screen.dart';
 import 'package:cedmate/widgets/profil_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,8 +23,9 @@ class _HomeScreenState extends State<HomeScreen> {
   late final AnamneseService anamneseService;
   bool _isLoading = true;
   bool _hatAnamnesedaten = false;
-  final TextEditingController _datumAuswahlController = TextEditingController();
-  DateTime? _ausgewaehtesMonatJahr;
+  // heutiges Datum TT.MM.JJJJ
+  final DateTime _heutigesDatum = DateTime.now();
+  final List<String> _wochentage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
   @override
   void initState() {
@@ -32,45 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
     auth = context.read<AuthService>();
     anamneseService = context.read<AnamneseService>();
     _ladeAnamneseDaten();
-    _ausgewaehtesMonatJahr = DateTime.now();
-    _datumAuswahlController.text =
-        '${DateTime.now().day} .${DateTime.now().month}.${DateTime.now().year}';
-  }
-
-  /// Öffnet den nativen DatePicker (nur Kalender!)
-  Future<void> _pickDate(BuildContext context) async {
-    final now = DateTime.now();
-
-    // Anzeigeformat nur Monat + Jahr
-    String formatMonthYear(DateTime date) {
-      return '${date.month.toString().padLeft(2, '0')}.${date.year}';
-    }
-
-    final picked = await showDatePicker(
-      context: context,
-      locale: const Locale('de', 'DE'),
-      initialDate: _ausgewaehtesMonatJahr ?? now,
-      firstDate: DateTime(1900),
-      lastDate: now.add(const Duration(days: 365)),
-      initialEntryMode: DatePickerEntryMode.calendarOnly,
-    );
-
-    if (picked != null) {
-      setState(() {
-        // das exakte Datum merken (nicht nur Monat!)
-        _ausgewaehtesMonatJahr = picked;
-        _datumAuswahlController.text =
-            '${picked.day.toString().padLeft(2, '0')}.${picked.month.toString().padLeft(2, '0')}.${picked.year}';
-      });
-
-      // optional: kurze Info
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Datum geändert auf ${formatMonthYear(picked)}'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
   }
 
   Future<void> _ladeAnamneseDaten() async {
@@ -84,6 +46,37 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       _isLoading = false;
     });
+  }
+
+  Widget _buildKachel(String titel, IconData icon, VoidCallback onTap) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          height: 100,
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 30, color: Colors.grey),
+              const SizedBox(height: 8),
+              Text(
+                titel,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -133,7 +126,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
-                            // Hier kannst du die Navigation zur Anamnese-Seite hinzufügen
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => const AnamneseScreen(),
@@ -151,66 +143,62 @@ class _HomeScreenState extends State<HomeScreen> {
           : SingleChildScrollView(
               child: Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 600),
-                  child: Padding(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: Container(
                     padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
+                        Text('Hallo, ${user?.username}'),
+                        Text(
+                          '${_wochentage[_heutigesDatum.weekday - 1]}, '
+                          '${_heutigesDatum.day}.${_heutigesDatum.month}.${_heutigesDatum.year}',
+                        ),
+                        const SizedBox(height: 20),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text('+ Schnell erfassen'),
+                        ),
+                        const SizedBox(height: 10),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
-                              user?.username != null
-                                  ? 'Hi, ${user!.username}'
-                                  : 'Hi',
-                              style: const TextStyle(fontSize: 15),
+                            _buildKachel('Symptom erfassen', Icons.sick, () {}),
+                            _buildKachel('Stuhlgang notieren', Icons.wc, () {}),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildKachel(
+                              'Mahlzeit Eintagen',
+                              Icons.restaurant_menu,
+                              () {},
                             ),
-                            Row(
-                              children: [
-                                // Monat/Jahr-Auswahl
-                                ElevatedButton.icon(
-                                  onPressed: () => _pickDate(context),
-                                  label: Text(
-                                    _ausgewaehtesMonatJahr != null
-                                        ? "${_ausgewaehtesMonatJahr!.month.toString().padLeft(2, '0')}.${_ausgewaehtesMonatJahr!.year}"
-                                        : "Monat wählen",
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: const Size(40, 40),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                    ),
-                                  ),
-                                  icon: const Icon(Icons.calendar_today),
-                                ),
-
-                                const SizedBox(width: 8),
-                              ],
+                            _buildKachel(
+                              'Stimmung notieren',
+                              Icons.mood,
+                              () {},
                             ),
                           ],
                         ),
-
-                        DatumRad(
-                          key: ValueKey(
-                            '${_ausgewaehtesMonatJahr!.year}-${_ausgewaehtesMonatJahr!.month}',
-                          ),
-                          year: _ausgewaehtesMonatJahr!.year,
-                          month: _ausgewaehtesMonatJahr!.month,
-                          initialDay: _ausgewaehtesMonatJahr!.day,
-                          onDateSelected: (date) {
-                            setState(() {
-                              _datumAuswahlController.text =
-                                  '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
-                            });
-                          },
-                        ),
-
-                        /// aktuelen Datum anzeigen
                         const SizedBox(height: 20),
-                        Text(
-                          _datumAuswahlController.text.isNotEmpty
-                              ? 'Ausgewähltes Datum: ${_datumAuswahlController.text}'
-                              : 'Kein Datum ausgewählt',
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => KalenderScreen(),
+                              ),
+                            );
+                          },
+                          label: Text('Zum Kalender'),
+                          icon: Icon(Icons.calendar_today),
                         ),
                       ],
                     ),
@@ -218,35 +206,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
-      /// Auf heute zurücksetzen, nur sichbar, wenn
-      /// nicht aktueller Monat ausgewählt ist
-      floatingActionButton:
-          (!(_ausgewaehtesMonatJahr != null &&
-              _ausgewaehtesMonatJahr!.month == DateTime.now().month &&
-              _ausgewaehtesMonatJahr!.year == DateTime.now().year))
-          ? ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _ausgewaehtesMonatJahr = DateTime.now();
-                });
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Zurück auf heutiges Datum gesetzt'),
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(40, 40),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                backgroundColor: Colors.grey[200],
-                foregroundColor: Colors.black,
-              ),
-              child: const Text('Heute'),
-            )
-          : null,
     );
   }
 }

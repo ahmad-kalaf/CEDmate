@@ -140,7 +140,7 @@ class _DatumRadState extends State<DatumRad> {
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: Colors.blue.withOpacity(0.4),
+                              color: Colors.blue,
                               blurRadius: 8,
                               spreadRadius: 1,
                             ),
