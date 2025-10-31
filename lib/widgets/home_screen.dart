@@ -309,6 +309,105 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         const SizedBox(height: 20),
+                        SizedBox(
+                          height: 160,
+                          child: PageView(
+                            controller: PageController(viewportFraction: 0.9),
+                            padEnds: false,
+                            children: [
+                              InkWell(
+                                splashColor: Colors.blue,
+                                borderRadius: BorderRadius.circular(20),
+                                onTap: () {
+                                  print("Hilfe für Unterwegs geklickt");
+                                },
+                                child: Card(
+                                  elevation: 6,
+                                  margin: const EdgeInsets.all(10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        Icon(
+                                          Icons.explore,
+                                          size: 36,
+                                          color: Colors.grey,
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          'Hilfe für Unterwegs',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Text(
+                                          'Toiletten & Restaurants in der Nähe',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black54,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                borderRadius: BorderRadius.circular(20),
+                                onTap: () {
+                                  print("Daten exportieren geklickt");
+                                },
+                                child: Card(
+                                  elevation: 6,
+                                  margin: const EdgeInsets.all(10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        Icon(
+                                          Icons.upload_file,
+                                          size: 36,
+                                          color: Colors.grey,
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          'Daten exportieren',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Text(
+                                          'Exportiere deine Daten für den Arztbesuch',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black54,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Row(
@@ -338,6 +437,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
+                        SizedBox(height: 100),
                       ],
                     ),
                   ),
