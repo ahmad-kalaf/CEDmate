@@ -3,7 +3,7 @@ import 'package:cedmate/repositories/anamnese_repository.dart';
 import 'package:cedmate/services/anamnese_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // automatisch von `flutterfire configure` generiert
+import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
