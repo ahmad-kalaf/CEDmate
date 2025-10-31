@@ -75,28 +75,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 const SizedBox(width: 10),
 
-                Column(
-                  mainAxisSize: MainAxisSize.min, // verhindert unnötige Höhe
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      zahl.toString(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                Flexible(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // verhindert unnötige Höhe
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        zahl.toString(),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      titel,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                      const SizedBox(height: 5),
+                      Text(
+                        titel,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                SizedBox(width: 30),
               ],
             ),
           ),
@@ -128,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -360,6 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               InkWell(
+                                splashColor: Colors.blue,
                                 borderRadius: BorderRadius.circular(20),
                                 onTap: () {
                                   print("Daten exportieren geklickt");
