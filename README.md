@@ -20,7 +20,9 @@ CEDmate soll Patient*innen ermöglichen:
 - Basisfragen zur Profilerstellung:
   - Alter  
   - Geschlecht  
-  - Ärztliche Diagnose (*Colitis ulcerosa*, *Morbus Crohn*, *sonstige CED-Formen*, *keine*)  
+  - Ärztliche Diagnose (*Colitis ulcerosa*, *Morbus Crohn*, *sonstige CED-Formen*, *keine*)
+  - Symptome im Schub
+  - Schubauslöser
   - Begleiterkrankungen  
 
 👉 Das Profil kann jederzeit unter **„Mein Profil“** angepasst werden.
@@ -85,13 +87,6 @@ Erfasse dein mentales und emotionales Befinden.
 
 ---
 
-## 💊 MediManager  
-- Medikamente verwalten (Name, Dosis, Einnahmezeit)  
-- Push-Benachrichtigungen zur Erinnerung  
-- Verlaufsübersicht der Einnahmen  
-
----
-
 ## 📍 Hilfe für unterwegs  
 - **Toilettenfinder:** GPS-gestützt, mit Filtern (Barrierefreiheit etc.)  
 - **GastroGuide:** Restaurants mit Community-Bewertungen  
@@ -105,17 +100,6 @@ Erfasse dein mentales und emotionales Befinden.
 - Artikel, Videos und Checklisten zu Themen wie Ernährung, Bewegung, Psyche  
 - Verlinkungen zu Fachgesellschaften (z. B. DCCV)  
 - Optional: Community-FAQ oder Antworten von Ärzt*innen  
-
----
-
-## 💡 Beispiel im Alltag  
-> **Mittag:** 🍝 Lasagne mit Käse → (*EssGefühl*: Mahlzeit loggen, enthält Laktose)  
->  
-> **2 h später:** 😖 Krämpfe & Durchfall → (*SymptomRadar*: Bauchschmerzen erfassen)  
->  
-> **3× Toilette:** 🚽 (*StuhlTagebuch*: Typ 6 + Schleim)  
->  
-> **Abends:** 😔 Gestresst & traurig → (*SeelenLog*: Stimmung erfassen)  
 
 ---
 
@@ -138,7 +122,6 @@ Erfasse dein mentales und emotionales Befinden.
   - services/
   - utils/
   - widgets/
-  - firebase_options.dart
   - main.dart
 
 ---
