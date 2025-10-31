@@ -94,6 +94,7 @@ class _AuthFormState extends State<AuthForm> {
                         : null,
                     onChanged: (v) => _username = v,
                     onSaved: (v) => _username = (v ?? ''),
+                    onFieldSubmitted: (_) => _submit(),
                   ),
                   // E-Mail nur bei Registrierung
                   if (!_isLogin)
@@ -105,6 +106,7 @@ class _AuthFormState extends State<AuthForm> {
                           : null,
                       onChanged: (v) => _email = v,
                       onSaved: (v) => _email = (v ?? ''),
+                      onFieldSubmitted: (_) => _submit(),
                     ),
                   // Passwort (immer)
                   TextFormField(
@@ -114,6 +116,7 @@ class _AuthFormState extends State<AuthForm> {
                         (v == null || v.length < 8) ? 'Mind. 8 Zeichen' : null,
                     onChanged: (v) => _password = v,
                     onSaved: (v) => _password = (v ?? ''),
+                    onFieldSubmitted: (_) => _submit(),
                   ),
                   // Anzeigename optional bei Registrierung
                   if (!_isLogin)
