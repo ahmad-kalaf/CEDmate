@@ -5,7 +5,9 @@ import '../repositories/auth_repository.dart';
 
 class AuthFailure implements Exception {
   final String message;
+
   AuthFailure(this.message);
+
   @override
   String toString() => message;
 }
@@ -13,6 +15,7 @@ class AuthFailure implements Exception {
 /// Service-Schicht für Authentifizierung:
 class AuthService {
   final AuthRepository _repo;
+
   AuthService(this._repo);
 
   // ---------- Eingabe-Validierungen ----------
@@ -47,6 +50,16 @@ class AuthService {
       }
       return await _repo.ladeUser(user.uid);
     });
+  }
+
+  User? get currentUser => _repo.currentUser;
+
+  String get currentUserId {
+    final user = _repo.currentUser;
+    if (user == null) {
+      throw AuthFailure('Kein Benutzer angemeldet.');
+    }
+    return user.uid;
   }
 
   Future<AppUser> register({
@@ -138,7 +151,6 @@ class AuthService {
       }
     }
   }
-
 
   // ---------- Fehlermapping (Firebase → deutsche Texte) ----------
   String _mapError(Object e) {

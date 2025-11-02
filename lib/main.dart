@@ -1,6 +1,8 @@
 import 'package:cedmate/models/app_user.dart';
 import 'package:cedmate/repositories/anamnese_repository.dart';
+import 'package:cedmate/repositories/symptom_repository.dart';
 import 'package:cedmate/services/anamnese_service.dart';
+import 'package:cedmate/services/symptom_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -40,6 +42,10 @@ class CEDmateApp extends StatelessWidget {
         Provider<AnamneseRepository>(create: (_) => AnamneseRepository()),
         ProxyProvider<AnamneseRepository, AnamneseService>(
           update: (_, repo, __) => AnamneseService(repo),
+        ),
+        Provider<SymptomRepository>(create: (_) => SymptomRepository()),
+        ProxyProvider2<SymptomRepository, AuthService, SymptomService>(
+          update: (_, repo, auth, __) => SymptomService(repo, auth),
         ),
         StreamProvider<AppUser?>(
           create: (context) => context.read<AuthService>().userStream(),
