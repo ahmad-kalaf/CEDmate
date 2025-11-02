@@ -11,6 +11,9 @@ class AuthRepository {
   /// Stream liefert null/nicht-null je nach Login-Status
   Stream<User?> authStateChanges() => _auth.authStateChanges();
 
+  /// 🔹 Aktuell eingeloggter Benutzer (kann null sein)
+  User? get currentUser => _auth.currentUser;
+
   /// Registrierung:
   /// 1) Username atomar reservieren (Dokument `usernames/{username}` anlegen).
   /// 2) Auth-Account via E-Mail/Passwort anlegen.
