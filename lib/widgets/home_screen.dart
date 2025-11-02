@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 
-/// Beispiel-Home (geschützter Bereich).
+/// Home (geschützter Bereich).
 /// Hier ist die eigentliche CEDmate-Funktionalität,
 /// die man nach dem Login benutzen kann.
 class HomeScreen extends StatefulWidget {
@@ -38,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _ladeAnamneseDaten() async {
     final anamnese = await anamneseService.ladeAnamnese();
     setState(() {
-      // hier muss geprüft werden, ob Anamnesedaten vorhanden sind
       if (anamnese != null) {
         _hatAnamnesedaten = true;
       } else {
@@ -66,37 +65,20 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
-            // alles im Zentrum
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Icon(icon, size: 30, color: Colors.grey),
-
                 const SizedBox(width: 10),
-
                 Flexible(
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // verhindert unnötige Höhe
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        zahl.toString(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      Text(zahl.toString(), overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 5),
-                      Text(
-                        titel,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      Text(titel, overflow: TextOverflow.ellipsis),
                     ],
                   ),
                 ),
@@ -123,16 +105,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 30, color: Colors.grey),
+              Icon(icon, size: 30),
               const SizedBox(height: 8),
-              Text(
-                titel,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
+              Text(titel, overflow: TextOverflow.ellipsis),
             ],
           ),
         ),
@@ -336,26 +311,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: const [
-                                        Icon(
-                                          Icons.explore,
-                                          size: 36,
-                                          color: Colors.grey,
-                                        ),
+                                        Icon(Icons.explore),
                                         SizedBox(height: 10),
-                                        Text(
-                                          'Hilfe für Unterwegs',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
+                                        Text('Hilfe für Unterwegs'),
                                         SizedBox(height: 5),
                                         Text(
                                           'Toiletten & Restaurants in der Nähe',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.black54,
-                                          ),
+
                                           textAlign: TextAlign.center,
                                         ),
                                       ],
@@ -380,26 +342,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: const [
-                                        Icon(
-                                          Icons.upload_file,
-                                          size: 36,
-                                          color: Colors.grey,
-                                        ),
+                                        Icon(Icons.upload_file),
                                         SizedBox(height: 10),
-                                        Text(
-                                          'Daten exportieren',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
+                                        Text('Daten exportieren'),
                                         SizedBox(height: 5),
                                         Text(
                                           'Exportiere deine Daten für den Arztbesuch',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.black54,
-                                          ),
                                           textAlign: TextAlign.center,
                                         ),
                                       ],
@@ -410,7 +358,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-
                         const SizedBox(height: 20),
                         const SizedBox(height: 20),
                         Align(

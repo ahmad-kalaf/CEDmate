@@ -120,6 +120,26 @@ class AuthService {
   Stream<bool> isLoggedInStream() =>
       _repo.authStateChanges().map((u) => u != null);
 
+  /// Stream für AuthGate: true = E-Mail bestätigt, sonst false
+  Future<bool> isEmailVerified() async {
+    final user = _repo.currentUser;
+    if (user == null) return false;
+    await user.reload(); // 🔥 Hier wird der Zustand aus Firebase neu geholt
+    return user.emailVerified;
+  }
+
+  Stream<bool> isEmailVerifiedStream() async* {
+    await for (final u in _repo.authStateChanges()) {
+      if (u == null) {
+        yield false;
+      } else {
+        await u.reload(); // <-- wichtig, sonst alter Zustand!
+        yield u.emailVerified;
+      }
+    }
+  }
+
+
   // ---------- Fehlermapping (Firebase → deutsche Texte) ----------
   String _mapError(Object e) {
     final s = e.toString();
