@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,6 +14,7 @@ class VerifiziereEmailScreen extends StatefulWidget {
 
 class _VerifiziereEmailScreenState extends State<VerifiziereEmailScreen> {
   late final AuthService auth;
+  bool _loading = false;
 
   @override
   void initState() {
@@ -22,21 +22,84 @@ class _VerifiziereEmailScreenState extends State<VerifiziereEmailScreen> {
     auth = context.read<AuthService>();
   }
 
+  Future<void> _checkVerification() async {
+    setState(() => _loading = true);
+    try {
+      final verified = await auth.isEmailVerified(); // ruft intern reload() auf
+      if (verified) {
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'E-Mail noch nicht bestätigt. Bitte Link in der Mail anklicken und erneut prüfen.',
+            ),
+          ),
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Fehler beim Prüfen. Bitte Internetverbindung prüfen.'),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AppUser?>();
-    return Scaffold(
+    final userAuth = auth.currentUser;
+    final AppUser? user = context.watch<AppUser?>();
 
-      appBar: AppBar(title: const Text('CEDmate'),
-        actions: [AusloggenButton(auth: auth, user: user)],),
-      body: const Center(
-        child: Text(
-          'Bitte bestätige deine E-Mail-Adresse.\n'
-              'Sobald du den Link geklickt hast, starte die App neu.',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 18),
-        ),
-      ),
+    return StreamBuilder<bool>(
+      stream: auth.isEmailVerifiedStream(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.data == true) {
+          // Automatisch navigieren, wenn verifiziert
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) Navigator.pushReplacementNamed(context, '/home');
+          });
+        }
+        return Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Text('CEDmate'),
+            actions: [AusloggenButton(auth: auth, user: user)],
+          ),
+          body: Center(
+            child: Column(
+              children: [
+                const Text(
+                  'Bitte bestätige deine E-Mail-Adresse.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _loading ? null : _checkVerification,
+                  icon: _loading
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.refresh),
+                  label: const Text('Überprüfen'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

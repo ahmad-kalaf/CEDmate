@@ -1,5 +1,6 @@
 import 'package:cedmate/models/app_user.dart';
 import 'package:cedmate/services/anamnese_service.dart';
+import 'package:cedmate/widgets/alle_symptome.dart';
 import 'package:cedmate/widgets/anamnese_screen.dart';
 import 'package:cedmate/widgets/ausloggen_button.dart';
 import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
@@ -142,12 +143,62 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.grey, Colors.white],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.analytics, size: 40),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'CEDmate',
+                              style: TextStyle(fontSize: 25),
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Erfassen. Verstehen. Verbessern.',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               ListTile(
                 title: const Text('Mein Profil'),
                 onTap: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const ProfilScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Symptom-Radar'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const AlleSymptome()),
                   );
                 },
               ),
@@ -203,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Hallo, ${user?.username}'),
+                        Text(user != null ? 'Hallo ${user.username}' : 'Hallo'),
                         Text(
                           '${_wochentage[_heutigesDatum.weekday - 1]}, '
                           '${_heutigesDatum.day}.${_heutigesDatum.month}.${_heutigesDatum.year}',
