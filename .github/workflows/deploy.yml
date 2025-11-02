@@ -3,10 +3,10 @@ name: Deploy CEDmate Web to GitHub Pages
 on:
   push:
     branches:
-      - main  # bei jedem Push auf main
+      - main
 
 permissions:
-  contents: write  # erlaubt das Erstellen des gh-pages-Branches
+  contents: write
 
 jobs:
   build:
@@ -28,12 +28,12 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      # 🔧 Hier wird das Base-Href automatisch korrigiert:
-      - name: Adjust base href for GitHub Pages
-        run: sed -i 's|<base href="/">|<base href="/cedmate/">|' web/index.html
-
       - name: Build Flutter Web (release)
         run: flutter build web --release
+
+      # ⚙️ Jetzt NACH dem Build das Base-Href in der Ausgabe-Datei anpassen:
+      - name: Adjust base href for GitHub Pages (after build)
+        run: sed -i 's|<base href="/">|<base href="/cedmate/">|' build/web/index.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
