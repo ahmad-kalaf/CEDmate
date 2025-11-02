@@ -117,6 +117,13 @@ class _KalenderScreenState extends State<KalenderScreen> {
                         ? 'Ausgewähltes Datum: ${_datumAuswahlController.text}'
                         : 'Kein Datum ausgewählt',
                   ),
+                  const SizedBox(height: 20),
+                  //hinweis dass noch entwickelt wird
+                  Text(
+                    'Diese Funktion wird noch entwickelt.\n'
+                    'Hier kann man später ein Datum auswählen und die erfassten'
+                    ' medizinischen Daten zu dem ausgewählten Datum sehen.',
+                  ),
                 ],
               ),
             ),
