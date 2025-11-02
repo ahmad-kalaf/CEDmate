@@ -2,11 +2,18 @@ import 'package:cedmate/models/app_user.dart';
 import 'package:cedmate/services/anamnese_service.dart';
 import 'package:cedmate/widgets/anamnese_screen.dart';
 import 'package:cedmate/widgets/ausloggen_button.dart';
+import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
 import 'package:cedmate/widgets/kalender_screen.dart';
+import 'package:cedmate/widgets/mahlzeit_eintragen.dart';
 import 'package:cedmate/widgets/profil_screen.dart';
+import 'package:cedmate/widgets/statistiken.dart';
+import 'package:cedmate/widgets/stimmung_notieren.dart';
+import 'package:cedmate/widgets/stuhlgang_notieren.dart';
+import 'package:cedmate/widgets/symptom_erfassen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import 'daten_exportieren.dart';
 
 /// Home (geschützter Bereich).
 /// Hier ist die eigentliche CEDmate-Funktionalität,
@@ -23,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final AnamneseService anamneseService;
   bool _isLoading = true;
   bool _hatAnamnesedaten = false;
+
   // heutiges Datum TT.MM.JJJJ
   final DateTime _heutigesDatum = DateTime.now();
   final List<String> _wochentage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
@@ -33,6 +41,12 @@ class _HomeScreenState extends State<HomeScreen> {
     auth = context.read<AuthService>();
     anamneseService = context.read<AnamneseService>();
     _ladeAnamneseDaten();
+  }
+
+  Future<T?> _navigiereZurSeite<T>(Widget seite) {
+    return Navigator.of(
+      context,
+    ).push<T>(MaterialPageRoute(builder: (context) => seite));
   }
 
   Future<void> _ladeAnamneseDaten() async {
@@ -54,22 +68,21 @@ class _HomeScreenState extends State<HomeScreen> {
     VoidCallback onTap,
   ) {
     return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          height: 100,
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(
+      child: Container(
+        height: 100,
+        margin: const EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(10),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(icon, size: 30, color: Colors.grey),
+                Icon(icon),
                 const SizedBox(width: 10),
                 Flexible(
                   child: Column(
@@ -105,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 30),
+              Icon(icon),
               const SizedBox(height: 8),
               Text(titel, overflow: TextOverflow.ellipsis),
             ],
@@ -214,12 +227,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             _iconTextKachel(
                               'Symptom erfassen',
                               Icons.sick,
-                              () {},
+                              () => _navigiereZurSeite(SymptomErfassen()),
                             ),
                             _iconTextKachel(
                               'Stuhlgang notieren',
                               Icons.wc,
-                              () {},
+                              () => _navigiereZurSeite(StuhlgangNotieren()),
                             ),
                           ],
                         ),
@@ -230,12 +243,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             _iconTextKachel(
                               'Mahlzeit Eintagen',
                               Icons.restaurant_menu,
-                              () {},
+                              () => _navigiereZurSeite(MahlzeitEintragen()),
                             ),
                             _iconTextKachel(
                               'Stimmung notieren',
                               Icons.mood,
-                              () {},
+                              () => _navigiereZurSeite(StimmungNotieren()),
                             ),
                           ],
                         ),
@@ -298,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 splashColor: Colors.blue,
                                 borderRadius: BorderRadius.circular(20),
                                 onTap: () {
-                                  print("Hilfe für Unterwegs geklickt");
+                                  _navigiereZurSeite(HilfeFuerUnterwegs());
                                 },
                                 child: Card(
                                   elevation: 6,
@@ -329,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 splashColor: Colors.blue,
                                 borderRadius: BorderRadius.circular(20),
                                 onTap: () {
-                                  print("Daten exportieren geklickt");
+                                  _navigiereZurSeite(DatenExportieren());
                                 },
                                 child: Card(
                                   elevation: 6,
@@ -385,7 +398,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             _iconTextKachel(
                               'Statistiken',
                               Icons.bar_chart,
-                              () {},
+                              () => _navigiereZurSeite(Statistiken()),
                             ),
                           ],
                         ),
