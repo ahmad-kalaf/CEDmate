@@ -28,6 +28,10 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      # 🔧 Hier wird das Base-Href automatisch korrigiert:
+      - name: Adjust base href for GitHub Pages
+        run: sed -i 's|<base href="/">|<base href="/cedmate/">|' web/index.html
+
       - name: Build Flutter Web (release)
         run: flutter build web --release
 
