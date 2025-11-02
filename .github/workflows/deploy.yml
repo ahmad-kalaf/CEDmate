@@ -33,7 +33,7 @@ jobs:
 
       # ⚙️ Jetzt NACH dem Build das Base-Href in der Ausgabe-Datei anpassen:
       - name: Adjust base href for GitHub Pages (after build)
-        run: sed -i 's|<base href="/">|<base href="/cedmate/">|' build/web/index.html
+        run: sed -i 's|<base href="/">|<base href="/CEDmate/">|' build/web/index.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
