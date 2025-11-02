@@ -44,7 +44,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Firebase config (darf NIE ins Repo!)
-lib/firebase_options.dart
+# Firebase config
+# Nur die FlutterFire-Konfig darf ins Repo!
+# Die anderen bleiben lokal (Android/iOS)
 google-services.json
 GoogleService-Info.plist
