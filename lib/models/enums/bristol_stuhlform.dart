@@ -1,0 +1,44 @@
+/// Repräsentiert die Bristol-Stuhlformen-Skala (Typ 1 bis 7).
+///
+/// Quelle: https://de.wikipedia.org/wiki/Bristol-Stuhlformen-Skala
+enum BristolStuhlform {
+  typ1, // einzelne, harte Klumpen (Verstopfung)
+  typ2, // wurstförmig, aber klumpig
+  typ3, // wurstförmig mit Rissen
+  typ4, // wurstförmig, glatt und weich (normal)
+  typ5, // weiche Klümpchen mit klaren Kanten
+  typ6, // breiig, unregelmäßig
+  typ7, // flüssig, keine festen Bestandteile (Durchfall)
+}
+
+/// Beschreibungen der Stuhlformen für UI-Anzeige.
+extension BristolBeschreibung on BristolStuhlform {
+  String get beschreibung {
+    switch (this) {
+      case BristolStuhlform.typ1:
+        return 'Typ 1 – Harte, getrennte Klumpen';
+      case BristolStuhlform.typ2:
+        return 'Typ 2 – Wurstförmig, aber klumpig';
+      case BristolStuhlform.typ3:
+        return 'Typ 3 – Wurstförmig mit Rissen';
+      case BristolStuhlform.typ4:
+        return 'Typ 4 – Glatt und weich (normal)';
+      case BristolStuhlform.typ5:
+        return 'Typ 5 – Weiche Klümpchen';
+      case BristolStuhlform.typ6:
+        return 'Typ 6 – Breiig';
+      case BristolStuhlform.typ7:
+        return 'Typ 7 – Wässrig, keine festen Bestandteile';
+    }
+  }
+
+  /// Für Firestore: enum → String (z. B. "typ4")
+  String get name => toString().split('.').last;
+
+  /// Für Firestore: String → enum
+  static BristolStuhlform fromName(String name) =>
+      BristolStuhlform.values.firstWhere(
+        (e) => e.name == name,
+        orElse: () => BristolStuhlform.typ4, // Standard: normal
+      );
+}

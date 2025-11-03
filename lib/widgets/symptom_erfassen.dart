@@ -166,76 +166,87 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
         appBar: AppBar(
           title: Text(isEditMode ? 'Symptom bearbeiten' : 'Symptom erfassen'),
         ),
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  TextFormField(
-                    controller: _bezeichnungController,
-                    decoration: const InputDecoration(labelText: 'Bezeichnung'),
-                    validator: (v) =>
-                        v == null || v.trim().isEmpty ? 'Bitte eingeben' : null,
-                  ),
-                  TextFormField(
-                    controller: _intensitaetController,
-                    decoration: const InputDecoration(
-                      labelText: 'Intensität (1–10)',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (v) {
-                      final i = int.tryParse(v ?? '');
-                      if (i == null || i < 1 || i > 10) {
-                        return 'Wert zwischen 1 und 10';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Form(
+                key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text('Startzeit: $datumAnzeige'),
-                      IconButton(
-                        icon: const Icon(Icons.edit_calendar),
-                        tooltip: 'Datum/Uhrzeit wählen',
-                        onPressed: _waehleStartzeit,
+                      TextFormField(
+                        controller: _bezeichnungController,
+                        decoration: const InputDecoration(
+                          labelText: 'Bezeichnung',
+                        ),
+                        validator: (v) => v == null || v.trim().isEmpty
+                            ? 'Bitte eingeben'
+                            : null,
+                      ),
+                      TextFormField(
+                        controller: _intensitaetController,
+                        decoration: const InputDecoration(
+                          labelText: 'Intensität (1–10)',
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: (v) {
+                          final i = int.tryParse(v ?? '');
+                          if (i == null || i < 1 || i > 10) {
+                            return 'Wert zwischen 1 und 10';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Startzeit: $datumAnzeige'),
+                          IconButton(
+                            icon: const Icon(Icons.edit_calendar),
+                            tooltip: 'Datum/Uhrzeit wählen',
+                            onPressed: _waehleStartzeit,
+                          ),
+                        ],
+                      ),
+                      const Divider(),
+                      TextFormField(
+                        controller: _dauerController,
+                        decoration: const InputDecoration(
+                          labelText: 'Dauer (in Minuten)',
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: (v) => v == null || v.trim().isEmpty
+                            ? 'Bitte eingeben'
+                            : null,
+                      ),
+                      TextFormField(
+                        controller: _notizenController,
+                        decoration: const InputDecoration(
+                          labelText: 'Notizen (optional)',
+                        ),
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        icon: _isSaving
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.save),
+                        label: Text(isEditMode ? 'Aktualisieren' : 'Speichern'),
+                        onPressed: _isSaving ? null : _speichereSymptom,
                       ),
                     ],
                   ),
-                  const Divider(),
-                  TextFormField(
-                    controller: _dauerController,
-                    decoration: const InputDecoration(
-                      labelText: 'Dauer (in Minuten)',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (v) =>
-                        v == null || v.trim().isEmpty ? 'Bitte eingeben' : null,
-                  ),
-                  TextFormField(
-                    controller: _notizenController,
-                    decoration: const InputDecoration(
-                      labelText: 'Notizen (optional)',
-                    ),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    icon: _isSaving
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.save),
-                    label: Text(isEditMode ? 'Aktualisieren' : 'Speichern'),
-                    onPressed: _isSaving ? null : _speichereSymptom,
-                  ),
-                ],
+                ),
               ),
             ),
           ),

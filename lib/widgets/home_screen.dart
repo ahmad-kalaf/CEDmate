@@ -1,5 +1,6 @@
 import 'package:cedmate/models/app_user.dart';
 import 'package:cedmate/services/anamnese_service.dart';
+import 'package:cedmate/widgets/alle_stuhlgang_eintraege.dart';
 import 'package:cedmate/widgets/alle_symptome.dart';
 import 'package:cedmate/widgets/anamnese_screen.dart';
 import 'package:cedmate/widgets/ausloggen_button.dart';
@@ -199,6 +200,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.of(context).pop();
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const AlleSymptome()),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Stuhlgang-Einträge'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const AlleStuhlgangEintraege(),
+                    ),
                   );
                 },
               ),
