@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Repräsentiert ein einzelnes Symptom.
 /// Immutable, mit sauberem Firestore-Mapping und optionaler ID.
+/// Ein Symptom hat eine Bezeichnung, Intensität (1–10), Startzeit,
+/// Dauer in Minuten und optionale Notizen.
 class Symptom {
   final String? id; // Firestore-Dokument-ID (optional)
   final String bezeichnung;
