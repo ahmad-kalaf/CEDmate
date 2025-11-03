@@ -1,7 +1,9 @@
 import 'package:cedmate/models/app_user.dart';
 import 'package:cedmate/repositories/anamnese_repository.dart';
+import 'package:cedmate/repositories/stuhlgang_repository.dart';
 import 'package:cedmate/repositories/symptom_repository.dart';
 import 'package:cedmate/services/anamnese_service.dart';
+import 'package:cedmate/services/stuhlgang_service.dart';
 import 'package:cedmate/services/symptom_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -50,6 +52,10 @@ class CEDmateApp extends StatelessWidget {
         StreamProvider<AppUser?>(
           create: (context) => context.read<AuthService>().userStream(),
           initialData: null,
+        ),
+        Provider<StuhlgangRepository>(create: (_) => StuhlgangRepository()),
+        ProxyProvider2<StuhlgangRepository, AuthService, StuhlgangService>(
+          update: (_, repo, auth, __) => StuhlgangService(repo, auth),
         ),
       ],
       child: MaterialApp(
