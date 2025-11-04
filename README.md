@@ -137,6 +137,8 @@ schriftlichen Einverständnis aller beteiligten Personen erlaubt:
 - Ahmad Kalaf  
 - Afrane Kwame Berquin  
 - Miriam Schwarz  
-- Aliena Glatzel  
+- Aliena Glatzel
+- Larissa Pychlau
+- Benedickt Löhn
 
 ➡️ Siehe [LICENSE](./LICENSE) für den vollständigen Lizenztext.
