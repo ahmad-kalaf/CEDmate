@@ -1,22 +1,79 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cedmate/models/stuhlgang.dart';
-import 'base_firestore_repository.dart';
 
 /// Repository für Stuhlgang-Einträge.
 ///
-/// Erbt von [BaseFirestoreRepository] und implementiert die
-/// Firestore-spezifischen Details (Collection-Pfad + Mapping).
-class StuhlgangRepository extends BaseFirestoreRepository<Stuhlgang> {
-  StuhlgangRepository({super.firestore});
+/// Enthält alle CRUD-Operationen direkt (kein generisches Baserepository mehr).
+///
+/// Verantwortlichkeiten:
+/// - Zugriff auf Firestore-Collection `users/{userId}/stuhlgaenge`
+/// - CRUD-Operationen (Create, Read, Update, Delete)
+/// - Mapping zwischen Firestore-Dokumenten und [Stuhlgang]-Objekten
+class StuhlgangRepository {
+  final FirebaseFirestore _firestore;
 
-  @override
-  CollectionReference<Map<String, dynamic>> collection(String userId) =>
-      firestore.collection('users').doc(userId).collection('stuhlgaenge');
+  StuhlgangRepository({FirebaseFirestore? firestore})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  @override
-  Stuhlgang fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
-      Stuhlgang.fromFirestore(doc);
+  /// Gibt die Collection der Stuhlgang-Einträge des Benutzers zurück.
+  CollectionReference<Map<String, dynamic>> _collection(String userId) =>
+      _firestore.collection('users').doc(userId).collection('stuhlgaenge');
 
-  @override
-  Map<String, dynamic> toMap(Stuhlgang stuhlgang) => stuhlgang.toMap();
+  /// Fügt einen neuen Stuhlgang-Eintrag hinzu und gibt die generierte ID zurück.
+  Future<String> add(String userId, Stuhlgang stuhlgang) async {
+    final docRef = await _collection(userId).add(stuhlgang.toMap());
+    return docRef.id;
+  }
+
+  /// Gibt einen Stream aller Stuhlgang-Einträge des Benutzers zurück,
+  /// sortiert nach Zeitpunkt (neueste zuerst).
+  Stream<List<Stuhlgang>> getAll(String userId) {
+    return _collection(userId)
+        .orderBy('eintragZeitpunkt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Stuhlgang.fromFirestore(doc)).toList(),
+        );
+  }
+
+  /// Gibt einen Stream aller Stuhlgang-Einträge des Benutzers zurück,
+  /// die in einem bestimmten Monat und Jahr liegen.
+  Stream<List<Stuhlgang>> getByMonthYear(String userId, int month, int year) {
+    assert(month >= 1 && month <= 12);
+    final start = DateTime(year, month, 1);
+    final end = (month == 12)
+        ? DateTime(year + 1, 1, 1)
+        : DateTime(year, month + 1, 1);
+
+    return _collection(userId)
+        .where(
+          'eintragZeitpunkt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(start),
+        )
+        .where('eintragZeitpunkt', isLessThan: Timestamp.fromDate(end))
+        .orderBy('eintragZeitpunkt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Stuhlgang.fromFirestore(doc)).toList(),
+        );
+  }
+
+  /// Holt einen bestimmten Stuhlgang-Eintrag anhand seiner Dokument-ID.
+  Future<Stuhlgang?> getById(String userId, String id) async {
+    final doc = await _collection(userId).doc(id).get();
+    if (!doc.exists) return null;
+    return Stuhlgang.fromFirestore(doc);
+  }
+
+  /// Aktualisiert einen vorhandenen Stuhlgang-Eintrag.
+  Future<void> update(String userId, String id, Stuhlgang stuhlgang) async {
+    await _collection(userId).doc(id).update(stuhlgang.toMap());
+  }
+
+  /// Löscht einen bestimmten Stuhlgang-Eintrag.
+  Future<void> delete(String userId, String id) async {
+    await _collection(userId).doc(id).delete();
+  }
 }

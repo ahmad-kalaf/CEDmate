@@ -52,6 +52,12 @@ class StuhlgangService {
     return _repo.getAll(_userId);
   }
 
+  /// Streamt alle Stuhlgang-Einträge des aktuell angemeldeten Nutzers
+  /// für einen bestimmten Monat und Jahr.
+  Stream<List<Stuhlgang>> ladeFuerMonatJahr(int monat, int jahr) {
+    return _repo.getByMonthYear(_userId, monat, jahr);
+  }
+
   /// Löscht einen Stuhlgang-Eintrag anhand seiner ID.
   Future<void> loescheStuhlgang(String id) async {
     await _repo.delete(_userId, id);
