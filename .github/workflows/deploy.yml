@@ -3,7 +3,7 @@ name: Deploy CEDmate Web to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - deploy
 
 permissions:
   contents: write
