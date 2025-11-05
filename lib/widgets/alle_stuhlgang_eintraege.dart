@@ -67,7 +67,10 @@ class _AlleStuhlgangEintraegeState extends State<AlleStuhlgangEintraege> {
           // Nur die Liste ist scrollbar
           Expanded(
             child: StreamBuilder<List<Stuhlgang>>(
-              stream: stuhlgangService.ladeAlle(),
+              stream: stuhlgangService.ladeFuerMonatJahr(
+                _filterDatum.month,
+                _filterDatum.year,
+              ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -81,11 +84,7 @@ class _AlleStuhlgangEintraegeState extends State<AlleStuhlgangEintraege> {
                   return const Center(child: Text('Keine Einträge gefunden.'));
                 }
 
-                // 🔍 Filter nach Monat & Jahr
-                final eintraege = snapshot.data!.where((s) {
-                  return s.eintragZeitpunkt.month == _filterDatum.month &&
-                      s.eintragZeitpunkt.year == _filterDatum.year;
-                }).toList();
+                final eintraege = snapshot.data!;
 
                 if (eintraege.isEmpty) {
                   return const Center(
