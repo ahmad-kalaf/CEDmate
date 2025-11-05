@@ -78,6 +78,9 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
       _selectedMonth = months.last;
     }
 
+    FocusNode _monatFocusNode = FocusNode();
+    FocusNode _jahrFocusNode = FocusNode();
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -85,6 +88,7 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
         DropdownButton<int>(
           value: _selectedMonth,
           underline: const SizedBox(),
+          focusNode: _monatFocusNode,
           items: months
               .map(
                 (m) => DropdownMenuItem(value: m, child: Text(_monate[m - 1])),
@@ -94,8 +98,7 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
             if (val != null) {
               setState(() => _selectedMonth = val);
               widget.onChanged?.call(DateTime(_selectedYear, _selectedMonth));
-              // 👇 Fokus entfernen, damit Dropdown „unfokussiert“ wird
-              FocusScope.of(context).unfocus();
+              _monatFocusNode.unfocus();
             }
           },
         ),
@@ -104,6 +107,7 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
         DropdownButton<int>(
           value: _selectedYear,
           underline: const SizedBox(),
+          focusNode: _jahrFocusNode,
           items: years
               .map((y) => DropdownMenuItem(value: y, child: Text(y.toString())))
               .toList(),
@@ -111,8 +115,7 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
             if (val != null) {
               setState(() => _selectedYear = val);
               widget.onChanged?.call(DateTime(_selectedYear, _selectedMonth));
-              // Fokus entfernen, damit Dropdown „unfokussiert“ wird
-              FocusScope.of(context).unfocus();
+              _jahrFocusNode.unfocus();
             }
           },
         ),
