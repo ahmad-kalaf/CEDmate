@@ -15,20 +15,6 @@ class AlleStuhlgangEintraege extends StatefulWidget {
 class _AlleStuhlgangEintraegeState extends State<AlleStuhlgangEintraege> {
   DateTime _filterDatum = DateTime.now();
 
-  void _resetFilter() {
-    setState(() {
-      _filterDatum = DateTime.now();
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Filter zurückgesetzt auf ${_filterDatum.month}.${_filterDatum.year}',
-        ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final stuhlgangService = context.read<StuhlgangService>();
@@ -47,16 +33,20 @@ class _AlleStuhlgangEintraegeState extends State<AlleStuhlgangEintraege> {
                 MonatJahrAuswahl(
                   firstDate: DateTime(DateTime.now().year - 100),
                   lastDate: DateTime.now(),
+                  showResetButton: true,
                   onChanged: (date) {
                     setState(() => _filterDatum = date);
                   },
-                ),
-                const SizedBox(width: 8),
-                // Reset-Button
-                IconButton(
-                  tooltip: 'Zurücksetzen',
-                  onPressed: _resetFilter,
-                  icon: const Icon(Icons.refresh),
+                  onReset: (date) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Filter zurückgesetzt auf ${date.month}.${date.year}',
+                        ),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
