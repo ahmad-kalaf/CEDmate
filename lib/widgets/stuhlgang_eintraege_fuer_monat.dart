@@ -1,26 +1,28 @@
-import 'package:cedmate/widgets/symptom_erfassen.dart';
+import 'package:cedmate/models/stuhlgang.dart';
+import 'package:cedmate/services/stuhlgang_service.dart';
+import 'package:cedmate/utils/monat_jahr_auswahl.dart';
+import 'package:cedmate/widgets/stuhlgang_notieren.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/symptom_service.dart';
-import '../models/symptom.dart';
-import '../utils/monat_jahr_auswahl.dart';
 
-class AlleSymptome extends StatefulWidget {
-  const AlleSymptome({super.key});
+class StuhlgangEintraegeFuerMonat extends StatefulWidget {
+  const StuhlgangEintraegeFuerMonat({super.key});
 
   @override
-  State<AlleSymptome> createState() => _AlleSymptomeState();
+  State<StuhlgangEintraegeFuerMonat> createState() =>
+      _StuhlgangEintraegeFuerMonatState();
 }
 
-class _AlleSymptomeState extends State<AlleSymptome> {
+class _StuhlgangEintraegeFuerMonatState
+    extends State<StuhlgangEintraegeFuerMonat> {
   DateTime _filterDatum = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
-    final symptomService = context.read<SymptomService>();
+    final stuhlgangService = context.read<StuhlgangService>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Alle Symptome')),
+      appBar: AppBar(title: const Text('Alle Stuhlgang-Einträge')),
       body: Column(
         children: [
           // Fester Filterbereich (nicht scrollbar)
@@ -56,8 +58,8 @@ class _AlleSymptomeState extends State<AlleSymptome> {
 
           // Nur die Liste ist scrollbar
           Expanded(
-            child: StreamBuilder<List<Symptom>>(
-              stream: symptomService.ladeFuerMonatJahr(
+            child: StreamBuilder<List<Stuhlgang>>(
+              stream: stuhlgangService.ladeFuerMonatJahr(
                 _filterDatum.month,
                 _filterDatum.year,
               ),
@@ -74,28 +76,32 @@ class _AlleSymptomeState extends State<AlleSymptome> {
                   return const Center(child: Text('Keine Einträge gefunden.'));
                 }
 
-                final symptome = snapshot.data!;
+                final eintraege = snapshot.data!;
 
-                if (symptome.isEmpty) {
+                if (eintraege.isEmpty) {
                   return const Center(
                     child: Text('Keine Einträge in diesem Monat.'),
                   );
                 }
 
                 return ListView.builder(
-                  itemCount: symptome.length,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemCount: eintraege.length,
                   itemBuilder: (context, index) {
-                    final s = symptome[index];
+                    final s = eintraege[index];
                     return Padding(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 4.0,
+                      ),
                       child: InkWell(
                         onTap: () async {
                           final bool? bearbeitenBestaetigt = await showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: Text('Symptom ${index + 1} bearbeiten'),
+                              title: Text('Eintrag ${index + 1} bearbeiten'),
                               content: const Text(
-                                'Möchtest du die Symptomdetails bearbeiten?',
+                                'Möchtest du die Eintragdetails bearbeiten?',
                               ),
                               actions: [
                                 TextButton(
@@ -115,25 +121,28 @@ class _AlleSymptomeState extends State<AlleSymptome> {
                             await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    SymptomErfassen(symptom: s),
+                                builder: (_) => StuhlgangNotieren(stuhlgang: s),
                               ),
                             );
                           }
                         },
                         child: Card(
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           child: ListTile(
-                            title: Text(s.bezeichnung),
+                            leading: Text('${index + 1})'),
+                            title: Text(s.konsistenz.name),
                             subtitle: Text(
-                              'Intensität: ${s.intensitaet} • Dauer: ${s.dauerInMinuten} Min',
+                              'Häufigkeit pro Tag: ${s.haeufigkeit}',
                             ),
                             trailing: Text(
-                              '${s.startZeit.day}.${s.startZeit.month}.${s.startZeit.year}'
-                              '\n'
-                              '${s.startZeit.hour}:${s.startZeit.minute} Uhr',
+                              '${s.eintragZeitpunkt.day}.${s.eintragZeitpunkt.month}.${s.eintragZeitpunkt.year}\n'
+                              '${s.eintragZeitpunkt.hour}:${s.eintragZeitpunkt.minute.toString().padLeft(2, '0')} Uhr',
+                              textAlign: TextAlign.right,
                               style: const TextStyle(color: Colors.grey),
                             ),
-                            leading: Text('${index + 1})'),
                           ),
                         ),
                       ),
