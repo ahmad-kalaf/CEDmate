@@ -16,16 +16,6 @@ class StuhlgangService {
 
   StuhlgangService(this._repo, this._auth);
 
-  /// Gibt die aktuelle User-ID zurück oder wirft einen Fehler,
-  /// wenn kein Benutzer angemeldet ist.
-  String get _userId {
-    final uid = _auth.currentUserId;
-    if (uid == null) {
-      throw StateError('Kein Benutzer angemeldet.');
-    }
-    return uid;
-  }
-
   /// Erstellt einen neuen Stuhlgang-Eintrag (mit Validierung).
   Future<void> erfasseStuhlgang({
     required BristolStuhlform konsistenz,
@@ -44,23 +34,23 @@ class StuhlgangService {
       notizen: notizen?.trim(),
     );
 
-    await _repo.add(_userId, eintrag);
+    await _repo.add(_auth.currentUserId, eintrag);
   }
 
   /// Streamt alle Stuhlgang-Einträge des aktuell angemeldeten Nutzers.
   Stream<List<Stuhlgang>> ladeAlle() {
-    return _repo.getAll(_userId);
+    return _repo.getAll(_auth.currentUserId);
   }
 
   /// Streamt alle Stuhlgang-Einträge des aktuell angemeldeten Nutzers
   /// für einen bestimmten Monat und Jahr.
   Stream<List<Stuhlgang>> ladeFuerMonatJahr(int monat, int jahr) {
-    return _repo.getByMonthYear(_userId, monat, jahr);
+    return _repo.getByMonthYear(_auth.currentUserId, monat, jahr);
   }
 
   /// Löscht einen Stuhlgang-Eintrag anhand seiner ID.
   Future<void> loescheStuhlgang(String id) async {
-    await _repo.delete(_userId, id);
+    await _repo.delete(_auth.currentUserId, id);
   }
 
   /// Aktualisiert einen bestehenden Stuhlgang-Eintrag (nach Validierung).
@@ -72,7 +62,7 @@ class StuhlgangService {
       throw ArgumentError('Häufigkeit muss größer als 0 sein.');
     }
 
-    await _repo.update(_userId, eintrag.id!, eintrag);
+    await _repo.update(_auth.currentUserId, eintrag.id!, eintrag);
   }
 
   /// Gibt nur Einträge der letzten [tage] Tage zurück (lokaler Filter).

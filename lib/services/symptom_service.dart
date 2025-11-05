@@ -30,6 +30,12 @@ class SymptomService {
     return _repository.getSymptom(userId, symptomId);
   }
 
+  /// Streamt alle Stuhlgang-Einträge des aktuell angemeldeten Nutzers
+  /// für einen bestimmten Monat und Jahr.
+  Stream<List<Symptom>> ladeFuerMonatJahr(int monat, int jahr) {
+    return _repository.getByMonthYear(_auth.currentUserId, monat, jahr);
+  }
+
   /// Symptom aktualisieren
   Future<void> updateSymptom(Symptom symptom) async {
     _validateSymptom(symptom);
