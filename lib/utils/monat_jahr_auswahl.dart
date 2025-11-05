@@ -6,12 +6,24 @@ class MonatJahrAuswahl extends StatefulWidget {
   final void Function(DateTime)? onChanged;
   final DateTime firstDate;
   final DateTime lastDate;
+  final DateTime? initialDate;
+  final DateTime? resetDate;
+  final void Function(DateTime)? onReset;
+  final bool showResetButton;
+  final String resetTooltip;
+  final IconData resetIcon;
 
   MonatJahrAuswahl({
     super.key,
     this.onChanged,
     DateTime? firstDate,
     DateTime? lastDate,
+    this.initialDate,
+    this.resetDate,
+    this.onReset,
+    this.showResetButton = false,
+    this.resetTooltip = 'Zurücksetzen',
+    this.resetIcon = Icons.refresh,
   }) : firstDate = firstDate ?? DateTime(2015, 1),
        lastDate = lastDate ?? DateTime.now();
 
@@ -22,6 +34,8 @@ class MonatJahrAuswahl extends StatefulWidget {
 class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
   late int _selectedMonth;
   late int _selectedYear;
+  late final FocusNode _monatFocusNode;
+  late final FocusNode _jahrFocusNode;
 
   final List<String> _monate = const [
     'Jan',
@@ -44,6 +58,47 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
     final now = DateTime.now();
     _selectedMonth = now.month;
     _selectedYear = now.year;
+    final initialDate = _clampDate(widget.initialDate ?? DateTime.now());
+    _selectedMonth = initialDate.month;
+    _selectedYear = initialDate.year;
+    _monatFocusNode = FocusNode();
+    _jahrFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _monatFocusNode.dispose();
+    _jahrFocusNode.dispose();
+    super.dispose();
+  }
+
+  DateTime _clampDate(DateTime date) {
+    var clamped = date;
+    if (clamped.isBefore(widget.firstDate)) {
+      clamped = widget.firstDate;
+    }
+    if (clamped.isAfter(widget.lastDate)) {
+      clamped = widget.lastDate;
+    }
+    return DateTime(clamped.year, clamped.month);
+  }
+
+  DateTime _currentSelection() => DateTime(_selectedYear, _selectedMonth);
+
+  void _notifyChange() {
+    widget.onChanged?.call(_currentSelection());
+  }
+
+  void _resetSelection() {
+    final target = _clampDate(widget.resetDate ?? DateTime.now());
+    setState(() {
+      _selectedMonth = target.month;
+      _selectedYear = target.year;
+    });
+    _monatFocusNode.unfocus();
+    _jahrFocusNode.unfocus();
+    _notifyChange();
+    widget.onReset?.call(_currentSelection());
   }
 
   @override
@@ -98,6 +153,7 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
             if (val != null) {
               setState(() => _selectedMonth = val);
               widget.onChanged?.call(DateTime(_selectedYear, _selectedMonth));
+              _notifyChange();
               _monatFocusNode.unfocus();
             }
           },
@@ -115,10 +171,19 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
             if (val != null) {
               setState(() => _selectedYear = val);
               widget.onChanged?.call(DateTime(_selectedYear, _selectedMonth));
+              _notifyChange();
               _jahrFocusNode.unfocus();
             }
           },
         ),
+        if (widget.showResetButton) ...[
+          const SizedBox(width: 8),
+          IconButton(
+            tooltip: widget.resetTooltip,
+            onPressed: _resetSelection,
+            icon: Icon(widget.resetIcon),
+          ),
+        ],
       ],
     );
   }
