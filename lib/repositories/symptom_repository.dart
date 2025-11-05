@@ -48,6 +48,22 @@ class SymptomRepository {
         );
   }
 
+  /// Gibt einen Stream aller Stuhlgang-Einträge des Benutzers zurück,
+  /// die an einem bestimmten Datum liegen.
+  Stream<List<Symptom>> getByDate(String userId, DateTime date) {
+    final start = DateTime(date.year, date.month, date.day);
+    final end = start.add(const Duration(days: 1));
+    return _collection(userId)
+        .where('startZeit', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+        .where('startZeit', isLessThan: Timestamp.fromDate(end))
+        .orderBy('startZeit', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Symptom.fromFirestore(doc)).toList(),
+        );
+  }
+
   /// Einzelnes Symptom abrufen
   Future<Symptom> getSymptom(String userId, String symptomId) async {
     final doc = await _collection(userId).doc(symptomId).get();
