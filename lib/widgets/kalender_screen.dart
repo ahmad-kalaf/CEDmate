@@ -1,4 +1,5 @@
 import 'package:cedmate/widgets/datum_rad.dart';
+import 'package:cedmate/widgets/symptome_fuer_datum.dart';
 import 'package:flutter/material.dart';
 
 class KalenderScreen extends StatefulWidget {
@@ -59,76 +60,82 @@ class _KalenderScreenState extends State<KalenderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Kalender')),
-      body: SingleChildScrollView(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 600),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          // Monat/Jahr-Auswahl
-                          ElevatedButton.icon(
-                            onPressed: () => _pickDate(context),
-                            label: Text(
-                              _ausgewaehtesMonatJahr != null
-                                  ? "${_ausgewaehtesMonatJahr!.month.toString().padLeft(2, '0')}.${_ausgewaehtesMonatJahr!.year}"
-                                  : "Monat wählen",
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(40, 40),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                              ),
-                            ),
-                            icon: const Icon(Icons.calendar_today),
-                          ),
+      appBar: AppBar(
+        title: const Text('Kalender'),
+        actions: [
+          // Monat/Jahr-Auswahl
+          ElevatedButton.icon(
+            onPressed: () => _pickDate(context),
+            label: Text(
+              _ausgewaehtesMonatJahr != null
+                  ? "${_ausgewaehtesMonatJahr!.month.toString().padLeft(2, '0')}.${_ausgewaehtesMonatJahr!.year}"
+                  : "Monat wählen",
+            ),
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(40, 40),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+            ),
+            icon: const Icon(Icons.calendar_today),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              children: [
+                // DatumRad: auch Zustand mit dem ausgewählten Datum aktualisieren
+                DatumRad(
+                  key: ValueKey(
+                    '${_ausgewaehtesMonatJahr!.year}-${_ausgewaehtesMonatJahr!.month}-${_ausgewaehtesMonatJahr!.day}',
+                  ),
+                  year: _ausgewaehtesMonatJahr!.year,
+                  month: _ausgewaehtesMonatJahr!.month,
+                  initialDay: _ausgewaehtesMonatJahr!.day,
+                  onDateSelected: (date) {
+                    setState(() {
+                      // komplettes Datum merken (Tag/Monat/Jahr)
+                      _ausgewaehtesMonatJahr = date;
+                      _datumAuswahlController.text =
+                          '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+                    });
+                  },
+                ),
 
-                          const SizedBox(width: 8),
-                        ],
+                /// aktuelen Datum anzeigen
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Ein Dropdown für Auswahl zwischen Symptomen, Stuhlgang, Mahlzeit-Einträge und Stimmungs-Einträge
+                    const Icon(Icons.menu),
+                    const SizedBox(width: 10),
+                    // Label für aktuelles ausgewähltes Datum
+                    Flexible(
+                      child: Text(
+                        _datumAuswahlController.text.isNotEmpty
+                            ? 'Ausgewählt: ${_datumAuswahlController.text}'
+                            : 'Kein Datum ausgewählt',
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
-                  DatumRad(
-                    key: ValueKey(
-                      '${_ausgewaehtesMonatJahr!.year}-${_ausgewaehtesMonatJahr!.month}',
                     ),
-                    year: _ausgewaehtesMonatJahr!.year,
-                    month: _ausgewaehtesMonatJahr!.month,
-                    initialDay: _ausgewaehtesMonatJahr!.day,
-                    onDateSelected: (date) {
-                      setState(() {
-                        _datumAuswahlController.text =
-                            '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
-                      });
-                    },
-                  ),
-
-                  /// aktuelen Datum anzeigen
-                  const SizedBox(height: 20),
-                  Text(
-                    _datumAuswahlController.text.isNotEmpty
-                        ? 'Ausgewähltes Datum: ${_datumAuswahlController.text}'
-                        : 'Kein Datum ausgewählt',
-                  ),
-                  const SizedBox(height: 20),
-                  //hinweis dass noch entwickelt wird
-                  Text(
-                    'Diese Funktion wird noch entwickelt.\n'
-                    'Hier kann man später ein Datum auswählen und die erfassten'
-                    ' medizinischen Daten zu dem ausgewählten Datum sehen.',
-                  ),
-                ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: SymptomeFuerDatum(
+              filterDatum: DateTime(
+                _ausgewaehtesMonatJahr!.year,
+                _ausgewaehtesMonatJahr!.month,
+                _ausgewaehtesMonatJahr!.day,
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

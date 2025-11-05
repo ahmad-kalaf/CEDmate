@@ -85,8 +85,10 @@ class _DatumRadState extends State<DatumRad> {
 
   @override
   Widget build(BuildContext context) {
+    int _visibleIndex = _currentIndex; // Sichtbarer Index getrennt verwalten
+
     return SizedBox(
-      height: 100,
+      height: 70,
       child: ScrollConfiguration(
         behavior: ScrollConfiguration.of(context).copyWith(
           dragDevices: {
@@ -99,12 +101,13 @@ class _DatumRadState extends State<DatumRad> {
           controller: _controller,
           itemCount: _dates.length,
           onPageChanged: (index) {
-            setState(() => _currentIndex = index);
-            widget.onDateSelected?.call(_dates[index]);
+            // Nur merken, welcher Tag sichtbar ist, aber nichts auswählen
+            _visibleIndex = index;
           },
           itemBuilder: (context, index) {
             final date = _dates[index];
-            final isSelected = index == _currentIndex;
+            final isSelected =
+                index == _currentIndex; // Nur wenn wirklich getappt
             final isToday =
                 date.day == DateTime.now().day &&
                 date.month == DateTime.now().month &&
@@ -112,23 +115,22 @@ class _DatumRadState extends State<DatumRad> {
 
             return GestureDetector(
               onTap: () {
-                /// wenn auf ein datum geklickt wird, dieses auswählen und dahin scrollen
+                setState(() => _currentIndex = index); // Markiere als gewählt
+                widget.onDateSelected?.call(_dates[index]);
                 _controller.animateToPage(
                   index,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 );
-                setState(() => _currentIndex = index);
-                widget.onDateSelected?.call(_dates[index]);
               },
               child: AnimatedOpacity(
-                opacity: isSelected ? 1.0 : 0.5,
-                duration: const Duration(milliseconds: 300),
+                opacity: isSelected ? 1.0 : 0.6,
+                duration: const Duration(milliseconds: 200),
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
+                  duration: const Duration(milliseconds: 200),
                   margin: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 12,
+                    horizontal: 4,
+                    vertical: 6,
                   ),
                   decoration: BoxDecoration(
                     color: isToday
@@ -136,12 +138,12 @@ class _DatumRadState extends State<DatumRad> {
                         : isSelected
                         ? Colors.blue[100]
                         : Colors.grey[200],
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: Colors.blue,
-                              blurRadius: 8,
+                              color: Colors.blue.withOpacity(0.4),
+                              blurRadius: 6,
                               spreadRadius: 1,
                             ),
                           ]
@@ -163,15 +165,16 @@ class _DatumRadState extends State<DatumRad> {
                           ][date.weekday - 1],
                           style: TextStyle(
                             color: isToday ? Colors.white : Colors.black54,
-                            fontSize: 14,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           '${date.day}.${date.month}',
                           style: TextStyle(
                             color: isToday ? Colors.white : Colors.black,
-                            fontSize: isSelected ? 22 : 18,
+                            fontSize: isSelected ? 16 : 14,
                             fontWeight: isSelected
                                 ? FontWeight.bold
                                 : FontWeight.normal,
