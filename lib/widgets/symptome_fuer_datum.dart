@@ -89,11 +89,17 @@ class _SymptomeFuerDatumState extends State<SymptomeFuerDatum> {
                           '${s.startZeit.day}.${s.startZeit.month}.${s.startZeit.year}'
                           ' $uhrSymbol '
                           '${s.startZeit.hour}:${s.startZeit.minute} Uhr',
-                          style: const TextStyle(color: Colors.black),
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                          ),
                         ),
                         Text(
                           'Dauer: ${s.dauerInMinuten} Min',
-                          style: const TextStyle(color: Colors.grey),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10,
+                          ),
                         ),
                         ListTile(
                           title: Text(s.bezeichnung),
@@ -103,15 +109,14 @@ class _SymptomeFuerDatumState extends State<SymptomeFuerDatum> {
                         if (s.notizen != null && s.notizen!.isNotEmpty) ...[
                           Divider(thickness: 1),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: Text(
-                              'Notiz: ${s.notizen}',
-                              maxLines: 3,
+                              'Notizen: ${s.notizen}',
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          SizedBox(height: 10),
                         ],
                       ],
                     ),
