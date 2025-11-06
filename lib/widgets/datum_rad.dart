@@ -30,7 +30,6 @@ class _DatumRadState extends State<DatumRad> {
   void initState() {
     super.initState();
 
-    final firstDay = DateTime(widget.year, widget.month, 1);
     final nextMonth = DateTime(widget.year, widget.month + 1, 1);
     final lastDay = nextMonth.subtract(const Duration(days: 1));
 
@@ -85,7 +84,7 @@ class _DatumRadState extends State<DatumRad> {
 
   @override
   Widget build(BuildContext context) {
-    int _visibleIndex = _currentIndex; // Sichtbarer Index getrennt verwalten
+    int visibleIndex = _currentIndex; // Sichtbarer Index getrennt verwalten
 
     return SizedBox(
       height: 70,
@@ -102,7 +101,7 @@ class _DatumRadState extends State<DatumRad> {
           itemCount: _dates.length,
           onPageChanged: (index) {
             // Nur merken, welcher Tag sichtbar ist, aber nichts auswählen
-            _visibleIndex = index;
+            visibleIndex = index;
           },
           itemBuilder: (context, index) {
             final date = _dates[index];
@@ -112,7 +111,6 @@ class _DatumRadState extends State<DatumRad> {
                 date.day == DateTime.now().day &&
                 date.month == DateTime.now().month &&
                 date.year == DateTime.now().year;
-
             return GestureDetector(
               onTap: () {
                 setState(() => _currentIndex = index); // Markiere als gewählt
@@ -133,10 +131,10 @@ class _DatumRadState extends State<DatumRad> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: isToday
+                    color: isSelected
+                        ? Colors.amberAccent
+                        : isToday
                         ? Colors.blueAccent
-                        : isSelected
-                        ? Colors.blue[100]
                         : Colors.grey[200],
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: isSelected

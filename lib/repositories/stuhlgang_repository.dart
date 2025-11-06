@@ -60,6 +60,26 @@ class StuhlgangRepository {
         );
   }
 
+  /// Gibt einen Stream aller Stuhlgang-Einträge des Benutzers zurück,
+  /// die an einem bestimmten Datum liegen.
+  Stream<List<Stuhlgang>> getByDate(String userId, DateTime date) {
+    final start = DateTime(date.year, date.month, date.day);
+    final end = start.add(const Duration(days: 1));
+
+    return _collection(userId)
+        .where(
+          'eintragZeitpunkt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(start),
+        )
+        .where('eintragZeitpunkt', isLessThan: Timestamp.fromDate(end))
+        .orderBy('eintragZeitpunkt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Stuhlgang.fromFirestore(doc)).toList(),
+        );
+  }
+
   /// Holt einen bestimmten Stuhlgang-Eintrag anhand seiner Dokument-ID.
   Future<Stuhlgang?> getById(String userId, String id) async {
     final doc = await _collection(userId).doc(id).get();
