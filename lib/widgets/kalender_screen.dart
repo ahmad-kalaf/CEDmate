@@ -1,4 +1,5 @@
 import 'package:cedmate/widgets/datum_rad.dart';
+import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_datum.dart';
 import 'package:cedmate/widgets/symptome_fuer_datum.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,9 @@ class KalenderScreen extends StatefulWidget {
 class _KalenderScreenState extends State<KalenderScreen> {
   final TextEditingController _datumAuswahlController = TextEditingController();
   DateTime? _ausgewaehtesMonatJahr;
+
+  // 0 -> Symptome, 1 -> Stuhlgang, 2 -> Mahlzeiten, 3 -> Stimmung
+  int _ausgewaehlteSeite = 0;
 
   @override
   void initState() {
@@ -67,76 +71,101 @@ class _KalenderScreenState extends State<KalenderScreen> {
           ElevatedButton.icon(
             onPressed: () => _pickDate(context),
             label: Text(
+              // format tt.mm.jjjj
               _ausgewaehtesMonatJahr != null
-                  ? "${_ausgewaehtesMonatJahr!.month.toString().padLeft(2, '0')}.${_ausgewaehtesMonatJahr!.year}"
+                  ? "${_ausgewaehtesMonatJahr!.day.toString().padLeft(2, '0')}.${_ausgewaehtesMonatJahr!.month.toString().padLeft(2, '0')}.${_ausgewaehtesMonatJahr!.year}"
                   : "Monat wählen",
+              style: TextStyle(fontSize: 12),
             ),
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(40, 40),
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-            ),
-            icon: const Icon(Icons.calendar_today),
+            icon: const Icon(Icons.calendar_today, size: 12),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              children: [
-                // DatumRad: auch Zustand mit dem ausgewählten Datum aktualisieren
-                DatumRad(
-                  key: ValueKey(
-                    '${_ausgewaehtesMonatJahr!.year}-${_ausgewaehtesMonatJahr!.month}-${_ausgewaehtesMonatJahr!.day}',
+      // 👇 nur einmal "body:"
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Column(
+            children: [
+              // Oberer Bereich (Datum + Buttons)
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: constraints.maxHeight * 0.35,
+                ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 6,
                   ),
-                  year: _ausgewaehtesMonatJahr!.year,
-                  month: _ausgewaehtesMonatJahr!.month,
-                  initialDay: _ausgewaehtesMonatJahr!.day,
-                  onDateSelected: (date) {
-                    setState(() {
-                      // komplettes Datum merken (Tag/Monat/Jahr)
-                      _ausgewaehtesMonatJahr = date;
-                      _datumAuswahlController.text =
-                          '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
-                    });
-                  },
-                ),
-
-                /// aktuelen Datum anzeigen
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Ein Dropdown für Auswahl zwischen Symptomen, Stuhlgang, Mahlzeit-Einträge und Stimmungs-Einträge
-                    const Icon(Icons.menu),
-                    const SizedBox(width: 10),
-                    // Label für aktuelles ausgewähltes Datum
-                    Flexible(
-                      child: Text(
-                        _datumAuswahlController.text.isNotEmpty
-                            ? 'Ausgewählt: ${_datumAuswahlController.text}'
-                            : 'Kein Datum ausgewählt',
-                        overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DatumRad(
+                        key: ValueKey(
+                          '${_ausgewaehtesMonatJahr!.year}-${_ausgewaehtesMonatJahr!.month}-${_ausgewaehtesMonatJahr!.day}',
+                        ),
+                        year: _ausgewaehtesMonatJahr!.year,
+                        month: _ausgewaehtesMonatJahr!.month,
+                        initialDay: _ausgewaehtesMonatJahr!.day,
+                        onDateSelected: (date) {
+                          setState(() {
+                            _ausgewaehtesMonatJahr = date;
+                            _datumAuswahlController.text =
+                                '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+                          });
+                        },
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 10),
+
+                      // Buttons: umbrechend, mit Abständen
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 10,
+                        runSpacing: 6,
+                        children: [
+                          _buildButton('Symptome', 0),
+                          _buildButton('Stuhlgang', 1),
+                          _buildButton('Mahlzeiten', 2),
+                          _buildButton('Stimmung', 3),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          Expanded(
-            child: SymptomeFuerDatum(
-              filterDatum: DateTime(
-                _ausgewaehtesMonatJahr!.year,
-                _ausgewaehtesMonatJahr!.month,
-                _ausgewaehtesMonatJahr!.day,
               ),
-            ),
-          ),
-        ],
+
+              const Divider(height: 1),
+
+              // Unterer Bereich: füllt den Rest
+              Expanded(
+                child: switch (_ausgewaehlteSeite) {
+                  0 => SymptomeFuerDatum(filterDatum: _ausgewaehtesMonatJahr!),
+                  1 => StuhlgangEintraegeFuerDatum(
+                    filterDatum: _ausgewaehtesMonatJahr!,
+                  ),
+                  _ => const Center(
+                    child: Text(
+                      'Keine Einträge für diese Seite implementiert.',
+                    ),
+                  ),
+                },
+              ),
+            ],
+          );
+        },
       ),
+    );
+  }
+
+  // 👉 muss außerhalb von build stehen
+  Widget _buildButton(String label, int index) {
+    return TextButton(
+      onPressed: () => setState(() => _ausgewaehlteSeite = index),
+      style: ButtonStyle(
+        backgroundColor: WidgetStatePropertyAll(
+          _ausgewaehlteSeite == index ? Colors.amberAccent : Colors.transparent,
+        ),
+      ),
+      child: Text(label),
     );
   }
 }
