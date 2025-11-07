@@ -69,13 +69,11 @@ Erfasse deine Stuhlkonsistenz objektiv.
 
 ### 🟡 3. EssGefühl (Ernährungstagebuch)
 
-Verknüpfe Mahlzeiten mit Symptomen und erkenne Auslöser.  
+Mahlzeiten eintragen.  
 **Funktionen:**
 
 - Mahlzeiten-Logging mit Zutaten & Freitext
 - Markierung von Unverträglichkeiten (z. B. Laktose, Gluten)
-- Analyse: Symptome 2–4 h nach dem Essen
-- Alert-Funktion: Warnung bei bekannten Auslösern
 
 📌 **Ziel:** Ernährung und Wohlbefinden gezielt in Einklang bringen.
 
