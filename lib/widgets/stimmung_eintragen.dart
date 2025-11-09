@@ -1,54 +1,32 @@
 import 'package:cedmate/models/enums/stimmung_level.dart';
-import 'package:cedmate/services/stimmung_service.dart';
 import 'package:cedmate/utils/build_list_section.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import '../models/stimmung.dart';
 
-class StimmungNotieren extends StatefulWidget {
+class StimmungEintragen extends StatefulWidget {
   final Stimmung? stimmung;
 
-  const StimmungNotieren({super.key, this.stimmung});
+  const StimmungEintragen({super.key, this.stimmung});
 
   @override
-  State<StimmungNotieren> createState() => _StimmungNotierenState();
+  State<StimmungEintragen> createState() => _StimmungEintragenState();
 }
 
-class _StimmungNotierenState extends State<StimmungNotieren> {
+class _StimmungEintragenState extends State<StimmungEintragen> {
   final _formKey = GlobalKey<FormState>();
-  late StimmungLevel _stimmungLevel;
+  StimmungLevel _stimmungLevel = StimmungLevel.neutral;
   final _stresslevelController = TextEditingController();
   final _notizController = TextEditingController();
   final _tagsController = TextEditingController();
 
   final List<String> _tags = [];
+
   bool _isSaving = false;
 
   bool get isEditMode => widget.stimmung != null;
 
-  @override
-  void initState() {
-    super.initState();
-    // Falls wir bearbeiten, vorhandene Werte übernehmen
-    if (isEditMode) {
-      final s = widget.stimmung!;
-      _stimmungLevel = s.level;
-      _stresslevelController.text = s.stresslevel.toString() ?? '';
-      _notizController.text = s.notiz ?? '';
-      _tags.addAll(s.tags ?? []);
-    } else {
-      _stimmungLevel = StimmungLevel.neutral;
-    }
-  }
-
-  @override
-  void dispose() {
-    _stresslevelController.dispose();
-    _notizController.dispose();
-    _tagsController.dispose();
-    super.dispose();
-  }
-
+  /// Allgemeine Hilfsfunktion zum Hinzufügen eines Eintrags zu einer Liste
   void _addTag(TextEditingController controller, List<String> list) {
     final text = controller.text.trim();
     if (text.isNotEmpty && !list.contains(text)) {
@@ -59,53 +37,9 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
     }
   }
 
+  /// Entfernt ein Element aus einer Liste
   void _removeTag(List<String> list, String value) {
     setState(() => list.remove(value));
-  }
-
-  Future<void> _speichereEintrag() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isSaving = true);
-
-    // eintrag speichern
-    final stimmung = Stimmung(
-      id: widget.stimmung?.id,
-      level: _stimmungLevel,
-      stresslevel: int.parse(_stresslevelController.text),
-      notiz: _notizController.text.trim().isEmpty
-          ? null
-          : _notizController.text.trim(),
-      tags: _tags.isEmpty ? null : List.from(_tags),
-      stimmungsZeitpunkt: widget.stimmung?.stimmungsZeitpunkt ?? DateTime.now(),
-    );
-
-    final stimmungService = context.read<StimmungService>();
-    try {
-      if (isEditMode) {
-        await stimmungService.aktualisiereStimmung(stimmung);
-      } else {
-        await stimmungService.erfasseStimmung(stimmung);
-      }
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isEditMode ? 'Eintrag aktualisiert' : 'Eintrag gespeichert',
-          ),
-        ),
-      );
-      if (mounted) Navigator.pop(context);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Fehler: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _isSaving = false);
-    }
   }
 
   @override
@@ -117,7 +51,7 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
           final bool? verlassenBestaetigt = await showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Seite verlassen?'),
+              title: const Text('Symptom bearbeiten'),
               content: const Text(
                 'Wenn du die Seite verlässt, werden deine Eingaben NICHT gespeichert!',
               ),
@@ -147,18 +81,12 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
               child: Form(
-                key: _formKey,
                 child: Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      DropdownButtonFormField<StimmungLevel>(
-                        initialValue: _stimmungLevel,
-                        decoration: const InputDecoration(
-                          labelText: 'Stimmung',
-                          border: OutlineInputBorder(),
-                        ),
+                      DropdownButton(
                         items: StimmungLevel.values.map((level) {
                           return DropdownMenuItem(
                             value: level,
@@ -166,19 +94,14 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
                           );
                         }).toList(),
                         onChanged: (value) {
-                          if (value != null) {
-                            setState(() => _stimmungLevel = value);
-                          }
+                          setState(() {});
                         },
                       ),
-                      const SizedBox(height: 12),
                       TextFormField(
                         controller: _stresslevelController,
                         decoration: const InputDecoration(
-                          labelText: 'Stresslevel (1–10)',
-                          border: OutlineInputBorder(),
+                          labelText: 'Intensität (1–10)',
                         ),
-                        keyboardType: TextInputType.number,
                         validator: (v) {
                           final i = int.tryParse(v ?? '');
                           if (i == null || i < 1 || i > 10) {
@@ -187,16 +110,13 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 12),
                       TextFormField(
                         controller: _notizController,
                         decoration: const InputDecoration(
                           labelText: 'Notizen (optional)',
-                          border: OutlineInputBorder(),
                         ),
                         maxLines: 3,
                       ),
-                      const SizedBox(height: 12),
                       buildListSection(
                         title: 'Tags (optional)',
                         context: context,
@@ -204,16 +124,6 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
                         items: _tags,
                         onAdd: () => _addTag(_tagsController, _tags),
                         onRemove: (val) => _removeTag(_tags, val),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: _isSaving ? null : _speichereEintrag,
-                        icon: const Icon(Icons.save),
-                        label: Text(
-                          isEditMode
-                              ? 'Änderungen speichern'
-                              : 'Eintrag speichern',
-                        ),
                       ),
                     ],
                   ),

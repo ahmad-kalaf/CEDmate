@@ -1,8 +1,12 @@
 import 'package:cedmate/models/app_user.dart';
 import 'package:cedmate/repositories/anamnese_repository.dart';
+import 'package:cedmate/repositories/mahlzeit_repository.dart';
+import 'package:cedmate/repositories/stimmung_repository.dart';
 import 'package:cedmate/repositories/stuhlgang_repository.dart';
 import 'package:cedmate/repositories/symptom_repository.dart';
 import 'package:cedmate/services/anamnese_service.dart';
+import 'package:cedmate/services/mahlzeit_service.dart';
+import 'package:cedmate/services/stimmung_service.dart';
 import 'package:cedmate/services/stuhlgang_service.dart';
 import 'package:cedmate/services/symptom_service.dart';
 import 'package:flutter/material.dart';
@@ -56,6 +60,14 @@ class CEDmateApp extends StatelessWidget {
         Provider<StuhlgangRepository>(create: (_) => StuhlgangRepository()),
         ProxyProvider2<StuhlgangRepository, AuthService, StuhlgangService>(
           update: (_, repo, auth, __) => StuhlgangService(repo, auth),
+        ),
+        Provider<StimmungRepository>(create: (_) => StimmungRepository()),
+        ProxyProvider2<StimmungRepository, AuthService, StimmungService>(
+          update: (_, repo, auth, __) => StimmungService(repo, auth),
+        ),
+        Provider<MahlzeitRepository>(create: (_) => MahlzeitRepository()),
+        ProxyProvider2<MahlzeitRepository, AuthService, MahlzeitService>(
+          update: (_, repo, auth, __) => MahlzeitService(repo, auth),
         ),
       ],
       child: MaterialApp(

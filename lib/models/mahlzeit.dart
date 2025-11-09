@@ -11,16 +11,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Mahlzeit {
   final String? id;
   final String bezeichnung;
-  final List<String> zutaten;
-  final String? notizen;
+  final List<String>? zutaten;
+  final String? notiz;
   final List<String>? unvertraeglichkeiten;
   final DateTime mahlzeitZeitpunkt;
 
   Mahlzeit({
     this.id,
     required this.bezeichnung,
-    required this.zutaten,
-    this.notizen,
+    this.zutaten,
+    this.notiz,
     this.unvertraeglichkeiten,
     DateTime? mahlzeitZeitpunkt,
   }) : mahlzeitZeitpunkt = mahlzeitZeitpunkt ?? DateTime.now();
@@ -42,8 +42,8 @@ class Mahlzeit {
     return Mahlzeit(
       id: doc.id,
       bezeichnung: (data['bezeichnung'] as String?) ?? '',
-      zutaten: toStringList(data['zutaten']),
-      notizen: _bereinigeOptionalenString(data['notizen']),
+      zutaten: (data['zutaten'] != null) ? toStringList(data['zutaten']) : null,
+      notiz: _bereinigeOptionalenString(data['notizen']),
       unvertraeglichkeiten: (data['unvertraeglichkeiten'] != null)
           ? toStringList(data['unvertraeglichkeiten'])
           : null,
@@ -55,13 +55,19 @@ class Mahlzeit {
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{
       'bezeichnung': bezeichnung,
-      'zutaten': zutaten,
       'mahlzeitZeitpunkt': Timestamp.fromDate(mahlzeitZeitpunkt),
     };
-    if (_istNichtLeer(notizen)) map['notizen'] = notizen;
+
+    if (zutaten != null && zutaten!.isNotEmpty) {
+      map['zutaten'] = zutaten;
+    }
+    if (_istNichtLeer(notiz)) {
+      map['notizen'] = notiz;
+    }
     if (unvertraeglichkeiten != null && unvertraeglichkeiten!.isNotEmpty) {
       map['unvertraeglichkeiten'] = unvertraeglichkeiten;
     }
+
     return map;
   }
 
@@ -99,7 +105,7 @@ class Mahlzeit {
       id: id ?? this.id,
       bezeichnung: bezeichnung ?? this.bezeichnung,
       zutaten: zutaten ?? this.zutaten,
-      notizen: notizen ?? this.notizen,
+      notiz: notizen ?? this.notiz,
       unvertraeglichkeiten: unvertraeglichkeiten ?? this.unvertraeglichkeiten,
       mahlzeitZeitpunkt: mahlzeitZeitpunkt ?? this.mahlzeitZeitpunkt,
     );
