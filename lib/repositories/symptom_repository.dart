@@ -82,4 +82,17 @@ class SymptomRepository {
   Future<void> deleteSymptom(String userId, String symptomId) async {
     await _collection(userId).doc(symptomId).delete();
   }
+
+  /// Anzahl der Symptome für einen Benutzer an einem bestimmten Datum zählen
+  Future<int> zaehleSymptomeFuerDatum(String userId, DateTime date) async {
+    final start = DateTime(date.year, date.month, date.day);
+    final ende = DateTime(date.year, date.month, date.day + 1);
+
+    final snapshot = await _collection(userId)
+        .where('startZeit', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+        .where('startZeit', isLessThan: Timestamp.fromDate(ende))
+        .get();
+
+    return snapshot.size;
+  }
 }

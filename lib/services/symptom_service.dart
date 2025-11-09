@@ -70,4 +70,10 @@ class SymptomService {
       throw ArgumentError('Startzeit darf nicht in der Zukunft liegen.');
     }
   }
+
+  /// Anzahl der Symptome für einen Benutzer an einem bestimmten Datum zählen
+  Future<int> zaehleFuerDatum(DateTime date) async {
+    final userId = _auth.currentUserId;
+    return _repository.zaehleSymptomeFuerDatum(userId, date);
+  }
 }
