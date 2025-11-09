@@ -85,7 +85,7 @@ class CEDmateApp extends StatelessWidget {
           '/': (_) => const AuthGate(), // entscheidet: Login oder Home?
           '/home': (_) => const HomeScreen(), // private Startseite
         },
-        theme: ThemeData(appBarTheme: const AppBarTheme(centerTitle: true)),
+        theme: ThemeData(appBarTheme: const AppBarTheme(centerTitle: false)),
       ),
     );
   }

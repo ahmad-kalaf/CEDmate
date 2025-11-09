@@ -1,5 +1,7 @@
 import 'package:cedmate/models/app_user.dart';
 import 'package:cedmate/services/anamnese_service.dart';
+import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
+import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
 import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_monat.dart';
 import 'package:cedmate/widgets/symptome_fuer_monat.dart';
 import 'package:cedmate/widgets/anamnese_screen.dart';
@@ -221,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const Placeholder()),
+                    MaterialPageRoute(builder: (_) => EssTagebuchFuerMonat()),
                   );
                 },
               ),
@@ -230,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const Placeholder()),
+                    MaterialPageRoute(builder: (_) => StimmungFuerMonat()),
                   );
                 },
               ),
