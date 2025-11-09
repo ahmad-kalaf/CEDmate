@@ -12,7 +12,7 @@ class StuhlgangEintraegeFuerMonat extends StatelessWidget {
   Widget build(BuildContext context) {
     final stuhlgangService = context.read<StuhlgangService>();
     return EintraegeFuerMonat<Stuhlgang>(
-      title: 'Alle Stuhlgang-Einträge',
+      title: 'Stuhlgang-Tagebuch',
       streamProvider: stuhlgangService.ladeFuerMonatJahr,
       itemBuilder: (context, stuhlgang, index) {
         return Padding(
