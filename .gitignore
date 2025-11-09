@@ -49,3 +49,7 @@ app.*.map.json
 # Die anderen bleiben lokal (Android/iOS)
 google-services.json
 GoogleService-Info.plist
+
+# service account keys
+serviceAccount.json
+lib/analytics/serviceAccount.json
