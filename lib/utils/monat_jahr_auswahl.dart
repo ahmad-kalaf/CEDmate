@@ -22,7 +22,7 @@ class MonatJahrAuswahl extends StatefulWidget {
     this.resetDate,
     this.onReset,
     this.showResetButton = false,
-    this.resetTooltip = 'Zurücksetzen',
+    this.resetTooltip = 'Datum zurücksetzen',
     this.resetIcon = Icons.refresh,
   }) : firstDate = firstDate ?? DateTime(2015, 1),
        lastDate = lastDate ?? DateTime.now();
@@ -130,7 +130,7 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
 
     // Falls aktueller Monat nicht mehr erlaubt ist
     if (!months.contains(_selectedMonth)) {
-      _selectedMonth = months.last;
+      _selectedMonth = months.first;
     }
 
     FocusNode _monatFocusNode = FocusNode();
@@ -138,12 +138,15 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Monat-Auswahl
         DropdownButton<int>(
           value: _selectedMonth,
           underline: const SizedBox(),
           focusNode: _monatFocusNode,
+          isDense: true,
+          style: const TextStyle(fontSize: 12),
           items: months
               .map(
                 (m) => DropdownMenuItem(value: m, child: Text(_monate[m - 1])),
@@ -158,12 +161,14 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
             }
           },
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
         // Jahr-Auswahl
         DropdownButton<int>(
           value: _selectedYear,
           underline: const SizedBox(),
           focusNode: _jahrFocusNode,
+          isDense: true,
+          style: const TextStyle(fontSize: 12),
           items: years
               .map((y) => DropdownMenuItem(value: y, child: Text(y.toString())))
               .toList(),
@@ -177,11 +182,16 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
           },
         ),
         if (widget.showResetButton) ...[
-          const SizedBox(width: 8),
-          IconButton(
-            tooltip: widget.resetTooltip,
-            onPressed: _resetSelection,
-            icon: Icon(widget.resetIcon),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              onPressed: _resetSelection,
+              tooltip: widget.resetTooltip,
+              iconSize: 16,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: Icon(widget.resetIcon),
+            ),
           ),
         ],
       ],
