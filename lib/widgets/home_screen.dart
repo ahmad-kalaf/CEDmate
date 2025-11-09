@@ -206,13 +206,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               ListTile(
-                title: const Text('Stuhlgang-Einträge'),
+                title: const Text('Stuhl-Tagebuch'),
                 onTap: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => const StuhlgangEintraegeFuerMonat(),
                     ),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Ess-Tagebuch'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const Placeholder()),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Seelen-Log'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const Placeholder()),
                   );
                 },
               ),
