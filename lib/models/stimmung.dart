@@ -6,7 +6,7 @@ class Stimmung {
   final String? id;
   final StimmungLevel level;
   final int stresslevel; // 1–10
-  final String? tagebuch; // optionaler Freitext
+  final String? notiz; // optionaler Freitext
   final List<String>? tags; // optional (z.\b. Angst, Wut, Freude)
   final DateTime stimmungsZeitpunkt;
 
@@ -14,7 +14,7 @@ class Stimmung {
     this.id,
     required this.level,
     required this.stresslevel,
-    this.tagebuch,
+    this.notiz,
     this.tags,
     DateTime? stimmungsZeitpunkt,
   }) : assert(stresslevel >= 1 && stresslevel <= 10),
@@ -54,7 +54,7 @@ class Stimmung {
       id: doc.id,
       level: parseStimmungLevel(data['stimmungsLevel']),
       stresslevel: (data['stresslevel'] as int?) ?? 5,
-      tagebuch: cleanOptional(data['tagebuch']),
+      notiz: cleanOptional(data['tagebuch']),
       tags: (data['tags'] != null) ? toStringList(data['tags']) : null,
       stimmungsZeitpunkt: parseZeit(data['stimmungsZeitpunkt']),
     );
@@ -67,8 +67,8 @@ class Stimmung {
       'stresslevel': stresslevel,
       'stimmungsZeitpunkt': Timestamp.fromDate(stimmungsZeitpunkt),
     };
-    if (tagebuch != null && tagebuch!.trim().isNotEmpty) {
-      map['tagebuch'] = tagebuch;
+    if (notiz != null && notiz!.trim().isNotEmpty) {
+      map['tagebuch'] = notiz;
     }
     if (tags != null && tags!.isNotEmpty) {
       map['tags'] = tags;
@@ -88,7 +88,7 @@ class Stimmung {
       id: id ?? this.id,
       level: level ?? this.level,
       stresslevel: stresslevel ?? this.stresslevel,
-      tagebuch: tagebuch ?? this.tagebuch,
+      notiz: tagebuch ?? this.notiz,
       tags: tags ?? this.tags,
       stimmungsZeitpunkt: stimmungsZeitpunkt ?? this.stimmungsZeitpunkt,
     );
