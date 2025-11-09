@@ -48,4 +48,10 @@ class MahlzeitService {
   Future<void> loescheMahlzeit(String id) {
     return _repo.delete(_auth.currentUserId, id);
   }
+
+  /// Anzahl der Stuhlgang-Einträge für einen Benutzer an einem bestimmten Datum zählen
+  Future<int> zaehleFuerDatum(DateTime datum) async {
+    final uid = _auth.currentUserId;
+    return _repo.zaehleEintraegeFuerDatum(uid, datum);
+  }
 }

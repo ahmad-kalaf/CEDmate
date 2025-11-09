@@ -74,4 +74,20 @@ class StimmungRepository {
   Future<void> delete(String userId, String id) async {
     await _collection(userId).doc(id).delete();
   }
+
+  /// Anzahl der Einträge für einen Benutzer an einem bestimmten Datum zählen
+  Future<int> zaehleEintraegeFuerDatum(String userId, DateTime date) async {
+    final start = DateTime(date.year, date.month, date.day);
+    final ende = DateTime(date.year, date.month, date.day + 1);
+
+    final snapshot = await _collection(userId)
+        .where(
+          'stimmungsZeitpunkt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(start),
+        )
+        .where('stimmungsZeitpunkt', isLessThan: Timestamp.fromDate(ende))
+        .get();
+
+    return snapshot.size;
+  }
 }

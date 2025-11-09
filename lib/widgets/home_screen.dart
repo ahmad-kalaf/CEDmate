@@ -1,5 +1,7 @@
 import 'package:cedmate/models/app_user.dart';
+import 'package:cedmate/models/stuhlgang.dart';
 import 'package:cedmate/services/anamnese_service.dart';
+import 'package:cedmate/services/symptom_service.dart';
 import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
 import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
 import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_monat.dart';
@@ -17,6 +19,9 @@ import 'package:cedmate/widgets/symptom_erfassen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../services/mahlzeit_service.dart';
+import '../services/stimmung_service.dart';
+import '../services/stuhlgang_service.dart';
 import 'daten_exportieren.dart';
 
 /// Home (geschützter Bereich).
@@ -34,6 +39,11 @@ class _HomeScreenState extends State<HomeScreen> {
   late final AnamneseService anamneseService;
   bool _isLoading = true;
   bool _hatAnamnesedaten = false;
+  bool _isLoadingEintraege = false;
+  int _symptomeHeute = 0;
+  int _stuhlgaengeHeute = 0;
+  int _mahlzeitenHeute = 0;
+  int _stimmungenHeute = 0;
 
   // heutiges Datum TT.MM.JJJJ
   final DateTime _heutigesDatum = DateTime.now();
@@ -45,12 +55,72 @@ class _HomeScreenState extends State<HomeScreen> {
     auth = context.read<AuthService>();
     anamneseService = context.read<AnamneseService>();
     _ladeAnamneseDaten();
+    _aktualisiereAnzahlEintraege();
   }
 
-  Future<T?> _navigiereZurSeite<T>(Widget seite) {
-    return Navigator.of(
+  Future<void> _aktualisiereAnzahlEintraege() async {
+    setState(() => _isLoadingEintraege = true);
+
+    try {
+      final symptomService = context.read<SymptomService>();
+      final stuhlgangService = context.read<StuhlgangService>();
+      final mahlzeitService = context.read<MahlzeitService>();
+      final stimmungService = context.read<StimmungService>();
+
+      // Alle Firestore-Abfragen parallel starten
+      final results = await Future.wait<int>([
+        symptomService.zaehleFuerDatum(_heutigesDatum),
+        stuhlgangService.zaehleFuerDatum(_heutigesDatum),
+        mahlzeitService.zaehleFuerDatum(_heutigesDatum),
+        stimmungService.zaehleFuerDatum(_heutigesDatum),
+      ]);
+
+      if (mounted) {
+        setState(() {
+          _symptomeHeute = results[0];
+          _stuhlgaengeHeute = results[1];
+          _mahlzeitenHeute = results[2];
+          _stimmungenHeute = results[3];
+        });
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Fehler beim Aktualisieren der Einträge: $e');
+      debugPrintStack(stackTrace: stackTrace);
+
+      if (mounted) {
+        setState(() {
+          _symptomeHeute = -1;
+          _stuhlgaengeHeute = -1;
+          _mahlzeitenHeute = -1;
+          _stimmungenHeute = -1;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Daten konnten nicht geladen werden. Bitte überprüfe deine Internetverbindung.',
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.redAccent.shade200,
+            duration: const Duration(seconds: 4),
+            action: SnackBarAction(
+              label: 'Erneut versuchen',
+              textColor: Colors.white,
+              onPressed: _aktualisiereAnzahlEintraege,
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoadingEintraege = false);
+    }
+  }
+
+  Future<void> _navigiereZurSeite<T>(Widget seite) async {
+    await Navigator.of(
       context,
     ).push<T>(MaterialPageRoute(builder: (context) => seite));
+    _aktualisiereAnzahlEintraege();
   }
 
   Future<void> _ladeAnamneseDaten() async {
@@ -350,41 +420,66 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _iconZahlTextKachel(
-                              Icons.sick,
-                              'Symptome heute',
-                              3,
-                              () {},
-                            ),
-                            _iconZahlTextKachel(
-                              Icons.wc,
-                              'Stuhlgänge',
-                              2,
-                              () {},
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _iconZahlTextKachel(
-                              Icons.restaurant_menu,
-                              'Mahlzeiten',
-                              3,
-                              () {},
-                            ),
-                            _iconZahlTextKachel(
-                              Icons.mood,
-                              'Stimmung',
-                              2,
-                              () {},
-                            ),
-                          ],
-                        ),
+                        _isLoadingEintraege
+                            ? const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                                child: SizedBox(
+                                  width: 35,
+                                  height: 35,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                  ),
+                                ),
+                              )
+                            : Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      _iconZahlTextKachel(
+                                        Icons.sick,
+                                        'Symptome heute',
+                                        _symptomeHeute,
+                                        () => _navigiereZurSeite(
+                                          const SymptomeFuerMonat(),
+                                        ),
+                                      ),
+                                      _iconZahlTextKachel(
+                                        Icons.wc,
+                                        'Stuhlgänge',
+                                        _stuhlgaengeHeute,
+                                        () => _navigiereZurSeite(
+                                          const StuhlgangEintraegeFuerMonat(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      _iconZahlTextKachel(
+                                        Icons.restaurant_menu,
+                                        'Mahlzeiten',
+                                        _mahlzeitenHeute,
+                                        () => _navigiereZurSeite(
+                                          EssTagebuchFuerMonat(),
+                                        ),
+                                      ),
+                                      _iconZahlTextKachel(
+                                        Icons.mood,
+                                        'Stimmung',
+                                        _stimmungenHeute,
+                                        () => _navigiereZurSeite(
+                                          StimmungFuerMonat(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                         const SizedBox(height: 20),
                         SizedBox(
                           height: 160,
