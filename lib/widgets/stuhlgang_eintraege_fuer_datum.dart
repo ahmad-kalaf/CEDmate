@@ -44,8 +44,9 @@ class _StuhlgangEintraegeFuerDatumState
         final String uhrSymbol = String.fromCharCode(0x1F570);
 
         return ListView.builder(
-          itemCount: eintrag.length,
+          physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
+          itemCount: eintrag.length,
           itemBuilder: (context, index) {
             final s = eintrag[index];
             return Padding(

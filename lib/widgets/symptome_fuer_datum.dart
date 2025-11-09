@@ -43,8 +43,9 @@ class _SymptomeFuerDatumState extends State<SymptomeFuerDatum> {
         final String uhrSymbol = String.fromCharCode(0x1F570);
 
         return ListView.builder(
-          itemCount: symptome.length,
+          physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
+          itemCount: symptome.length,
           itemBuilder: (context, index) {
             final s = symptome[index];
             return Padding(
