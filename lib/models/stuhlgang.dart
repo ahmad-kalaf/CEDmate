@@ -55,8 +55,9 @@ class Stuhlgang {
       'haeufigkeit': haeufigkeit,
       'eintragZeitpunkt': Timestamp.fromDate(eintragZeitpunkt),
     };
-    if (_istNichtLeer(auffaelligkeiten))
+    if (_istNichtLeer(auffaelligkeiten)) {
       map['auffaelligkeiten'] = auffaelligkeiten;
+    }
     if (_istNichtLeer(notizen)) map['notizen'] = notizen;
     return map;
   }
