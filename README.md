@@ -157,6 +157,6 @@ schriftlichen Einverständnis aller beteiligten Personen erlaubt:
 - Miriam Schwarz
 - Aliena Glatzel
 - Larissa Pychlau
-- Benedickt Löhn
+- Benedict Löhn
 
 ➡️ Siehe [LICENSE](./LICENSE) für den vollständigen Lizenztext.
