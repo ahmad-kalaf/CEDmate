@@ -23,6 +23,7 @@ import '../services/mahlzeit_service.dart';
 import '../services/stimmung_service.dart';
 import '../services/stuhlgang_service.dart';
 import 'daten_exportieren.dart';
+import 'impressum_credits_screen.dart';
 
 /// Home (geschützter Bereich).
 /// Hier ist die eigentliche CEDmate-Funktionalität,
@@ -306,6 +307,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
+              ListTile(
+                title: const Text('Impressum und Credits'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ImpressumCreditsScreen(),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -509,8 +522,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Text('Hilfe für Unterwegs'),
                                         SizedBox(height: 5),
                                         Text(
-                                          'Toiletten & Restaurants in der Nähe',
-
+                                          'Toiletten in der Nähe',
                                           textAlign: TextAlign.center,
                                         ),
                                       ],

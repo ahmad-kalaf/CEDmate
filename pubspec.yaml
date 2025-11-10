@@ -17,6 +17,15 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  # Karten & Geodaten
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
+  http: ^1.2.2
+  geolocator: ^10.1.0
+  shared_preferences: ^2.3.2
+  connectivity_plus: ^6.1.0
+  flutter_map_cancellable_tile_provider: ^3.1.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
