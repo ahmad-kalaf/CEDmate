@@ -39,7 +39,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
     _ladeToilettenDaten();
   }
 
-  // 💾 Cache speichern
+  // Cache speichern
   Future<void> _cacheSpeichern(List<Toilette> toiletten) async {
     final prefs = await SharedPreferences.getInstance();
     final liste = toiletten
@@ -54,7 +54,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
     prefs.setString('toiletten_cache', jsonEncode(liste));
   }
 
-  // 💾 Cache laden
+  // Cache laden
   Future<List<Toilette>> _cacheLaden() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString('toiletten_cache');
@@ -70,12 +70,12 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
         .toList();
   }
 
-  /// 🔄 Berechnet den Suchradius anhand des Zoom-Levels der Karte.
+  // Berechnet den Suchradius anhand des Zoom-Levels der Karte
   double _berechneSuchradius(double zoom) {
     return 1000 * (20 - zoom).clamp(2, 15);
   }
 
-  /// 🌐 Lädt Toilettendaten über die Overpass-API oder aus dem Cache.
+  // Lädt Toilettendaten über die Overpass-API oder aus dem Cache
   Future<void> _ladeToilettenDaten({LatLng? benutzerPosition}) async {
     LocationPermission permission = await Geolocator.checkPermission();
 
@@ -125,7 +125,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
       final hatInternet = !verbindung.contains(ConnectivityResult.none);
 
       if (hatInternet) {
-        // 🛰️ Online – Daten von Overpass holen
+        // Online – Daten von Overpass holen
         final abfrage =
             '''
           [out:json][timeout:25];
@@ -154,7 +154,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
           await _cacheSpeichern(toiletten);
         }
       } else {
-        // 🚫 Offline – Cache laden
+        // Offline – Cache laden
         final gespeicherte = await _cacheLaden();
         if (gespeicherte.isNotEmpty) {
           setState(() => _toilettenListe = gespeicherte);
@@ -174,14 +174,12 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
     }
   }
 
-  /// 🧩 Gibt einen lesbaren deutschen Text für verschiedene OSM-Tag-Werte zurück.
-  /// Unterstützt z. B. yes/no, access, fee, wheelchair und Öffnungszeiten.
+  // Gibt einen deutschen Text für verschiedene OSM-Tag-Werte zurück
   String _textStatus(String? wert) {
     if (wert == null || wert.isEmpty) return "unbekannt";
 
     final normalized = wert.toLowerCase().trim();
 
-    // ✅ Einfache Standardfälle
     switch (normalized) {
       case "yes":
         return "ja";
@@ -201,7 +199,6 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
         return "unbekannt";
     }
 
-    // 💰 Für Kostenangaben
     if (normalized == "free") return "kostenlos";
     if (normalized.startsWith("€") ||
         normalized.contains("cent") ||
@@ -209,22 +206,18 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
       return "Kosten: $wert";
     }
 
-    // ♿ Für Barrierefreiheit
     if (normalized == "limited") return "eingeschränkt barrierefrei";
 
-    // ⏰ Öffnungszeiten parsen
     if (normalized.contains(":") ||
         normalized.contains("mo") ||
         normalized.contains("tu")) {
       return _formatOpeningHours(wert);
     }
 
-    // Fallback: Wert unverändert zurückgeben
     return wert;
   }
 
-  /// 🕓 Formatiert OSM-Öffnungszeiten etwas lesbarer.
-  /// Beispiel: "Mo-Fr 08:00-20:00; Sa 10:00-18:00" → "Mo–Fr: 8–20 Uhr, Sa: 10–18 Uhr"
+  // Formatiert Öffnungszeiten lesbarer
   String _formatOpeningHours(String rohwert) {
     try {
       String cleaned = rohwert
@@ -241,11 +234,11 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
       cleaned = cleaned.replaceAllMapped(
         RegExp(r'(\d{1,2}):00'),
         (m) => m.group(1)!,
-      ); // "08:00" → "8"
-      cleaned = cleaned.replaceAll(":", " "); // dünnes Leerzeichen vor "Uhr"
+      );
+      cleaned = cleaned.replaceAll(":", " ");
       return "$cleaned Uhr";
     } catch (_) {
-      return rohwert; // falls Parsing fehlschlägt, Originaltext
+      return rohwert;
     }
   }
 
@@ -255,7 +248,12 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_aktuellerStandort == null) {
-      return const Center(child: Text('Standort wird bestimmt...'));
+      return const Center(
+        child: Text(
+          'Standort wird bestimmt...',
+          style: TextStyle(fontSize: 15, color: Colors.black),
+        ),
+      );
     }
 
     return Scaffold(
@@ -319,12 +317,12 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
                 RichAttributionWidget(
                   alignment: AttributionAlignment.bottomRight,
                   attributions: [
-                    TextSourceAttribution('© OpenStreetMap contributors'),
+                    TextSourceAttribution('OpenStreetMap contributors'),
                   ],
                 ),
               ],
             ),
-            // Popup untere Karte
+            // Popup unter der Karte
             if (_ausgewaehlteToilette != null)
               Positioned(
                 left: 10,
@@ -379,7 +377,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
                   ),
                 ),
               ),
-            // 🧭 Button: Zurück zum aktuellen Standort
+            // Button: Zurück zum aktuellen Standort
             Positioned(
               top: 20,
               right: 20,
@@ -390,23 +388,18 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
                 tooltip: 'Zum aktuellen Standort',
                 onPressed: () async {
                   try {
-                    // Standort neu bestimmen
                     final pos = await Geolocator.getCurrentPosition(
                       desiredAccuracy: LocationAccuracy.best,
                     );
                     final neuerStandort = LatLng(pos.latitude, pos.longitude);
 
-                    // Karte auf Standort zentrieren und Radius zurücksetzen
                     setState(() {
                       _aktuellerStandort = neuerStandort;
                       _suchradius = 2000;
-                      _ausgewaehlteToilette = null; // Popup schließen
+                      _ausgewaehlteToilette = null;
                     });
 
-                    // Karte animiert zur neuen Position bewegen
                     _kartenController.move(neuerStandort, 15);
-
-                    // Toiletten neu laden
                     await _ladeToilettenDaten(benutzerPosition: neuerStandort);
                   } catch (e) {
                     if (mounted) {
@@ -423,7 +416,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
                 child: const Icon(Icons.my_location),
               ),
             ),
-            // 🔄 Ladeindikator (oben rechts)
+            // Ladeindikator
             if (_ladevorgang)
               const Center(
                 child: SizedBox(
