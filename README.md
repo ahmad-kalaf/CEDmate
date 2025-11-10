@@ -6,6 +6,9 @@ Die App hilft Betroffenen, Symptome, Ernährung, Psyche und Krankheitsverlauf sy
 erfassen und zu verstehen – für ein besseres Leben mit CED.
 
 https://ahmad-kalaf.github.io/CEDmate/
+⚠️ Hinweis zur Online-Version:
+Die auf GitHub Pages bereitgestellte Web-App dient nur zur Demonstration
+und ist nicht für den produktiven oder kommerziellen Gebrauch bestimmt.
 
 ---
 
@@ -109,6 +112,10 @@ Erfasse dein mentales und emotionales Befinden.
     - Freitextbewertungen (anonym)
     - Sortier- und Favoritenfunktion
 - *(Geplant)* **QR-Code-Scanner** für Lebensmittel (ähnlich *CodeCheck*)
+
+> Kartendaten © OpenStreetMap-Mitwirkende, verwendet unter der ODbL-Lizenz.
+> Diese Kartenfunktionen dienen ausschließlich zu Demonstrations- und Lernzwecken.
+
 
 ---
 
