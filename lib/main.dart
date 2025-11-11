@@ -86,12 +86,62 @@ class CEDmateApp extends StatelessWidget {
           '/home': (_) => const HomeScreen(), // private Startseite
         },
         builder: (context, child) {
+          if (child == null) {
+            // Wenn kein Child vorhanden ist, gib einfach ein leeres Widget zurück
+            return const SizedBox.shrink();
+          }
+
+          // sonst normale Darstellung
           return Container(
             color: Colors.white,
-            child: SafeArea(child: child ?? const SizedBox.shrink()),
+            child: SafeArea(child: child),
           );
         },
-        theme: ThemeData(appBarTheme: const AppBarTheme(centerTitle: false)),
+        theme: ThemeData(
+          useMaterial3: false,
+          brightness: Brightness.light,
+          scaffoldBackgroundColor: Colors.white,
+
+          // Standard-Schriftfarbe
+          textTheme: const TextTheme(
+            bodyLarge: TextStyle(color: Colors.black),
+            bodyMedium: TextStyle(color: Colors.black),
+            bodySmall: TextStyle(color: Colors.black),
+            titleLarge: TextStyle(color: Colors.black),
+            titleMedium: TextStyle(color: Colors.black),
+            titleSmall: TextStyle(color: Colors.black),
+          ),
+
+          // AppBar-Stil
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            // Titel, Icons
+            elevation: 0,
+            centerTitle: false,
+            // Titel linksbündig
+            titleTextStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+            iconTheme: IconThemeData(color: Colors.black),
+          ),
+
+          // Icons allgemein
+          iconTheme: const IconThemeData(color: Colors.black),
+
+          // Buttons (z. B. ElevatedButton)
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

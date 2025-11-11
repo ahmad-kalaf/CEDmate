@@ -136,65 +136,71 @@ class _MonatJahrAuswahlState extends State<MonatJahrAuswahl> {
     FocusNode _monatFocusNode = FocusNode();
     FocusNode _jahrFocusNode = FocusNode();
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Monat-Auswahl
-        DropdownButton<int>(
-          value: _selectedMonth,
-          underline: const SizedBox(),
-          focusNode: _monatFocusNode,
-          isDense: true,
-          style: const TextStyle(fontSize: 12),
-          items: months
-              .map(
-                (m) => DropdownMenuItem(value: m, child: Text(_monate[m - 1])),
-              )
-              .toList(),
-          onChanged: (val) {
-            if (val != null) {
-              setState(() => _selectedMonth = val);
-              widget.onChanged?.call(DateTime(_selectedYear, _selectedMonth));
-              _notifyChange();
-              _monatFocusNode.unfocus();
-            }
-          },
-        ),
-        const SizedBox(width: 4),
-        // Jahr-Auswahl
-        DropdownButton<int>(
-          value: _selectedYear,
-          underline: const SizedBox(),
-          focusNode: _jahrFocusNode,
-          isDense: true,
-          style: const TextStyle(fontSize: 12),
-          items: years
-              .map((y) => DropdownMenuItem(value: y, child: Text(y.toString())))
-              .toList(),
-          onChanged: (val) {
-            if (val != null) {
-              setState(() => _selectedYear = val);
-              widget.onChanged?.call(DateTime(_selectedYear, _selectedMonth));
-              _notifyChange();
-              _jahrFocusNode.unfocus();
-            }
-          },
-        ),
-        if (widget.showResetButton) ...[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              onPressed: _resetSelection,
-              tooltip: widget.resetTooltip,
-              iconSize: 16,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              icon: Icon(widget.resetIcon),
-            ),
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Monat-Auswahl
+          DropdownButton<int>(
+            value: _selectedMonth,
+            underline: const SizedBox(),
+            focusNode: _monatFocusNode,
+            isDense: true,
+            style: const TextStyle(fontSize: 12, color: Colors.black),
+            items: months
+                .map(
+                  (m) =>
+                      DropdownMenuItem(value: m, child: Text(_monate[m - 1])),
+                )
+                .toList(),
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _selectedMonth = val);
+                widget.onChanged?.call(DateTime(_selectedYear, _selectedMonth));
+                _notifyChange();
+                _monatFocusNode.unfocus();
+              }
+            },
           ),
+          const SizedBox(width: 4),
+          // Jahr-Auswahl
+          DropdownButton<int>(
+            value: _selectedYear,
+            underline: const SizedBox(),
+            focusNode: _jahrFocusNode,
+            isDense: true,
+            style: const TextStyle(fontSize: 12, color: Colors.black),
+            items: years
+                .map(
+                  (y) => DropdownMenuItem(value: y, child: Text(y.toString())),
+                )
+                .toList(),
+            onChanged: (val) {
+              if (val != null) {
+                setState(() => _selectedYear = val);
+                widget.onChanged?.call(DateTime(_selectedYear, _selectedMonth));
+                _notifyChange();
+                _jahrFocusNode.unfocus();
+              }
+            },
+          ),
+          if (widget.showResetButton) ...[
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: IconButton(
+                onPressed: _resetSelection,
+                tooltip: widget.resetTooltip,
+                iconSize: 16,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: Icon(widget.resetIcon),
+              ),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
