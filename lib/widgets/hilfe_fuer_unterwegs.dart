@@ -281,6 +281,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
               children: [
                 TileLayer(
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'app.cedmate',
                   tileProvider: CancellableNetworkTileProvider(),
                 ),
                 MarkerLayer(

@@ -501,7 +501,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             padEnds: false,
                             children: [
                               InkWell(
-                                splashColor: Colors.blue,
                                 borderRadius: BorderRadius.circular(20),
                                 onTap: () {
                                   _navigiereZurSeite(HilfeFuerUnterwegs());
@@ -531,7 +530,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               InkWell(
-                                splashColor: Colors.blue,
                                 borderRadius: BorderRadius.circular(20),
                                 onTap: () {
                                   _navigiereZurSeite(DatenExportieren());
