@@ -53,3 +53,4 @@ GoogleService-Info.plist
 # service account keys
 serviceAccount.json
 lib/analytics/serviceAccount.json
+lib/analytics/output
