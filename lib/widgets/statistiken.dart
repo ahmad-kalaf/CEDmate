@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -16,12 +17,17 @@ class Statistiken extends StatefulWidget {
 class _StatistikenState extends State<Statistiken> {
   bool _isRunning = false;
   String _status = '';
+
+  /// lokale Dateien (für Mobile/Desktop)
   List<File> _generatedImages = [];
+
+  /// URLs (für Web)
+  List<String> _generatedImageUrls = [];
 
   /// aktueller Firebase-Benutzer (UID)
   String? get _currentUserId => FirebaseAuth.instance.currentUser?.uid;
 
-  /// Render-API Konfiguration (🧩 Testversion)
+  /// Render-API Konfiguration
   static const String apiUrl =
       'https://cedmate-analytics-api.onrender.com/analytics';
   static const String apiKey = 'CEDmateHAWahmad1#';
@@ -34,6 +40,7 @@ class _StatistikenState extends State<Statistiken> {
       _isRunning = true;
       _status = '⏳ Analysen werden in der Cloud erstellt...';
       _generatedImages.clear();
+      _generatedImageUrls.clear();
     });
 
     try {
@@ -53,6 +60,19 @@ class _StatistikenState extends State<Statistiken> {
       setState(() => _status = '✅ Analyse abgeschlossen.');
 
       final results = Map<String, dynamic>.from(data['results'] ?? {});
+
+      if (kIsWeb) {
+        // Web → Nur URLs anzeigen
+        _generatedImageUrls = results.values
+            .where((e) => e != null && e.toString().isNotEmpty)
+            .map((e) => e.toString())
+            .toList();
+
+        setState(() {});
+        return;
+      }
+
+      // Mobile/Desktop → Dateien speichern
       final imgs = await _downloadImages(results);
       setState(() => _generatedImages = imgs);
     } catch (e) {
@@ -62,8 +82,7 @@ class _StatistikenState extends State<Statistiken> {
     }
   }
 
-  /// Lädt Diagramme (PNGs) von Render herunter
-  /// Lädt Diagramme (PNGs) von Render herunter
+  /// Lädt Diagramme herunter (nur Windows/Android/iOS/macOS)
   Future<List<File>> _downloadImages(Map<String, dynamic> results) async {
     final dir = await getTemporaryDirectory();
     List<File> files = [];
@@ -72,7 +91,7 @@ class _StatistikenState extends State<Statistiken> {
       final url = entry.value?.toString() ?? '';
       if (url.isEmpty) continue;
 
-      // Wenn bereits vollständige URL, direkt verwenden
+      // Wenn bereits vollständige URL → direkt verwenden
       final imgUrl = url.startsWith('http')
           ? url
           : '${apiUrl.replaceAll('/analytics', '')}/$url';
@@ -95,7 +114,7 @@ class _StatistikenState extends State<Statistiken> {
     return files;
   }
 
-  /// Speichert ein Diagramm lokal
+  /// Speichert ein Diagramm lokal (nur Desktop/Mobile)
   Future<void> _saveImage(File file) async {
     final savePath = p.join(Directory.current.path, p.basename(file.path));
     try {
@@ -136,57 +155,104 @@ class _StatistikenState extends State<Statistiken> {
                 ),
               ),
             const SizedBox(height: 16),
-            Expanded(
-              child: _generatedImages.isEmpty
-                  ? Center(
-                      child: Text(
-                        _isRunning
-                            ? 'Analysiere Daten... (kann 1-2 Minuten dauern)'
-                            : 'Noch keine Diagramme vorhanden.',
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: _generatedImages.length,
-                      itemBuilder: (context, index) {
-                        final file = _generatedImages[index];
-                        final fileName = p.basename(file.path);
-                        return Card(
-                          elevation: 3,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  fileName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
+
+            // ----------------------------------------------
+            // WEB-ANZEIGE
+            // ----------------------------------------------
+            if (kIsWeb)
+              Expanded(
+                child: _generatedImageUrls.isEmpty
+                    ? Center(
+                        child: Text(
+                          _isRunning
+                              ? 'Analysiere Daten... (kann 1-2 Minuten dauern)'
+                              : 'Noch keine Diagramme vorhanden.',
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _generatedImageUrls.length,
+                        itemBuilder: (context, index) {
+                          final url = _generatedImageUrls[index];
+                          final fileName = p.basename(url);
+                          return Card(
+                            elevation: 3,
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    fileName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Image.file(
-                                    file,
-                                    fit: BoxFit.contain,
+                                  const SizedBox(height: 8),
+                                  Image.network(
+                                    url,
                                     height: 300,
+                                    fit: BoxFit.contain,
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                ElevatedButton.icon(
-                                  onPressed: () => _saveImage(file),
-                                  icon: const Icon(Icons.download),
-                                  label: const Text('Bild speichern'),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
+                          );
+                        },
+                      ),
+              ),
+
+            // ----------------------------------------------
+            // MOBILE/DESKTOP-ANZEIGE
+            // ----------------------------------------------
+            if (!kIsWeb)
+              Expanded(
+                child: _generatedImages.isEmpty
+                    ? Center(
+                        child: Text(
+                          _isRunning
+                              ? 'Analysiere Daten... (kann 1-2 Minuten dauern)'
+                              : 'Noch keine Diagramme vorhanden.',
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _generatedImages.length,
+                        itemBuilder: (context, index) {
+                          final file = _generatedImages[index];
+                          final fileName = p.basename(file.path);
+                          return Card(
+                            elevation: 3,
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    fileName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Image.file(
+                                    file,
+                                    height: 300,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ElevatedButton.icon(
+                                    onPressed: () => _saveImage(file),
+                                    icon: const Icon(Icons.download),
+                                    label: const Text('Bild speichern'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
           ],
         ),
       ),
