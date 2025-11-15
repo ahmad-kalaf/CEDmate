@@ -1,5 +1,6 @@
 import 'package:cedmate/models/stuhlgang.dart';
 import 'package:cedmate/services/stuhlgang_service.dart';
+import 'package:cedmate/utils/loesche_eintrag.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -193,6 +194,38 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
                         label: Text(isEditMode ? 'Aktualisieren' : 'Speichern'),
                         onPressed: _isSaving ? null : _speichereEintrag,
                       ),
+                      if (isEditMode) ...[
+                        SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          icon: _isSaving
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.delete_forever),
+                          label: Text('Löschen'),
+                          onPressed: _isSaving
+                              ? null
+                              : () async {
+                                  final symptomService = context
+                                      .read<StuhlgangService>();
+                                  await deleteEntry(
+                                    context,
+                                    titel: 'Eintrag löschen',
+                                    text:
+                                        'Möchtest du diesen Eintrag wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden',
+                                    deleteAction: () =>
+                                        symptomService.loescheStuhlgang(
+                                          widget.stuhlgang!.id!,
+                                        ),
+                                  );
+                                  if (mounted) Navigator.pop(context);
+                                },
+                        ),
+                      ],
                     ],
                   ),
                 ),

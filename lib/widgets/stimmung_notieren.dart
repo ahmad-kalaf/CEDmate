@@ -4,6 +4,7 @@ import 'package:cedmate/utils/build_list_section.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/stimmung.dart';
+import '../utils/loesche_eintrag.dart';
 
 class StimmungNotieren extends StatefulWidget {
   final Stimmung? stimmung;
@@ -215,6 +216,36 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
                               : 'Eintrag speichern',
                         ),
                       ),
+                      if (isEditMode) ...[
+                        SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          icon: _isSaving
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.delete_forever),
+                          label: Text('Löschen'),
+                          onPressed: _isSaving
+                              ? null
+                              : () async {
+                                  final symptomService = context
+                                      .read<StimmungService>();
+                                  await deleteEntry(
+                                    context,
+                                    titel: 'Eintrag löschen',
+                                    text:
+                                        'Möchtest du diesen Eintrag wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden',
+                                    deleteAction: () => symptomService
+                                        .loescheStimmung(widget.stimmung!.id!),
+                                  );
+                                  if (mounted) Navigator.pop(context);
+                                },
+                        ),
+                      ],
                     ],
                   ),
                 ),
