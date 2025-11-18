@@ -9,8 +9,10 @@ import 'package:cedmate/services/mahlzeit_service.dart';
 import 'package:cedmate/services/stimmung_service.dart';
 import 'package:cedmate/services/stuhlgang_service.dart';
 import 'package:cedmate/services/symptom_service.dart';
+import 'package:cedmate/widgets/CEDColors.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -100,47 +102,66 @@ class CEDmateApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: false,
           brightness: Brightness.light,
-          scaffoldBackgroundColor: Colors.white,
-
-          // Standard-Schriftfarbe
-          textTheme: const TextTheme(
-            bodyLarge: TextStyle(color: Colors.black),
-            bodyMedium: TextStyle(color: Colors.black),
-            bodySmall: TextStyle(color: Colors.black),
-            titleLarge: TextStyle(color: Colors.black),
-            titleMedium: TextStyle(color: Colors.black),
-            titleSmall: TextStyle(color: Colors.black),
-          ),
-
-          // AppBar-Stil
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            // Titel, Icons
-            elevation: 0,
-            centerTitle: false,
-            // Titel linksbündig
-            titleTextStyle: TextStyle(
-              color: Colors.black,
+          scaffoldBackgroundColor: CEDColors.background,
+          textTheme: GoogleFonts.interTextTheme().copyWith(
+            bodyLarge: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: CEDColors.primaryText,
+            ),
+            bodyMedium: const TextStyle(
+              fontSize: 14,
+              color: CEDColors.primaryText,
+            ),
+            titleLarge: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
+              color: CEDColors.primaryText,
             ),
-            iconTheme: IconThemeData(color: Colors.black),
+            titleMedium: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: CEDColors.primaryText,
+            ),
+          ),
+          // AppBar minimalistisch
+          appBarTheme: const AppBarTheme(
+            backgroundColor: CEDColors.appBarBackground,
+            foregroundColor: CEDColors.primaryText,
+            elevation: 10,
+            shadowColor: CEDColors.appBarBackground,
+            centerTitle: false,
+            titleTextStyle: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: CEDColors.primaryText,
+            ),
           ),
 
-          // Icons allgemein
-          iconTheme: const IconThemeData(color: Colors.black),
+          // Allgemeine Icons
+          iconTheme: const IconThemeData(
+            color: CEDColors.primaryText,
+            size: 26,
+          ),
 
-          // Buttons (z. B. ElevatedButton)
+          // Buttons
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              foregroundColor: CEDColors.primaryText,
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
+
+          // Alle Container-Borders
+          dividerColor: CEDColors.border,
         ),
       ),
     );
