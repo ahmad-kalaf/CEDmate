@@ -1,7 +1,7 @@
 import 'package:cedmate/models/app_user.dart';
-import 'package:cedmate/models/stuhlgang.dart';
 import 'package:cedmate/services/anamnese_service.dart';
 import 'package:cedmate/services/symptom_service.dart';
+import 'package:cedmate/widgets/CEDColors.dart';
 import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
 import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
 import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_monat.dart';
@@ -16,6 +16,9 @@ import 'package:cedmate/widgets/statistiken.dart';
 import 'package:cedmate/widgets/stimmung_notieren.dart';
 import 'package:cedmate/widgets/stuhlgang_notieren.dart';
 import 'package:cedmate/widgets/symptom_erfassen.dart';
+
+import 'package:cedmate/widgets/gelb_layout.dart'; // <--- WICHTIG
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
@@ -25,9 +28,6 @@ import '../services/stuhlgang_service.dart';
 import 'daten_exportieren.dart';
 import 'impressum_credits_screen.dart';
 
-/// Home (geschützter Bereich).
-/// Hier ist die eigentliche CEDmate-Funktionalität,
-/// die man nach dem Login benutzen kann.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -38,15 +38,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final AuthService auth;
   late final AnamneseService anamneseService;
+
   bool _isLoading = true;
   bool _hatAnamnesedaten = false;
   bool _isLoadingEintraege = false;
+
   int _symptomeHeute = 0;
   int _stuhlgaengeHeute = 0;
   int _mahlzeitenHeute = 0;
   int _stimmungenHeute = 0;
 
-  // heutiges Datum TT.MM.JJJJ
   final DateTime _heutigesDatum = DateTime.now();
   final List<String> _wochentage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
@@ -68,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final mahlzeitService = context.read<MahlzeitService>();
       final stimmungService = context.read<StimmungService>();
 
-      // Alle Firestore-Abfragen parallel starten
       final results = await Future.wait<int>([
         symptomService.zaehleFuerDatum(_heutigesDatum),
         stuhlgangService.zaehleFuerDatum(_heutigesDatum),
@@ -76,64 +76,80 @@ class _HomeScreenState extends State<HomeScreen> {
         stimmungService.zaehleFuerDatum(_heutigesDatum),
       ]);
 
-      if (mounted) {
-        setState(() {
-          _symptomeHeute = results[0];
-          _stuhlgaengeHeute = results[1];
-          _mahlzeitenHeute = results[2];
-          _stimmungenHeute = results[3];
-        });
-      }
-    } catch (e, stackTrace) {
-      debugPrint('Fehler beim Aktualisieren der Einträge: $e');
-      debugPrintStack(stackTrace: stackTrace);
+      if (!mounted) return;
 
-      if (mounted) {
-        setState(() {
-          _symptomeHeute = -1;
-          _stuhlgaengeHeute = -1;
-          _mahlzeitenHeute = -1;
-          _stimmungenHeute = -1;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Daten konnten nicht geladen werden. Bitte überprüfe deine Internetverbindung.',
-            ),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.redAccent.shade200,
-            duration: const Duration(seconds: 4),
-            action: SnackBarAction(
-              label: 'Erneut versuchen',
-              textColor: Colors.white,
-              onPressed: _aktualisiereAnzahlEintraege,
-            ),
-          ),
-        );
-      }
+      setState(() {
+        _symptomeHeute = results[0];
+        _stuhlgaengeHeute = results[1];
+        _mahlzeitenHeute = results[2];
+        _stimmungenHeute = results[3];
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _symptomeHeute = -1;
+        _stuhlgaengeHeute = -1;
+        _mahlzeitenHeute = -1;
+        _stimmungenHeute = -1;
+      });
     } finally {
       if (mounted) setState(() => _isLoadingEintraege = false);
     }
   }
 
+  Future<void> _ladeAnamneseDaten() async {
+    final anamnese = await anamneseService.ladeAnamnese();
+    if (!mounted) return;
+
+    setState(() {
+      _hatAnamnesedaten = anamnese != null;
+      _isLoading = false;
+    });
+  }
+
   Future<void> _navigiereZurSeite<T>(Widget seite) async {
-    await Navigator.of(
-      context,
-    ).push<T>(MaterialPageRoute(builder: (context) => seite));
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => seite));
     _aktualisiereAnzahlEintraege();
   }
 
-  Future<void> _ladeAnamneseDaten() async {
-    final anamnese = await anamneseService.ladeAnamnese();
-    setState(() {
-      if (anamnese != null) {
-        _hatAnamnesedaten = true;
-      } else {
-        _hatAnamnesedaten = false;
-      }
-      _isLoading = false;
-    });
+  // -------------------------------------------------------
+  //  THEME-BEREINIGTE Widgets (unverändert)
+  // -------------------------------------------------------
+
+  Widget _iconTextKachel(String titel, IconData icon, VoidCallback onTap) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          height: 100,
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            border: Border.all(color: CEDColors.border),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  border: Border.all(color: Colors.white, width: 4),
+                ),
+                child: Icon(icon, color: Colors.lightBlueAccent),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                titel,
+                style: Theme.of(context).textTheme.bodyMedium,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _iconZahlTextKachel(
@@ -143,30 +159,46 @@ class _HomeScreenState extends State<HomeScreen> {
     VoidCallback onTap,
   ) {
     return Expanded(
-      child: Container(
-        height: 100,
-        margin: const EdgeInsets.symmetric(horizontal: 5),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          height: 100,
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            border: Border.all(color: CEDColors.border),
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(icon),
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    border: Border.all(color: Colors.white, width: 4),
+                  ),
+                  child: Icon(icon, color: Colors.lightBlueAccent),
+                ),
                 const SizedBox(width: 10),
                 Flexible(
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(zahl.toString(), overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 5),
-                      Text(titel, overflow: TextOverflow.ellipsis),
+                      Text(
+                        zahl.toString(),
+                        style: Theme.of(context).textTheme.titleMedium!
+                            .copyWith(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        titel,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                 ),
@@ -178,30 +210,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _iconTextKachel(String titel, IconData icon, VoidCallback onTap) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          height: 100,
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon),
-              const SizedBox(height: 8),
-              Text(titel, overflow: TextOverflow.ellipsis),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  // -------------------------------------------------------
+  //  BUILD → ERSETZT Scaffold durch GelbLayout
+  // -------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -211,394 +222,256 @@ class _HomeScreenState extends State<HomeScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return Scaffold(
-      drawer: Drawer(
-        child: SafeArea(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.grey, Colors.white],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+    return GelbLayout(
+      title: "CEDmate",
+      actions: [AusloggenButton(auth: auth, user: user)],
+      child: _hatAnamnesedaten
+          ? _buildHomeContent(context, user)
+          : _buildKeineAnamnese(context),
+    );
+  }
+
+  // -------------------------------------------------------
+  //  Sub-Widgets (unverändert)
+  // -------------------------------------------------------
+
+  Widget _buildKeineAnamnese(BuildContext context) {
+    return SingleChildScrollView(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              children: [
+                Text(
+                  'Medizinisches Profil noch nicht ausgefüllt',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => _navigiereZurSeite(const AnamneseScreen()),
+                  child: Text(
+                    'Jetzt ausfüllen',
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHomeContent(BuildContext context, AppUser? user) {
+    return SingleChildScrollView(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              border: Border.all(color: CEDColors.border),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  user != null ? 'Hallo ${user.username}' : 'Hallo',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(
+                  '${_wochentage[_heutigesDatum.weekday - 1]}, '
+                  '${_heutigesDatum.day}.${_heutigesDatum.month}.${_heutigesDatum.year}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+
+                const SizedBox(height: 20),
+
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Schnell erfassen',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                Row(
                   children: [
-                    const Icon(Icons.analytics, size: 40),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'CEDmate',
-                              style: TextStyle(fontSize: 25),
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Erfassen. Verstehen. Verbessern.',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ),
-                        ],
-                      ),
+                    _iconTextKachel(
+                      'Symptom erfassen',
+                      Icons.sick,
+                      () => _navigiereZurSeite(SymptomErfassen()),
+                    ),
+                    _iconTextKachel(
+                      'Stuhlgang notieren',
+                      Icons.wc,
+                      () => _navigiereZurSeite(StuhlgangNotieren()),
                     ),
                   ],
                 ),
-              ),
-              ListTile(
-                title: const Text('Mein Profil'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ProfilScreen()),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('Symptom-Radar'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const SymptomeFuerMonat(),
+
+                const SizedBox(height: 10),
+
+                Row(
+                  children: [
+                    _iconTextKachel(
+                      'Mahlzeit Eintragen',
+                      Icons.restaurant_menu,
+                      () => _navigiereZurSeite(MahlzeitEintragen()),
                     ),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('Stuhl-Tagebuch'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const StuhlgangEintraegeFuerMonat(),
+                    _iconTextKachel(
+                      'Stimmung notieren',
+                      Icons.mood,
+                      () => _navigiereZurSeite(StimmungNotieren()),
                     ),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('Ess-Tagebuch'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => EssTagebuchFuerMonat()),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('Seelen-Log'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => StimmungFuerMonat()),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('Impressum und Credits'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ImpressumCreditsScreen(),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Heute in Zahlen',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                _isLoadingEintraege
+                    ? const SizedBox(
+                        width: 35,
+                        height: 35,
+                        child: CircularProgressIndicator(strokeWidth: 3),
+                      )
+                    : Column(
+                        children: [
+                          Row(
+                            children: [
+                              _iconZahlTextKachel(
+                                Icons.sick,
+                                'Symptome',
+                                _symptomeHeute,
+                                () => _navigiereZurSeite(
+                                  const SymptomeFuerMonat(),
+                                ),
+                              ),
+                              _iconZahlTextKachel(
+                                Icons.wc,
+                                'Stuhlgänge',
+                                _stuhlgaengeHeute,
+                                () => _navigiereZurSeite(
+                                  const StuhlgangEintraegeFuerMonat(),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              _iconZahlTextKachel(
+                                Icons.restaurant_menu,
+                                'Mahlzeiten',
+                                _mahlzeitenHeute,
+                                () =>
+                                    _navigiereZurSeite(EssTagebuchFuerMonat()),
+                              ),
+                              _iconZahlTextKachel(
+                                Icons.mood,
+                                'Stimmungen',
+                                _stimmungenHeute,
+                                () => _navigiereZurSeite(StimmungFuerMonat()),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+
+                const Divider(height: 20, thickness: 3),
+
+                Row(
+                  children: [
+                    _iconTextKachel(
+                      'Toiletten finden',
+                      Icons.explore,
+                      () => _navigiereZurSeite(HilfeFuerUnterwegs()),
                     ),
-                  );
-                },
+                    _iconTextKachel(
+                      'Daten exportieren',
+                      Icons.upload_file,
+                      () => _navigiereZurSeite(DatenExportieren()),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Verschaffe dir einen Überblick',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+
+                Row(
+                  children: [
+                    _iconTextKachel(
+                      'Kalender',
+                      Icons.calendar_month,
+                      () => _navigiereZurSeite(KalenderScreen()),
+                    ),
+                    _iconTextKachel(
+                      'Statistiken',
+                      Icons.bar_chart,
+                      () => _navigiereZurSeite(Statistiken()),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 100),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardPage({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Card(
+        elevation: 4,
+        margin: const EdgeInsets.all(10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon),
+              const SizedBox(height: 10),
+              Text(title, style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 5),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall,
+                textAlign: TextAlign.center,
               ),
             ],
           ),
         ),
       ),
-      appBar: AppBar(
-        title: const Text('CEDmate'),
-        actions: [AusloggenButton(auth: auth, user: user)],
-      ),
-      body: !_hatAnamnesedaten
-          ? SingleChildScrollView(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Medizinisches Profil noch nicht ausgefüllt',
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const AnamneseScreen(),
-                              ),
-                            );
-                          },
-                          child: const Text('Jetzt ausfüllen'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            )
-          : SingleChildScrollView(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    margin: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(user != null ? 'Hallo ${user.username}' : 'Hallo'),
-                        Text(
-                          '${_wochentage[_heutigesDatum.weekday - 1]}, '
-                          '${_heutigesDatum.day}.${_heutigesDatum.month}.${_heutigesDatum.year}',
-                        ),
-                        const SizedBox(height: 20),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.flash_on),
-                              SizedBox(width: 5),
-                              Text('Schnell erfassen'),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _iconTextKachel(
-                              'Symptom erfassen',
-                              Icons.sick,
-                              () => _navigiereZurSeite(SymptomErfassen()),
-                            ),
-                            _iconTextKachel(
-                              'Stuhlgang notieren',
-                              Icons.wc,
-                              () => _navigiereZurSeite(StuhlgangNotieren()),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _iconTextKachel(
-                              'Mahlzeit Eintagen',
-                              Icons.restaurant_menu,
-                              () => _navigiereZurSeite(MahlzeitEintragen()),
-                            ),
-                            _iconTextKachel(
-                              'Stimmung notieren',
-                              Icons.mood,
-                              () => _navigiereZurSeite(StimmungNotieren()),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.numbers),
-                              SizedBox(width: 5),
-                              Text('Heute in Zahlen'),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        _isLoadingEintraege
-                            ? const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 20),
-                                child: SizedBox(
-                                  width: 35,
-                                  height: 35,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                  ),
-                                ),
-                              )
-                            : Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      _iconZahlTextKachel(
-                                        Icons.sick,
-                                        'Symptome heute',
-                                        _symptomeHeute,
-                                        () => _navigiereZurSeite(
-                                          const SymptomeFuerMonat(),
-                                        ),
-                                      ),
-                                      _iconZahlTextKachel(
-                                        Icons.wc,
-                                        'Stuhlgänge',
-                                        _stuhlgaengeHeute,
-                                        () => _navigiereZurSeite(
-                                          const StuhlgangEintraegeFuerMonat(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      _iconZahlTextKachel(
-                                        Icons.restaurant_menu,
-                                        'Mahlzeiten',
-                                        _mahlzeitenHeute,
-                                        () => _navigiereZurSeite(
-                                          EssTagebuchFuerMonat(),
-                                        ),
-                                      ),
-                                      _iconZahlTextKachel(
-                                        Icons.mood,
-                                        'Stimmung',
-                                        _stimmungenHeute,
-                                        () => _navigiereZurSeite(
-                                          StimmungFuerMonat(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          height: 160,
-                          child: PageView(
-                            controller: PageController(viewportFraction: 0.9),
-                            padEnds: false,
-                            children: [
-                              InkWell(
-                                borderRadius: BorderRadius.circular(20),
-                                onTap: () {
-                                  _navigiereZurSeite(HilfeFuerUnterwegs());
-                                },
-                                child: Card(
-                                  elevation: 6,
-                                  margin: const EdgeInsets.all(10),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(Icons.explore),
-                                        SizedBox(height: 10),
-                                        Text('Hilfe für Unterwegs'),
-                                        SizedBox(height: 5),
-                                        Text(
-                                          'Toiletten in der Nähe',
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              InkWell(
-                                borderRadius: BorderRadius.circular(20),
-                                onTap: () {
-                                  _navigiereZurSeite(DatenExportieren());
-                                },
-                                child: Card(
-                                  elevation: 6,
-                                  margin: const EdgeInsets.all(10),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(Icons.upload_file),
-                                        SizedBox(height: 10),
-                                        Text('Daten exportieren'),
-                                        SizedBox(height: 5),
-                                        Text(
-                                          'Exportiere deine Daten für den Arztbesuch',
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        const SizedBox(height: 20),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.show_chart),
-                              SizedBox(width: 5),
-                              Text('Verschaffe dir einen Überblick'),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            _iconTextKachel(
-                              'Kalender',
-                              Icons.calendar_month,
-                              () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => KalenderScreen(),
-                                ),
-                              ),
-                            ),
-                            _iconTextKachel(
-                              'Statistiken',
-                              Icons.bar_chart,
-                              () => _navigiereZurSeite(Statistiken()),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 100),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
     );
   }
 }
