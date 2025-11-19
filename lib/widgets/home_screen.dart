@@ -5,6 +5,7 @@ import 'package:cedmate/widgets/CEDColors.dart';
 import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
 import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
 import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_monat.dart';
+import 'package:cedmate/widgets/symptome_fuer_datum.dart';
 import 'package:cedmate/widgets/symptome_fuer_monat.dart';
 import 'package:cedmate/widgets/anamnese_screen.dart';
 import 'package:cedmate/widgets/ausloggen_button.dart';
@@ -236,209 +237,175 @@ class _HomeScreenState extends State<HomeScreen> {
   // -------------------------------------------------------
 
   Widget _buildKeineAnamnese(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              children: [
-                Text(
-                  'Medizinisches Profil noch nicht ausgefüllt',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => _navigiereZurSeite(const AnamneseScreen()),
-                  child: Text(
-                    'Jetzt ausfüllen',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Medizinisches Profil noch nicht ausgefüllt',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () => _navigiereZurSeite(const AnamneseScreen()),
+          child: Text(
+            'Jetzt ausfüllen',
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
-      ),
+      ],
     );
   }
 
   Widget _buildHomeContent(BuildContext context, AppUser? user) {
-    return SingleChildScrollView(
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            margin: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              border: Border.all(color: CEDColors.border),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  user != null ? 'Hallo ${user.username}' : 'Hallo',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(
-                  '${_wochentage[_heutigesDatum.weekday - 1]}, '
-                  '${_heutigesDatum.day}.${_heutigesDatum.month}.${_heutigesDatum.year}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-
-                const SizedBox(height: 20),
-
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Schnell erfassen',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                Row(
-                  children: [
-                    _iconTextKachel(
-                      'Symptom erfassen',
-                      Icons.sick,
-                      () => _navigiereZurSeite(SymptomErfassen()),
-                    ),
-                    _iconTextKachel(
-                      'Stuhlgang notieren',
-                      Icons.wc,
-                      () => _navigiereZurSeite(StuhlgangNotieren()),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                Row(
-                  children: [
-                    _iconTextKachel(
-                      'Mahlzeit Eintragen',
-                      Icons.restaurant_menu,
-                      () => _navigiereZurSeite(MahlzeitEintragen()),
-                    ),
-                    _iconTextKachel(
-                      'Stimmung notieren',
-                      Icons.mood,
-                      () => _navigiereZurSeite(StimmungNotieren()),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Heute in Zahlen',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                _isLoadingEintraege
-                    ? const SizedBox(
-                        width: 35,
-                        height: 35,
-                        child: CircularProgressIndicator(strokeWidth: 3),
-                      )
-                    : Column(
-                        children: [
-                          Row(
-                            children: [
-                              _iconZahlTextKachel(
-                                Icons.sick,
-                                'Symptome',
-                                _symptomeHeute,
-                                () => _navigiereZurSeite(
-                                  const SymptomeFuerMonat(),
-                                ),
-                              ),
-                              _iconZahlTextKachel(
-                                Icons.wc,
-                                'Stuhlgänge',
-                                _stuhlgaengeHeute,
-                                () => _navigiereZurSeite(
-                                  const StuhlgangEintraegeFuerMonat(),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              _iconZahlTextKachel(
-                                Icons.restaurant_menu,
-                                'Mahlzeiten',
-                                _mahlzeitenHeute,
-                                () =>
-                                    _navigiereZurSeite(EssTagebuchFuerMonat()),
-                              ),
-                              _iconZahlTextKachel(
-                                Icons.mood,
-                                'Stimmungen',
-                                _stimmungenHeute,
-                                () => _navigiereZurSeite(StimmungFuerMonat()),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                const Divider(height: 20, thickness: 3),
-
-                Row(
-                  children: [
-                    _iconTextKachel(
-                      'Toiletten finden',
-                      Icons.explore,
-                      () => _navigiereZurSeite(HilfeFuerUnterwegs()),
-                    ),
-                    _iconTextKachel(
-                      'Daten exportieren',
-                      Icons.upload_file,
-                      () => _navigiereZurSeite(DatenExportieren()),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Verschaffe dir einen Überblick',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-
-                Row(
-                  children: [
-                    _iconTextKachel(
-                      'Kalender',
-                      Icons.calendar_month,
-                      () => _navigiereZurSeite(KalenderScreen()),
-                    ),
-                    _iconTextKachel(
-                      'Statistiken',
-                      Icons.bar_chart,
-                      () => _navigiereZurSeite(Statistiken()),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 100),
-              ],
-            ),
+    return Column(
+      children: [
+        Text(
+          user != null ? 'Hallo ${user.username}' : 'Hallo',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        Text(
+          '${_wochentage[_heutigesDatum.weekday - 1]}, '
+          '${_heutigesDatum.day}.${_heutigesDatum.month}.${_heutigesDatum.year}',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 20),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Schnell erfassen',
+            style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
-      ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _iconTextKachel(
+              'Symptom erfassen',
+              Icons.sick,
+              () => _navigiereZurSeite(SymptomErfassen()),
+            ),
+            _iconTextKachel(
+              'Stuhlgang notieren',
+              Icons.wc,
+              () => _navigiereZurSeite(StuhlgangNotieren()),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _iconTextKachel(
+              'Mahlzeit Eintragen',
+              Icons.restaurant_menu,
+              () => _navigiereZurSeite(MahlzeitEintragen()),
+            ),
+            _iconTextKachel(
+              'Stimmung notieren',
+              Icons.mood,
+              () => _navigiereZurSeite(StimmungNotieren()),
+            ),
+          ],
+        ),
+        const Divider(height: 30, thickness: 3),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Heute in Zahlen',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        const SizedBox(height: 10),
+        _isLoadingEintraege
+            ? const SizedBox(
+                width: 35,
+                height: 35,
+                child: CircularProgressIndicator(strokeWidth: 3),
+              )
+            : Column(
+                children: [
+                  Row(
+                    children: [
+                      _iconZahlTextKachel(
+                        Icons.sick,
+                        'Symptome',
+                        _symptomeHeute,
+                        () => _navigiereZurSeite(
+                          KalenderScreen(ausgewaehlteSeite: 0),
+                        ),
+                      ),
+                      _iconZahlTextKachel(
+                        Icons.wc,
+                        'Stuhlgänge',
+                        _stuhlgaengeHeute,
+                        () => _navigiereZurSeite(
+                          KalenderScreen(ausgewaehlteSeite: 1),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      _iconZahlTextKachel(
+                        Icons.restaurant_menu,
+                        'Mahlzeiten',
+                        _mahlzeitenHeute,
+                        () => _navigiereZurSeite(
+                          KalenderScreen(ausgewaehlteSeite: 2),
+                        ),
+                      ),
+                      _iconZahlTextKachel(
+                        Icons.mood,
+                        'Stimmungen',
+                        _stimmungenHeute,
+                        () => _navigiereZurSeite(
+                          KalenderScreen(ausgewaehlteSeite: 3),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+        const Divider(height: 30, thickness: 3),
+        Row(
+          children: [
+            _iconTextKachel(
+              'Toiletten finden',
+              Icons.explore,
+              () => _navigiereZurSeite(HilfeFuerUnterwegs()),
+            ),
+            _iconTextKachel(
+              'Daten exportieren',
+              Icons.upload_file,
+              () => _navigiereZurSeite(DatenExportieren()),
+            ),
+          ],
+        ),
+        const Divider(height: 30, thickness: 3),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Verschaffe dir einen Überblick',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _iconTextKachel(
+              'Kalender',
+              Icons.calendar_month,
+              () => _navigiereZurSeite(KalenderScreen()),
+            ),
+            _iconTextKachel(
+              'Statistiken',
+              Icons.bar_chart,
+              () => _navigiereZurSeite(Statistiken()),
+            ),
+          ],
+        ),
+        const SizedBox(height: 100),
+      ],
     );
   }
 

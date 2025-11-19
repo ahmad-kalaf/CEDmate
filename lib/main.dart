@@ -147,7 +147,7 @@ class CEDmateApp extends StatelessWidget {
           // Buttons
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
+              backgroundColor: CEDColors.buttonsBackground,
               foregroundColor: CEDColors.primaryText,
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
               shape: RoundedRectangleBorder(
