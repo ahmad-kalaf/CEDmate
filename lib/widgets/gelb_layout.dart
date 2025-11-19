@@ -7,6 +7,8 @@ import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
 import 'package:cedmate/widgets/symptome_fuer_monat.dart';
 import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
 
+import 'CEDColors.dart';
+
 class GelbLayout extends StatelessWidget {
   final String title;
   final Widget child;
@@ -33,10 +35,25 @@ class GelbLayout extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.amberAccent, Colors.white],
+            colors: [CEDColors.gradientStart, CEDColors.gradientend],
           ),
         ),
-        child: child,
+        child: SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: CEDColors.border),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: child,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

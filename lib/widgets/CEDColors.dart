@@ -15,4 +15,7 @@ class CEDColors {
   static const border = Colors.lightBlueAccent;
   static const background = Color(0xFFFFFFFF);
   static const appBarBackground = Colors.amberAccent;
+  static const gradientStart = Colors.amberAccent;
+  static const gradientend = Colors.white;
+  static const buttonsBackground = Colors.white;
 }
