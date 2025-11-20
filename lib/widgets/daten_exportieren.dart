@@ -1,3 +1,4 @@
+import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 
 class DatenExportieren extends StatelessWidget {
@@ -5,9 +6,9 @@ class DatenExportieren extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Daten exportieren')),
-      body: Center(
+    return CEDLayout(
+      title: 'Daten exportieren',
+      child: Center(
         child: Text(
           'Diese Funktion wird noch entwickelt.\nHier kann man später seine'
           ' Daten als Vorbereitung für den Arztbesuch exportieren.',

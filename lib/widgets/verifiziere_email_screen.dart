@@ -1,3 +1,4 @@
+import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -70,13 +71,9 @@ class _VerifiziereEmailScreenState extends State<VerifiziereEmailScreen> {
             if (mounted) Navigator.pushReplacementNamed(context, '/home');
           });
         }
-        return Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: const Text('CEDmate'),
-            actions: [AusloggenButton(auth: auth, user: user)],
-          ),
-          body: Center(
+        return CEDLayout(
+          title: 'CEDmate',
+          child: Center(
             child: Column(
               children: [
                 const Text(
