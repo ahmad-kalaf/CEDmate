@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:cedmate/widgets/ced_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -257,6 +258,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
     }
 
     return Scaffold(
+      drawer: const CEDDrawer(),
       appBar: AppBar(title: Text('Toiletten-Karte')),
       body: SafeArea(
         child: Stack(

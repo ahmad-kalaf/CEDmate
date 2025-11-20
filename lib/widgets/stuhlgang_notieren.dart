@@ -1,6 +1,7 @@
 import 'package:cedmate/models/stuhlgang.dart';
 import 'package:cedmate/services/stuhlgang_service.dart';
 import 'package:cedmate/utils/loesche_eintrag.dart';
+import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/enums/bristol_stuhlform.dart';
@@ -69,8 +70,9 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
         await service.aktualisiereStuhlgang(aktualisiert);
 
         if (mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('Eintrag aktualisiert.')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Eintrag aktualisiert.')),
+          );
         }
       } else {
         await service.erfasseStuhlgang(
@@ -80,16 +82,18 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
         );
 
         if (mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('Eintrag gespeichert.')));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Eintrag gespeichert.')));
         }
       }
 
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Fehler: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Fehler: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -125,130 +129,121 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
 
         if (verlassen == true && mounted) Navigator.pop(context);
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(isEditMode ? 'Eintrag bearbeiten' : 'Eintrag erfassen'),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    // ------------------------------
-                    // BRISTOL DROPDOWN (styled)
-                    // ------------------------------
-                    InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: "Typ – Konsistenz",
-                        border: OutlineInputBorder(),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<BristolStuhlform>(
-                          value: _ausgewaehlteForm,
-                          isExpanded: true,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                          dropdownColor: Theme.of(context).cardColor,
-                          items: BristolStuhlform.values.map((form) {
-                            return DropdownMenuItem(
-                              value: form,
-                              child: Text(form.beschreibung),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() => _ausgewaehlteForm = value);
-                            }
-                          },
-                        ),
-                      ),
-                    ),
+      child: CEDLayout(
+        title: isEditMode ? 'Eintrag bearbeiten' : 'Eintrag erfassen',
 
-                    const SizedBox(height: 16),
-
-                    // ------------------------------
-                    // HÄUFIGKEIT
-                    // ------------------------------
-                    TextFormField(
-                      controller: _haeufigkeitController,
-                      decoration: const InputDecoration(
-                        labelText: 'Häufigkeit pro Tag (min. 1)',
-                      ),
-                      keyboardType: TextInputType.number,
-                      validator: (v) {
-                        final i = int.tryParse(v ?? '');
-                        if (i == null || i < 1) {
-                          return 'Bitte mindestens 1 eingeben.';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // ------------------------------
-                    // NOTIZEN
-                    // ------------------------------
-                    TextFormField(
-                      controller: _notizenController,
-                      decoration: const InputDecoration(
-                        labelText: 'Notizen (optional)',
-                      ),
-                      maxLines: 3,
-                    ),
-
-                    const SizedBox(height: 26),
-
-                    // ------------------------------
-                    // SPEICHERN BUTTON
-                    // ------------------------------
-                    ElevatedButton.icon(
-                      icon: _isSaving
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.save),
-                      label: Text(isEditMode ? 'Aktualisieren' : 'Speichern'),
-                      onPressed: _isSaving ? null : _speichereEintrag,
-                    ),
-
-                    // ------------------------------
-                    // LÖSCHEN BUTTON (nur im Edit-Modus)
-                    // ------------------------------
-                    if (isEditMode) ...[
-                      const SizedBox(height: 10),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
-                          foregroundColor: Colors.white,
-                        ),
-                        icon: const Icon(Icons.delete_forever),
-                        label: const Text('Löschen'),
-                        onPressed: () async {
-                          final service = context.read<StuhlgangService>();
-
-                          await deleteEntry(
-                            context,
-                            titel: 'Eintrag löschen',
-                            text:
-                                'Diesen Eintrag wirklich löschen? Dies kann nicht rückgängig gemacht werden.',
-                            deleteAction: () =>
-                                service.loescheStuhlgang(widget.stuhlgang!.id!),
-                          );
-
-                          if (mounted) Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ],
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // ------------------------------
+              // BRISTOL DROPDOWN (styled)
+              // ------------------------------
+              InputDecorator(
+                decoration: const InputDecoration(
+                  labelText: "Typ – Konsistenz",
+                  border: OutlineInputBorder(),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<BristolStuhlform>(
+                    value: _ausgewaehlteForm,
+                    isExpanded: true,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    dropdownColor: Theme.of(context).cardColor,
+                    items: BristolStuhlform.values.map((form) {
+                      return DropdownMenuItem(
+                        value: form,
+                        child: Text(form.beschreibung),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _ausgewaehlteForm = value);
+                      }
+                    },
+                  ),
                 ),
               ),
-            ),
+
+              const SizedBox(height: 16),
+
+              // ------------------------------
+              // HÄUFIGKEIT
+              // ------------------------------
+              TextFormField(
+                controller: _haeufigkeitController,
+                decoration: const InputDecoration(
+                  labelText: 'Häufigkeit pro Tag (min. 1)',
+                ),
+                keyboardType: TextInputType.number,
+                validator: (v) {
+                  final i = int.tryParse(v ?? '');
+                  if (i == null || i < 1) {
+                    return 'Bitte mindestens 1 eingeben.';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // ------------------------------
+              // NOTIZEN
+              // ------------------------------
+              TextFormField(
+                controller: _notizenController,
+                decoration: const InputDecoration(
+                  labelText: 'Notizen (optional)',
+                ),
+                maxLines: 3,
+              ),
+
+              const SizedBox(height: 26),
+
+              // ------------------------------
+              // SPEICHERN BUTTON
+              // ------------------------------
+              ElevatedButton.icon(
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.save),
+                label: Text(isEditMode ? 'Aktualisieren' : 'Speichern'),
+                onPressed: _isSaving ? null : _speichereEintrag,
+              ),
+
+              // ------------------------------
+              // LÖSCHEN BUTTON (nur im Edit-Modus)
+              // ------------------------------
+              if (isEditMode) ...[
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.delete_forever),
+                  label: const Text('Löschen'),
+                  onPressed: () async {
+                    final service = context.read<StuhlgangService>();
+
+                    await deleteEntry(
+                      context,
+                      titel: 'Eintrag löschen',
+                      text:
+                          'Diesen Eintrag wirklich löschen? Dies kann nicht rückgängig gemacht werden.',
+                      deleteAction: () =>
+                          service.loescheStuhlgang(widget.stuhlgang!.id!),
+                    );
+
+                    if (mounted) Navigator.pop(context);
+                  },
+                ),
+              ],
+            ],
           ),
         ),
       ),

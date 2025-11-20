@@ -1,5 +1,6 @@
 import 'package:cedmate/services/symptom_service.dart';
 import 'package:cedmate/utils/loesche_eintrag.dart';
+import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -163,122 +164,107 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
           }
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(isEditMode ? 'Symptom bearbeiten' : 'Symptom erfassen'),
-        ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Form(
-                key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TextFormField(
-                        controller: _bezeichnungController,
-                        decoration: const InputDecoration(
-                          labelText: 'Bezeichnung',
-                        ),
-                        validator: (v) => v == null || v.trim().isEmpty
-                            ? 'Bitte eingeben'
-                            : null,
-                      ),
-                      TextFormField(
-                        controller: _intensitaetController,
-                        decoration: const InputDecoration(
-                          labelText: 'Intensität (1–10)',
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (v) {
-                          final i = int.tryParse(v ?? '');
-                          if (i == null || i < 1 || i > 10) {
-                            return 'Wert zwischen 1 und 10';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Startzeit: $datumAnzeige'),
-                          IconButton(
-                            icon: const Icon(Icons.edit_calendar),
-                            tooltip: 'Datum/Uhrzeit wählen',
-                            onPressed: _waehleStartzeit,
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      TextFormField(
-                        controller: _dauerController,
-                        decoration: const InputDecoration(
-                          labelText: 'Dauer (in Minuten)',
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (v) => v == null || v.trim().isEmpty
-                            ? 'Bitte eingeben'
-                            : null,
-                      ),
-                      TextFormField(
-                        controller: _notizenController,
-                        decoration: const InputDecoration(
-                          labelText: 'Notizen (optional)',
-                        ),
-                        maxLines: 3,
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        icon: _isSaving
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.save),
-                        label: Text(isEditMode ? 'Aktualisieren' : 'Speichern'),
-                        onPressed: _isSaving ? null : _speichereSymptom,
-                      ),
-                      if (isEditMode) ...[
-                        SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          icon: _isSaving
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.delete_forever),
-                          label: Text('Löschen'),
-                          onPressed: _isSaving
-                              ? null
-                              : () async {
-                                  final symptomService = context
-                                      .read<SymptomService>();
-                                  await deleteEntry(
-                                    context,
-                                    titel: 'Eintrag löschen',
-                                    text:
-                                        'Möchtest du diesen Eintrag wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden',
-                                    deleteAction: () => symptomService
-                                        .deleteSymptom(widget.symptom!.id!),
-                                  );
-                                  if (mounted) Navigator.pop(context);
-                                },
-                        ),
-                      ],
-                    ],
-                  ),
+      child: CEDLayout(
+        title: isEditMode ? 'Symptom bearbeiten' : 'Symptom erfassen',
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 10,
+              children: [
+                TextFormField(
+                  controller: _bezeichnungController,
+                  decoration: const InputDecoration(labelText: 'Bezeichnung'),
+                  validator: (v) =>
+                      v == null || v.trim().isEmpty ? 'Bitte eingeben' : null,
                 ),
-              ),
+                TextFormField(
+                  controller: _intensitaetController,
+                  decoration: const InputDecoration(
+                    labelText: 'Intensität (1–10)',
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (v) {
+                    final i = int.tryParse(v ?? '');
+                    if (i == null || i < 1 || i > 10) {
+                      return 'Wert zwischen 1 und 10';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Startzeit: $datumAnzeige'),
+                    IconButton(
+                      icon: const Icon(Icons.edit_calendar),
+                      tooltip: 'Datum/Uhrzeit wählen',
+                      onPressed: _waehleStartzeit,
+                    ),
+                  ],
+                ),
+                const Divider(),
+                TextFormField(
+                  controller: _dauerController,
+                  decoration: const InputDecoration(
+                    labelText: 'Dauer (in Minuten)',
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (v) =>
+                      v == null || v.trim().isEmpty ? 'Bitte eingeben' : null,
+                ),
+                TextFormField(
+                  controller: _notizenController,
+                  decoration: const InputDecoration(
+                    labelText: 'Notizen (optional)',
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  icon: _isSaving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.save),
+                  label: Text(isEditMode ? 'Aktualisieren' : 'Speichern'),
+                  onPressed: _isSaving ? null : _speichereSymptom,
+                ),
+                if (isEditMode) ...[
+                  SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    icon: _isSaving
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.delete_forever),
+                    label: Text('Löschen'),
+                    onPressed: _isSaving
+                        ? null
+                        : () async {
+                            final symptomService = context
+                                .read<SymptomService>();
+                            await deleteEntry(
+                              context,
+                              titel: 'Eintrag löschen',
+                              text:
+                                  'Möchtest du diesen Eintrag wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden',
+                              deleteAction: () => symptomService.deleteSymptom(
+                                widget.symptom!.id!,
+                              ),
+                            );
+                            if (mounted) Navigator.pop(context);
+                          },
+                  ),
+                ],
+              ],
             ),
           ),
         ),
