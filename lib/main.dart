@@ -2,6 +2,16 @@
 //  MAIN FILE — CLEAN, SAFE, MODERN
 // -----------------------------------------------------------------------------
 
+import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
+import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
+import 'package:cedmate/widgets/impressum_credits_screen.dart';
+import 'package:cedmate/widgets/mahlzeit_eintragen.dart';
+import 'package:cedmate/widgets/profil_screen.dart';
+import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
+import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_monat.dart';
+import 'package:cedmate/widgets/stuhlgang_notieren.dart';
+import 'package:cedmate/widgets/symptome_fuer_datum.dart';
+import 'package:cedmate/widgets/symptome_fuer_monat.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -53,7 +63,6 @@ class CEDmateApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-
         // AUTH
         Provider<AuthRepository>(create: (_) => AuthRepository()),
         ProxyProvider<AuthRepository, AuthService>(
@@ -105,10 +114,7 @@ class CEDmateApp extends StatelessWidget {
         title: 'CEDmate',
 
         locale: const Locale('de', 'DE'),
-        supportedLocales: const [
-          Locale('en', 'US'),
-          Locale('de', 'DE'),
-        ],
+        supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
@@ -116,8 +122,15 @@ class CEDmateApp extends StatelessWidget {
         ],
 
         routes: {
-          '/': (_) => const AuthGate(),
-          '/home': (_) => const HomeScreen(),
+          '/': (_) => const AuthGate(), // Login oder Home
+          '/home': (_) => const HomeScreen(), // Startseite nach Login
+          '/profil': (_) => const ProfilScreen(),
+          '/symptomeMonat': (_) => SymptomeFuerMonat(),
+          '/stuhlMonat': (_) => const StuhlgangEintraegeFuerMonat(),
+          '/essenMonat': (_) => EssTagebuchFuerMonat(),
+          '/stimmungMonat': (_) => StimmungFuerMonat(),
+          '/hilfeUnterwegs': (_) => HilfeFuerUnterwegs(),
+          '/credits': (_) => ImpressumCreditsScreen(),
         },
 
         builder: (context, child) =>
@@ -141,18 +154,9 @@ class CEDmateApp extends StatelessWidget {
           // TEXT THEMING
           // ------------------------------
           textTheme: GoogleFonts.interTextTheme().copyWith(
-            bodyLarge: TextStyle(
-              color: CEDColors.textPrimary,
-              fontSize: 16,
-            ),
-            bodyMedium: TextStyle(
-              color: CEDColors.textPrimary,
-              fontSize: 14,
-            ),
-            bodySmall: TextStyle(
-              color: CEDColors.textSecondary,
-              fontSize: 12,
-            ),
+            bodyLarge: TextStyle(color: CEDColors.textPrimary, fontSize: 16),
+            bodyMedium: TextStyle(color: CEDColors.textPrimary, fontSize: 14),
+            bodySmall: TextStyle(color: CEDColors.textSecondary, fontSize: 12),
             titleMedium: TextStyle(
               color: CEDColors.textPrimary,
               fontWeight: FontWeight.w600,
@@ -182,10 +186,7 @@ class CEDmateApp extends StatelessWidget {
           // ------------------------------
           // ICONS
           // ------------------------------
-          iconTheme: IconThemeData(
-            color: CEDColors.textPrimary,
-            size: 26,
-          ),
+          iconTheme: IconThemeData(color: CEDColors.textPrimary, size: 26),
 
           // ------------------------------
           // BUTTONS
@@ -231,8 +232,6 @@ class CEDmateApp extends StatelessWidget {
             iconColor: CEDColors.textPrimary,
             prefixIconColor: CEDColors.textPrimary,
             suffixIconColor: CEDColors.textPrimary,
-            
-            
           ),
 
           // ------------------------------

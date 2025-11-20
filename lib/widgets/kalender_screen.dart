@@ -1,3 +1,4 @@
+import 'package:cedmate/widgets/ced_drawer.dart';
 import 'package:cedmate/widgets/datum_rad.dart';
 import 'package:cedmate/widgets/ess_tagebuch_fuer_datum.dart';
 import 'package:cedmate/widgets/seelen_log_fuer_datum.dart';
@@ -65,6 +66,7 @@ class _KalenderScreenState extends State<KalenderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const CEDDrawer(),
       appBar: AppBar(
         title: const Text('Kalender'),
         actionsPadding: EdgeInsets.all(10),
@@ -81,78 +83,70 @@ class _KalenderScreenState extends State<KalenderScreen> {
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [CEDColors.gradientStart, CEDColors.gradientend],
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                margin: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    DatumRad(
-                      key: ValueKey(
-                        '${_ausgewaehtesMonatJahr!.year}-${_ausgewaehtesMonatJahr!.month}-${_ausgewaehtesMonatJahr!.day}',
+      body: SingleChildScrollView(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              margin: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: CEDColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: CEDColors.border, width: 1),
+              ),
+              child: Column(
+                children: [
+                  DatumRad(
+                    key: ValueKey(
+                      '${_ausgewaehtesMonatJahr!.year}-${_ausgewaehtesMonatJahr!.month}-${_ausgewaehtesMonatJahr!.day}',
+                    ),
+                    year: _ausgewaehtesMonatJahr!.year,
+                    month: _ausgewaehtesMonatJahr!.month,
+                    initialDay: _ausgewaehtesMonatJahr!.day,
+                    onDateSelected: (date) {
+                      setState(() {
+                        _ausgewaehtesMonatJahr = date;
+                        _datumAuswahlController.text =
+                            '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 10,
+                    runSpacing: 6,
+                    children: [
+                      _buildButton('Symptome', 0),
+                      _buildButton('Stuhlgang', 1),
+                      _buildButton('Mahlzeiten', 2),
+                      _buildButton('Stimmung', 3),
+                    ],
+                  ),
+                  const Divider(height: 16),
+                  // Hier KEIN Expanded, stattdessen einfach Container
+                  Container(
+                    alignment: Alignment.center,
+                    child: switch (_ausgewaehlteSeite) {
+                      0 => SymptomeFuerDatum(
+                        filterDatum: _ausgewaehtesMonatJahr!,
                       ),
-                      year: _ausgewaehtesMonatJahr!.year,
-                      month: _ausgewaehtesMonatJahr!.month,
-                      initialDay: _ausgewaehtesMonatJahr!.day,
-                      onDateSelected: (date) {
-                        setState(() {
-                          _ausgewaehtesMonatJahr = date;
-                          _datumAuswahlController.text =
-                              '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 10,
-                      runSpacing: 6,
-                      children: [
-                        _buildButton('Symptome', 0),
-                        _buildButton('Stuhlgang', 1),
-                        _buildButton('Mahlzeiten', 2),
-                        _buildButton('Stimmung', 3),
-                      ],
-                    ),
-                    const Divider(height: 16),
-                    // Hier KEIN Expanded, stattdessen einfach Container
-                    Container(
-                      alignment: Alignment.center,
-                      child: switch (_ausgewaehlteSeite) {
-                        0 => SymptomeFuerDatum(
-                          filterDatum: _ausgewaehtesMonatJahr!,
-                        ),
-                        1 => StuhlgangEintraegeFuerDatum(
-                          filterDatum: _ausgewaehtesMonatJahr!,
-                        ),
-                        2 => EssTagebuchFuerDatum(
-                          filterDatum: _ausgewaehtesMonatJahr!,
-                        ),
-                        3 => SeelenLogFuerDatum(
-                          filterDatum: _ausgewaehtesMonatJahr!,
-                        ),
-                        _ => const Text(
-                          'Keine Einträge für diese Seite implementiert.',
-                        ),
-                      },
-                    ),
-                  ],
-                ),
+                      1 => StuhlgangEintraegeFuerDatum(
+                        filterDatum: _ausgewaehtesMonatJahr!,
+                      ),
+                      2 => EssTagebuchFuerDatum(
+                        filterDatum: _ausgewaehtesMonatJahr!,
+                      ),
+                      3 => SeelenLogFuerDatum(
+                        filterDatum: _ausgewaehtesMonatJahr!,
+                      ),
+                      _ => const Text(
+                        'Keine Einträge für diese Seite implementiert.',
+                      ),
+                    },
+                  ),
+                ],
               ),
             ),
           ),

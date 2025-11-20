@@ -1,6 +1,7 @@
 import 'package:cedmate/models/enums/stimmung_level.dart';
 import 'package:cedmate/services/stimmung_service.dart';
 import 'package:cedmate/utils/build_list_section.dart';
+import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/stimmung.dart';
@@ -139,117 +140,104 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
           }
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(isEditMode ? 'Eintrag bearbeiten' : 'Eintrag erfassen'),
-        ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Form(
-                key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      DropdownButtonFormField<StimmungLevel>(
-                        initialValue: _stimmungLevel,
-                        decoration: const InputDecoration(
-                          labelText: 'Stimmung',
-                          border: OutlineInputBorder(),
-                        ),
-                        items: StimmungLevel.values.map((level) {
-                          return DropdownMenuItem(
-                            value: level,
-                            child: Text(level.name),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() => _stimmungLevel = value);
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _stresslevelController,
-                        decoration: const InputDecoration(
-                          labelText: 'Stresslevel (1–10)',
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (v) {
-                          final i = int.tryParse(v ?? '');
-                          if (i == null || i < 1 || i > 10) {
-                            return 'Wert zwischen 1 und 10';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _notizController,
-                        decoration: const InputDecoration(
-                          labelText: 'Notizen (optional)',
-                          border: OutlineInputBorder(),
-                        ),
-                        maxLines: 3,
-                      ),
-                      const SizedBox(height: 12),
-                      buildListSection(
-                        title: 'Tags (optional)',
-                        context: context,
-                        controller: _tagsController,
-                        items: _tags,
-                        onAdd: () => _addTag(_tagsController, _tags),
-                        onRemove: (val) => _removeTag(_tags, val),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: _isSaving ? null : _speichereEintrag,
-                        icon: const Icon(Icons.save),
-                        label: Text(
-                          isEditMode
-                              ? 'Änderungen speichern'
-                              : 'Eintrag speichern',
-                        ),
-                      ),
-                      if (isEditMode) ...[
-                        SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          icon: _isSaving
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.delete_forever),
-                          label: Text('Löschen'),
-                          onPressed: _isSaving
-                              ? null
-                              : () async {
-                                  final symptomService = context
-                                      .read<StimmungService>();
-                                  await deleteEntry(
-                                    context,
-                                    titel: 'Eintrag löschen',
-                                    text:
-                                        'Möchtest du diesen Eintrag wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden',
-                                    deleteAction: () => symptomService
-                                        .loescheStimmung(widget.stimmung!.id!),
-                                  );
-                                  if (mounted) Navigator.pop(context);
-                                },
-                        ),
-                      ],
-                    ],
+      child: CEDLayout(
+        title: isEditMode ? 'Eintrag bearbeiten' : 'Eintrag erfassen',
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DropdownButtonFormField<StimmungLevel>(
+                  initialValue: _stimmungLevel,
+                  decoration: const InputDecoration(
+                    labelText: 'Stimmung',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: StimmungLevel.values.map((level) {
+                    return DropdownMenuItem(
+                      value: level,
+                      child: Text(level.name),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _stimmungLevel = value);
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _stresslevelController,
+                  decoration: const InputDecoration(
+                    labelText: 'Stresslevel (1–10)',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (v) {
+                    final i = int.tryParse(v ?? '');
+                    if (i == null || i < 1 || i > 10) {
+                      return 'Wert zwischen 1 und 10';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _notizController,
+                  decoration: const InputDecoration(
+                    labelText: 'Notizen (optional)',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 12),
+                buildListSection(
+                  title: 'Tags (optional)',
+                  context: context,
+                  controller: _tagsController,
+                  items: _tags,
+                  onAdd: () => _addTag(_tagsController, _tags),
+                  onRemove: (val) => _removeTag(_tags, val),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: _isSaving ? null : _speichereEintrag,
+                  icon: const Icon(Icons.save),
+                  label: Text(
+                    isEditMode ? 'Änderungen speichern' : 'Eintrag speichern',
                   ),
                 ),
-              ),
+                if (isEditMode) ...[
+                  SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    icon: _isSaving
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.delete_forever),
+                    label: Text('Löschen'),
+                    onPressed: _isSaving
+                        ? null
+                        : () async {
+                            final symptomService = context
+                                .read<StimmungService>();
+                            await deleteEntry(
+                              context,
+                              titel: 'Eintrag löschen',
+                              text:
+                                  'Möchtest du diesen Eintrag wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden',
+                              deleteAction: () => symptomService
+                                  .loescheStimmung(widget.stimmung!.id!),
+                            );
+                            if (mounted) Navigator.pop(context);
+                          },
+                  ),
+                ],
+              ],
             ),
           ),
         ),

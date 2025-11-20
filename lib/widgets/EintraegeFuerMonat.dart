@@ -1,5 +1,7 @@
+import 'package:cedmate/widgets/ced_drawer.dart';
 import 'package:flutter/material.dart';
 import '../utils/monat_jahr_auswahl.dart';
+import 'CEDColors.dart';
 
 class EintraegeFuerMonat<T> extends StatefulWidget {
   final String title;
@@ -23,17 +25,19 @@ class _EintraegeFuerMonatState<T> extends State<EintraegeFuerMonat<T>> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const CEDDrawer(),
       appBar: AppBar(title: Text(widget.title)),
       body: SingleChildScrollView(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
             child: Container(
-              margin: const EdgeInsets.all(10),
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(20),
+              margin: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
+                color: CEDColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: CEDColors.border, width: 1),
               ),
               child: StreamBuilder<List<T>>(
                 stream: widget.streamProvider(

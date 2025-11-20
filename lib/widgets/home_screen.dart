@@ -2,17 +2,11 @@ import 'package:cedmate/models/app_user.dart';
 import 'package:cedmate/services/anamnese_service.dart';
 import 'package:cedmate/services/symptom_service.dart';
 import 'package:cedmate/widgets/CEDColors.dart';
-import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
-import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
-import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_monat.dart';
-import 'package:cedmate/widgets/symptome_fuer_datum.dart';
-import 'package:cedmate/widgets/symptome_fuer_monat.dart';
 import 'package:cedmate/widgets/anamnese_screen.dart';
 import 'package:cedmate/widgets/ausloggen_button.dart';
 import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
 import 'package:cedmate/widgets/kalender_screen.dart';
 import 'package:cedmate/widgets/mahlzeit_eintragen.dart';
-import 'package:cedmate/widgets/profil_screen.dart';
 import 'package:cedmate/widgets/statistiken.dart';
 import 'package:cedmate/widgets/stimmung_notieren.dart';
 import 'package:cedmate/widgets/stuhlgang_notieren.dart';
@@ -145,10 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Icon(icon, color: CEDColors.iconPrimary, size: 30),
               const SizedBox(height: 10),
-              Text(
-                text,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+              Text(text, style: Theme.of(context).textTheme.bodyMedium),
             ],
           ),
         ),
@@ -156,58 +147,55 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget _homeStatTile({
-  required IconData icon,
-  required String text,
-  required int value,
-  required VoidCallback onTap,
-}) {
-  return Expanded(
-    child: InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: Container(
-        height: 110,
-        margin: const EdgeInsets.symmetric(horizontal: 5),
-        decoration: BoxDecoration(
-          color: CEDColors.surfaceDark, // same style as other tiles
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: CEDColors.iconSecondary, size: 30),
-            const SizedBox(height: 8),
+    required IconData icon,
+    required String text,
+    required int value,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          height: 110,
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            color: CEDColors.surfaceDark, // same style as other tiles
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: CEDColors.iconSecondary, size: 30),
+              const SizedBox(height: 8),
 
-            Text(
-              '$value',
-              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 4),
+              Text(
+                '$value',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
 
-            Text(
-              text,
-              style: Theme.of(context).textTheme.bodySmall,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+              Text(
+                text,
+                style: Theme.of(context).textTheme.bodySmall,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
-
-
+    );
+  }
 
   // -------------------------------------------------------------------------
   // BUILD
@@ -265,7 +253,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
 
         const SizedBox(height: 25),
-        Text('Schnell erfassen', style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          'Schnell erfassen',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         const SizedBox(height: 10),
 
         Row(
@@ -314,13 +305,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icons.sick,
                         text: 'Symptome',
                         value: _symptomeHeute,
-                        onTap: () => _navigiereZurSeite(KalenderScreen(ausgewaehlteSeite: 0)),
+                        onTap: () => _navigiereZurSeite(
+                          KalenderScreen(ausgewaehlteSeite: 0),
+                        ),
                       ),
                       _homeStatTile(
                         icon: Icons.wc,
                         text: 'Stuhlgänge',
                         value: _stuhlgaengeHeute,
-                        onTap: () => _navigiereZurSeite(KalenderScreen(ausgewaehlteSeite: 1)),
+                        onTap: () => _navigiereZurSeite(
+                          KalenderScreen(ausgewaehlteSeite: 1),
+                        ),
                       ),
                     ],
                   ),
@@ -331,13 +326,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icons.restaurant_menu,
                         text: 'Mahlzeiten',
                         value: _mahlzeitenHeute,
-                        onTap: () => _navigiereZurSeite(KalenderScreen(ausgewaehlteSeite: 2)),
+                        onTap: () => _navigiereZurSeite(
+                          KalenderScreen(ausgewaehlteSeite: 2),
+                        ),
                       ),
                       _homeStatTile(
                         icon: Icons.mood,
                         text: 'Stimmungen',
                         value: _stimmungenHeute,
-                        onTap: () => _navigiereZurSeite(KalenderScreen(ausgewaehlteSeite: 3)),
+                        onTap: () => _navigiereZurSeite(
+                          KalenderScreen(ausgewaehlteSeite: 3),
+                        ),
                       ),
                     ],
                   ),
@@ -345,6 +344,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
         const SizedBox(height: 30),
+
+        Text(
+          'Hilfe für Unterwegs',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+
+        const SizedBox(height: 10),
 
         Row(
           children: [
@@ -363,8 +369,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         const SizedBox(height: 30),
 
-        Text('Verschaffe dir einen Überblick',
-            style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          'Verschaffe dir einen Überblick',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
 
         const SizedBox(height: 10),
 

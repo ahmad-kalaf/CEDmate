@@ -1,6 +1,7 @@
 import 'package:cedmate/models/mahlzeit.dart';
 import 'package:cedmate/services/mahlzeit_service.dart';
 import 'package:cedmate/utils/build_list_section.dart';
+import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/loesche_eintrag.dart';
@@ -96,16 +97,18 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(isEditMode ? 'Eintrag aktualisiert' : 'Eintrag gespeichert'),
+          content: Text(
+            isEditMode ? 'Eintrag aktualisiert' : 'Eintrag gespeichert',
+          ),
         ),
       );
 
       Navigator.pop(context);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Fehler: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Fehler: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -123,7 +126,8 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
             builder: (context) => AlertDialog(
               title: const Text('Seite verlassen?'),
               content: const Text(
-                  'Wenn du die Seite verlässt, werden deine Eingaben NICHT gespeichert!'),
+                'Wenn du die Seite verlässt, werden deine Eingaben NICHT gespeichert!',
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
@@ -142,128 +146,115 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
           }
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(isEditMode ? 'Eintrag bearbeiten' : 'Mahlzeit erfassen'),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    // -------------------------
-                    // BEZEICHNUNG
-                    // -------------------------
-                    TextFormField(
-                      controller: _bezeichnungController,
-                      decoration: const InputDecoration(
-                        labelText: 'Bezeichnung der Mahlzeit',
-                      ),
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return 'Bitte eine Bezeichnung angeben';
-                        }
-                        return null;
-                      },
-                    ),
+      child: CEDLayout(
+        title: isEditMode ? 'Eintrag bearbeiten' : 'Mahlzeit erfassen',
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // -------------------------
+              // BEZEICHNUNG
+              // -------------------------
+              TextFormField(
+                controller: _bezeichnungController,
+                decoration: const InputDecoration(
+                  labelText: 'Bezeichnung der Mahlzeit',
+                ),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) {
+                    return 'Bitte eine Bezeichnung angeben';
+                  }
+                  return null;
+                },
+              ),
 
-                    const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-                    // -------------------------
-                    // ZUTATEN
-                    // -------------------------
-                    buildListSection(
-                      title: 'Zutaten (optional)',
-                      context: context,
-                      controller: _zutatenController,
-                      items: _zutaten,
-                      onAdd: () => _addItem(_zutatenController, _zutaten),
-                      onRemove: (v) => _removeItem(_zutaten, v),
-                    ),
+              // -------------------------
+              // ZUTATEN
+              // -------------------------
+              buildListSection(
+                title: 'Zutaten (optional)',
+                context: context,
+                controller: _zutatenController,
+                items: _zutaten,
+                onAdd: () => _addItem(_zutatenController, _zutaten),
+                onRemove: (v) => _removeItem(_zutaten, v),
+              ),
 
-                    const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-                    // -------------------------
-                    // NOTIZ
-                    // -------------------------
-                    TextFormField(
-                      controller: _notizController,
-                      decoration: const InputDecoration(
-                        labelText: 'Notizen (optional)',
-                      ),
-                      maxLines: 3,
-                    ),
+              // -------------------------
+              // NOTIZ
+              // -------------------------
+              TextFormField(
+                controller: _notizController,
+                decoration: const InputDecoration(
+                  labelText: 'Notizen (optional)',
+                ),
+                maxLines: 3,
+              ),
 
-                    const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-                    // -------------------------
-                    // UNVERTRÄGLICHKEITEN
-                    // -------------------------
-                    buildListSection(
-                      title: 'Unverträglichkeiten (optional)',
-                      context: context,
-                      controller: _unvertraeglichkeitenController,
-                      items: _unvertraeglichkeiten,
-                      onAdd: () => _addItem(
-                        _unvertraeglichkeitenController,
-                        _unvertraeglichkeiten,
-                      ),
-                      onRemove: (v) => _removeItem(_unvertraeglichkeiten, v),
-                    ),
+              // -------------------------
+              // UNVERTRÄGLICHKEITEN
+              // -------------------------
+              buildListSection(
+                title: 'Unverträglichkeiten (optional)',
+                context: context,
+                controller: _unvertraeglichkeitenController,
+                items: _unvertraeglichkeiten,
+                onAdd: () => _addItem(
+                  _unvertraeglichkeitenController,
+                  _unvertraeglichkeiten,
+                ),
+                onRemove: (v) => _removeItem(_unvertraeglichkeiten, v),
+              ),
 
-                    const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-                    // -------------------------
-                    // SPEICHERN BUTTON
-                    // -------------------------
-                    ElevatedButton.icon(
-                      onPressed: _isSaving ? null : _speichereEintrag,
-                      icon: const Icon(Icons.save),
-                      label: Text(
-                        isEditMode
-                            ? 'Änderungen speichern'
-                            : 'Eintrag speichern',
-                      ),
-                    ),
-
-                    // -------------------------
-                    // LÖSCHEN BUTTON
-                    // -------------------------
-                    if (isEditMode) ...[
-                      const SizedBox(height: 10),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade300,
-                        ),
-                        icon: const Icon(Icons.delete_forever),
-                        label: const Text('Löschen'),
-                        onPressed: _isSaving
-                            ? null
-                            : () async {
-                                final service =
-                                    context.read<MahlzeitService>();
-
-                                await deleteEntry(
-                                  context,
-                                  titel: 'Eintrag löschen',
-                                  text:
-                                      'Möchtest du diesen Eintrag wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden',
-                                  deleteAction: () =>
-                                      service.loescheMahlzeit(widget.mahlzeit!.id!),
-                                );
-
-                                if (mounted) Navigator.pop(context);
-                              },
-                      ),
-                    ],
-                  ],
+              // -------------------------
+              // SPEICHERN BUTTON
+              // -------------------------
+              ElevatedButton.icon(
+                onPressed: _isSaving ? null : _speichereEintrag,
+                icon: const Icon(Icons.save),
+                label: Text(
+                  isEditMode ? 'Änderungen speichern' : 'Eintrag speichern',
                 ),
               ),
-            ),
+
+              // -------------------------
+              // LÖSCHEN BUTTON
+              // -------------------------
+              if (isEditMode) ...[
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade300,
+                  ),
+                  icon: const Icon(Icons.delete_forever),
+                  label: const Text('Löschen'),
+                  onPressed: _isSaving
+                      ? null
+                      : () async {
+                          final service = context.read<MahlzeitService>();
+
+                          await deleteEntry(
+                            context,
+                            titel: 'Eintrag löschen',
+                            text:
+                                'Möchtest du diesen Eintrag wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden',
+                            deleteAction: () =>
+                                service.loescheMahlzeit(widget.mahlzeit!.id!),
+                          );
+
+                          if (mounted) Navigator.pop(context);
+                        },
+                ),
+              ],
+            ],
           ),
         ),
       ),
