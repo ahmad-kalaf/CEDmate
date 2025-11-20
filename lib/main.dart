@@ -2,12 +2,15 @@
 //  MAIN FILE — CLEAN, SAFE, MODERN
 // -----------------------------------------------------------------------------
 
+import 'package:cedmate/widgets/daten_exportieren.dart';
 import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
 import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
 import 'package:cedmate/widgets/impressum_credits_screen.dart';
+import 'package:cedmate/widgets/kalender_screen.dart';
 import 'package:cedmate/widgets/mahlzeit_eintragen.dart';
 import 'package:cedmate/widgets/profil_screen.dart';
 import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
+import 'package:cedmate/widgets/statistiken.dart';
 import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_monat.dart';
 import 'package:cedmate/widgets/stuhlgang_notieren.dart';
 import 'package:cedmate/widgets/symptome_fuer_datum.dart';
@@ -122,14 +125,17 @@ class CEDmateApp extends StatelessWidget {
         ],
 
         routes: {
-          '/': (_) => const AuthGate(), // Login oder Home
-          '/home': (_) => const HomeScreen(), // Startseite nach Login
+          '/': (_) => const AuthGate(),
+          '/home': (_) => const HomeScreen(),
           '/profil': (_) => const ProfilScreen(),
           '/symptomeMonat': (_) => SymptomeFuerMonat(),
           '/stuhlMonat': (_) => const StuhlgangEintraegeFuerMonat(),
           '/essenMonat': (_) => EssTagebuchFuerMonat(),
           '/stimmungMonat': (_) => StimmungFuerMonat(),
           '/hilfeUnterwegs': (_) => HilfeFuerUnterwegs(),
+          '/export': (_) => const DatenExportieren(),
+          '/kalender': (_) => const KalenderScreen(),
+          '/statistiken': (_) => const Statistiken(),
           '/credits': (_) => ImpressumCreditsScreen(),
         },
 

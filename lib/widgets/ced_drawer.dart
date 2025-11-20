@@ -43,6 +43,20 @@ class CEDDrawer extends StatelessWidget {
                   _drawerItem(context, 'Toiletten finden', Icons.map, () {
                     Navigator.pushNamed(context, '/hilfeUnterwegs');
                   }),
+                  _drawerItem(
+                    context,
+                    'Daten exportieren',
+                    Icons.import_export,
+                    () {
+                      Navigator.pushNamed(context, '/export');
+                    },
+                  ),
+                  _drawerItem(context, 'Kalender', Icons.calendar_month, () {
+                    Navigator.pushNamed(context, '/kalender');
+                  }),
+                  _drawerItem(context, 'Statistiken', Icons.bar_chart, () {
+                    Navigator.pushNamed(context, '/statistiken');
+                  }),
                   _drawerItem(context, 'Impressum & Credits', Icons.info, () {
                     Navigator.pushNamed(context, '/credits');
                   }),
