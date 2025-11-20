@@ -2,10 +2,12 @@ import 'package:cedmate/models/anamnese.dart';
 import 'package:cedmate/models/enums/diagnose.dart';
 import 'package:cedmate/models/enums/gender.dart';
 import 'package:cedmate/services/anamnese_service.dart';
+import 'package:cedmate/widgets/ced_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/build_list_section.dart';
+import 'CEDColors.dart';
 
 class AnamneseScreen extends StatefulWidget {
   const AnamneseScreen({super.key});
@@ -138,6 +140,7 @@ class _AnamneseScreenState extends State<AnamneseScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
+      drawer: const CEDDrawer(),
       appBar: AppBar(
         title: const Text('Medizinisches Profil'),
         centerTitle: true,
@@ -146,8 +149,14 @@ class _AnamneseScreenState extends State<AnamneseScreen> {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              margin: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: CEDColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: CEDColors.border, width: 1),
+              ),
               child: Form(
                 key: _formKey,
                 child: Column(
