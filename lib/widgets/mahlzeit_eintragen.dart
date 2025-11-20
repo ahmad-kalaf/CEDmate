@@ -3,7 +3,6 @@ import 'package:cedmate/services/mahlzeit_service.dart';
 import 'package:cedmate/utils/build_list_section.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../utils/loesche_eintrag.dart';
 
 class MahlzeitEintragen extends StatefulWidget {
@@ -33,6 +32,7 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
   @override
   void initState() {
     super.initState();
+
     if (isEditMode) {
       final m = widget.mahlzeit!;
       _bezeichnungController.text = m.bezeichnung;
@@ -83,28 +83,29 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
       mahlzeitZeitpunkt: widget.mahlzeit?.mahlzeitZeitpunkt ?? DateTime.now(),
     );
 
-    final mahlzeitService = context.read<MahlzeitService>();
+    final service = context.read<MahlzeitService>();
+
     try {
       if (isEditMode) {
-        await mahlzeitService.aktualisiereMahlzeit(mahlzeit);
+        await service.aktualisiereMahlzeit(mahlzeit);
       } else {
-        await mahlzeitService.erfasseMahlzeit(mahlzeit);
+        await service.erfasseMahlzeit(mahlzeit);
       }
 
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            isEditMode ? 'Eintrag aktualisiert' : 'Eintrag gespeichert',
-          ),
+          content:
+              Text(isEditMode ? 'Eintrag aktualisiert' : 'Eintrag gespeichert'),
         ),
       );
+
       Navigator.pop(context);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Fehler: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Fehler: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -117,13 +118,12 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          final bool? verlassenBestaetigt = await showDialog(
+          final bool? confirm = await showDialog(
             context: context,
             builder: (context) => AlertDialog(
               title: const Text('Seite verlassen?'),
               content: const Text(
-                'Wenn du die Seite verlässt, werden deine Eingaben NICHT gespeichert!',
-              ),
+                  'Wenn du die Seite verlässt, werden deine Eingaben NICHT gespeichert!'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
@@ -136,7 +136,8 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
               ],
             ),
           );
-          if (verlassenBestaetigt == true && context.mounted) {
+
+          if (confirm == true && context.mounted) {
             Navigator.pop(context);
           }
         }
@@ -146,102 +147,120 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
           title: Text(isEditMode ? 'Eintrag bearbeiten' : 'Mahlzeit erfassen'),
         ),
         body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
               child: Form(
                 key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TextFormField(
-                        controller: _bezeichnungController,
-                        decoration: const InputDecoration(
-                          labelText: 'Bezeichnung der Mahlzeit',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
-                            return 'Bitte eine Bezeichnung angeben';
-                          }
-                          return null;
-                        },
+                child: Column(
+                  children: [
+                    // -------------------------
+                    // BEZEICHNUNG
+                    // -------------------------
+                    TextFormField(
+                      controller: _bezeichnungController,
+                      decoration: const InputDecoration(
+                        labelText: 'Bezeichnung der Mahlzeit',
                       ),
-                      const SizedBox(height: 12),
-                      buildListSection(
-                        title: 'Zutaten (optional)',
-                        context: context,
-                        controller: _zutatenController,
-                        items: _zutaten,
-                        onAdd: () => _addItem(_zutatenController, _zutaten),
-                        onRemove: (val) => _removeItem(_zutaten, val),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return 'Bitte eine Bezeichnung angeben';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // -------------------------
+                    // ZUTATEN
+                    // -------------------------
+                    buildListSection(
+                      title: 'Zutaten (optional)',
+                      context: context,
+                      controller: _zutatenController,
+                      items: _zutaten,
+                      onAdd: () => _addItem(_zutatenController, _zutaten),
+                      onRemove: (v) => _removeItem(_zutaten, v),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // -------------------------
+                    // NOTIZ
+                    // -------------------------
+                    TextFormField(
+                      controller: _notizController,
+                      decoration: const InputDecoration(
+                        labelText: 'Notizen (optional)',
                       ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _notizController,
-                        decoration: const InputDecoration(
-                          labelText: 'Notizen (optional)',
-                          border: OutlineInputBorder(),
-                        ),
-                        maxLines: 3,
+                      maxLines: 3,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // -------------------------
+                    // UNVERTRÄGLICHKEITEN
+                    // -------------------------
+                    buildListSection(
+                      title: 'Unverträglichkeiten (optional)',
+                      context: context,
+                      controller: _unvertraeglichkeitenController,
+                      items: _unvertraeglichkeiten,
+                      onAdd: () => _addItem(
+                        _unvertraeglichkeitenController,
+                        _unvertraeglichkeiten,
                       ),
-                      const SizedBox(height: 12),
-                      buildListSection(
-                        title: 'Unverträglichkeiten (optional)',
-                        context: context,
-                        controller: _unvertraeglichkeitenController,
-                        items: _unvertraeglichkeiten,
-                        onAdd: () => _addItem(
-                          _unvertraeglichkeitenController,
-                          _unvertraeglichkeiten,
-                        ),
-                        onRemove: (val) =>
-                            _removeItem(_unvertraeglichkeiten, val),
+                      onRemove: (v) => _removeItem(_unvertraeglichkeiten, v),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // -------------------------
+                    // SPEICHERN BUTTON
+                    // -------------------------
+                    ElevatedButton.icon(
+                      onPressed: _isSaving ? null : _speichereEintrag,
+                      icon: const Icon(Icons.save),
+                      label: Text(
+                        isEditMode
+                            ? 'Änderungen speichern'
+                            : 'Eintrag speichern',
                       ),
-                      const SizedBox(height: 20),
+                    ),
+
+                    // -------------------------
+                    // LÖSCHEN BUTTON
+                    // -------------------------
+                    if (isEditMode) ...[
+                      const SizedBox(height: 10),
                       ElevatedButton.icon(
-                        onPressed: _isSaving ? null : _speichereEintrag,
-                        icon: const Icon(Icons.save),
-                        label: Text(
-                          isEditMode
-                              ? 'Änderungen speichern'
-                              : 'Eintrag speichern',
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade300,
                         ),
+                        icon: const Icon(Icons.delete_forever),
+                        label: const Text('Löschen'),
+                        onPressed: _isSaving
+                            ? null
+                            : () async {
+                                final service =
+                                    context.read<MahlzeitService>();
+
+                                await deleteEntry(
+                                  context,
+                                  titel: 'Eintrag löschen',
+                                  text:
+                                      'Möchtest du diesen Eintrag wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden',
+                                  deleteAction: () =>
+                                      service.loescheMahlzeit(widget.mahlzeit!.id!),
+                                );
+
+                                if (mounted) Navigator.pop(context);
+                              },
                       ),
-                      if (isEditMode) ...[
-                        SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          icon: _isSaving
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.delete_forever),
-                          label: Text('Löschen'),
-                          onPressed: _isSaving
-                              ? null
-                              : () async {
-                                  final symptomService = context
-                                      .read<MahlzeitService>();
-                                  await deleteEntry(
-                                    context,
-                                    titel: 'Eintrag löschen',
-                                    text:
-                                        'Möchtest du diesen Eintrag wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden',
-                                    deleteAction: () => symptomService
-                                        .loescheMahlzeit(widget.mahlzeit!.id!),
-                                  );
-                                  if (mounted) Navigator.pop(context);
-                                },
-                        ),
-                      ],
                     ],
-                  ),
+                  ],
                 ),
               ),
             ),

@@ -1,21 +1,38 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart' show Colors;
+
+//COLOUR PALLETTE:_------------------------------------------------------------
 
 class CEDColors {
-  static const symptom = Color(0xFFFF8A65); // warmes Orange
-  static const stool = Color(0xFF6D4C41); // warmes Braun
-  static const meal = Color(0xFFFBC02D); // weiches Gelb
-  static const mood = Color(0xFF4FC3F7); // entspannendes Hellblau
+  // BRAND COLORS
+  static const primary = Color.fromARGB(255, 114, 131, 110); // 
+  static const accent = Color.fromARGB(255, 119, 136, 115);  // 
 
-  static const primaryText = Color(
-    0xFF1A1A1A,
-  ); // dunkles Grau statt tiefes Schwarz
-  static const secondaryText = Color(0xFF4E5D6A);
-  static const border = Colors.lightBlueAccent;
-  static const background = Color(0xFFFFFFFF);
-  static const appBarBackground = Colors.amberAccent;
-  static const gradientStart = Colors.amberAccent;
-  static const gradientend = Colors.white;
-  static const buttonsBackground = Colors.white;
+  // BACKGROUND
+  static const background = Color.fromARGB(255, 112, 128, 108);
+  static const surface = Color.fromARGB(255, 241, 243, 224);   // for cards/panels
+  static const surfaceDark = Color.fromARGB(255, 210, 220, 182);
+
+  // TEXT
+  static const textPrimary = Color.fromARGB(255, 0, 43, 40);
+  static const textSecondary = Color.fromARGB(255, 0, 56, 52);
+
+  // BORDERS
+  static const border = Color.fromARGB(255, 0, 43, 40);
+
+  // ICONS
+  static const iconPrimary = Color.fromARGB(255, 183, 95, 112);
+  static const iconSecondary = Color.fromARGB(255, 113, 73, 120);
+
+  // BUTTONS
+  static const buttonBackground = Color.fromARGB(255, 0, 43, 40);
+  static const buttonPrimary = accent;
+  static const buttonSecondary = primary;
+
+  // COMPATIBILTY (Remove later if no longer needed)
+  static const appBarBackground = background;
+  static const buttonsBackground = buttonBackground;
+  static const gradientStart = background;
+  static const gradientEnd = background;
+  static const gradientend = gradientEnd;
 }

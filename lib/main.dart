@@ -1,39 +1,51 @@
-import 'package:cedmate/models/app_user.dart';
-import 'package:cedmate/repositories/anamnese_repository.dart';
-import 'package:cedmate/repositories/mahlzeit_repository.dart';
-import 'package:cedmate/repositories/stimmung_repository.dart';
-import 'package:cedmate/repositories/stuhlgang_repository.dart';
-import 'package:cedmate/repositories/symptom_repository.dart';
-import 'package:cedmate/services/anamnese_service.dart';
-import 'package:cedmate/services/mahlzeit_service.dart';
-import 'package:cedmate/services/stimmung_service.dart';
-import 'package:cedmate/services/stuhlgang_service.dart';
-import 'package:cedmate/services/symptom_service.dart';
-import 'package:cedmate/widgets/CEDColors.dart';
+// -----------------------------------------------------------------------------
+//  MAIN FILE — CLEAN, SAFE, MODERN
+// -----------------------------------------------------------------------------
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'repositories/auth_repository.dart';
-import 'services/auth_service.dart';
+import 'firebase_options.dart';
+
+// MODELS
+import 'package:cedmate/models/app_user.dart';
+
+// REPOSITORIES
+import 'package:cedmate/repositories/auth_repository.dart';
+import 'package:cedmate/repositories/anamnese_repository.dart';
+import 'package:cedmate/repositories/symptom_repository.dart';
+import 'package:cedmate/repositories/stuhlgang_repository.dart';
+import 'package:cedmate/repositories/stimmung_repository.dart';
+import 'package:cedmate/repositories/mahlzeit_repository.dart';
+
+// SERVICES
+import 'package:cedmate/services/auth_service.dart';
+import 'package:cedmate/services/anamnese_service.dart';
+import 'package:cedmate/services/symptom_service.dart';
+import 'package:cedmate/services/stuhlgang_service.dart';
+import 'package:cedmate/services/stimmung_service.dart';
+import 'package:cedmate/services/mahlzeit_service.dart';
+
+// UI
 import 'widgets/auth_gate.dart';
 import 'widgets/home_screen.dart';
+import 'widgets/CEDColors.dart';
 
-/// Einstiegspunkt der App.
-/// - Initialisiert Firebase
-/// - Registriert Repository + Service in Provider (Dependency Injection)
+// -----------------------------------------------------------------------------
+//  APP ENTRY POINT
+// -----------------------------------------------------------------------------
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialisiert das native Firebase SDK mit deinen Projekt-Keys
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
   runApp(const CEDmateApp());
 }
 
+// -----------------------------------------------------------------------------
+//  ROOT APP WIDGET
+// -----------------------------------------------------------------------------
 class CEDmateApp extends StatelessWidget {
   const CEDmateApp({super.key});
 
@@ -41,126 +53,204 @@ class CEDmateApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Repository spricht direkt mit Firebase (Auth + Firestore)
+
+        // AUTH
         Provider<AuthRepository>(create: (_) => AuthRepository()),
-        // Service kapselt Business-Logik + Validierung
         ProxyProvider<AuthRepository, AuthService>(
           update: (_, repo, __) => AuthService(repo),
         ),
+
+        // ANAMNESE
         Provider<AnamneseRepository>(create: (_) => AnamneseRepository()),
         ProxyProvider<AnamneseRepository, AnamneseService>(
           update: (_, repo, __) => AnamneseService(repo),
         ),
+
+        // SYMPTOMS
         Provider<SymptomRepository>(create: (_) => SymptomRepository()),
         ProxyProvider2<SymptomRepository, AuthService, SymptomService>(
           update: (_, repo, auth, __) => SymptomService(repo, auth),
         ),
-        StreamProvider<AppUser?>(
-          create: (context) => context.read<AuthService>().userStream(),
-          initialData: null,
-        ),
+
+        // STOOL
         Provider<StuhlgangRepository>(create: (_) => StuhlgangRepository()),
         ProxyProvider2<StuhlgangRepository, AuthService, StuhlgangService>(
           update: (_, repo, auth, __) => StuhlgangService(repo, auth),
         ),
+
+        // MOOD
         Provider<StimmungRepository>(create: (_) => StimmungRepository()),
         ProxyProvider2<StimmungRepository, AuthService, StimmungService>(
           update: (_, repo, auth, __) => StimmungService(repo, auth),
         ),
+
+        // MEALS
         Provider<MahlzeitRepository>(create: (_) => MahlzeitRepository()),
         ProxyProvider2<MahlzeitRepository, AuthService, MahlzeitService>(
           update: (_, repo, auth, __) => MahlzeitService(repo, auth),
         ),
+
+        // USER STREAM
+        StreamProvider<AppUser?>(
+          create: (context) => context.read<AuthService>().userStream(),
+          initialData: null,
+        ),
       ],
+
+      // -------------------------------------------------------------------------
+      //  ROOT MATERIAL APP
+      // -------------------------------------------------------------------------
       child: MaterialApp(
-        locale: Locale('de', 'DE'),
-        supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
-        localizationsDelegates: [
-          // Diese Delegates sind wichtig für showDatePicker!
+        debugShowCheckedModeBanner: false,
+        title: 'CEDmate',
+
+        locale: const Locale('de', 'DE'),
+        supportedLocales: const [
+          Locale('en', 'US'),
+          Locale('de', 'DE'),
+        ],
+        localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        debugShowCheckedModeBanner: false,
-        title: 'CEDmate',
-        routes: {
-          '/': (_) => const AuthGate(), // entscheidet: Login oder Home?
-          '/home': (_) => const HomeScreen(), // private Startseite
-        },
-        builder: (context, child) {
-          if (child == null) {
-            // Wenn kein Child vorhanden ist, gib einfach ein leeres Widget zurück
-            return const SizedBox.shrink();
-          }
 
-          // sonst normale Darstellung
-          return Container(
-            color: Colors.white,
-            child: SafeArea(child: child),
-          );
+        routes: {
+          '/': (_) => const AuthGate(),
+          '/home': (_) => const HomeScreen(),
         },
+
+        builder: (context, child) =>
+            child == null ? const SizedBox.shrink() : SafeArea(child: child),
+
+        // =====================================================================
+        //  THEME — CLEAN, COMPLETE, NO NULL VALUES
+        // =====================================================================
         theme: ThemeData(
           useMaterial3: false,
           brightness: Brightness.light,
+
+          // ------------------------------
+          // BACKGROUND COLORS
+          // ------------------------------
           scaffoldBackgroundColor: CEDColors.background,
+          canvasColor: CEDColors.background,
+          cardColor: CEDColors.surface,
+
+          // ------------------------------
+          // TEXT THEMING
+          // ------------------------------
           textTheme: GoogleFonts.interTextTheme().copyWith(
-            bodyLarge: const TextStyle(
+            bodyLarge: TextStyle(
+              color: CEDColors.textPrimary,
               fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: CEDColors.primaryText,
             ),
-            bodyMedium: const TextStyle(
+            bodyMedium: TextStyle(
+              color: CEDColors.textPrimary,
               fontSize: 14,
-              color: CEDColors.primaryText,
             ),
-            titleLarge: const TextStyle(
+            bodySmall: TextStyle(
+              color: CEDColors.textSecondary,
+              fontSize: 12,
+            ),
+            titleMedium: TextStyle(
+              color: CEDColors.textPrimary,
+              fontWeight: FontWeight.w600,
               fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: CEDColors.primaryText,
             ),
-            titleMedium: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: CEDColors.primaryText,
-            ),
-          ),
-          // AppBar minimalistisch
-          appBarTheme: const AppBarTheme(
-            backgroundColor: CEDColors.appBarBackground,
-            foregroundColor: CEDColors.primaryText,
-            elevation: 10,
-            shadowColor: CEDColors.appBarBackground,
-            centerTitle: false,
-            titleTextStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: CEDColors.primaryText,
+            titleLarge: TextStyle(
+              color: CEDColors.textPrimary,
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
             ),
           ),
 
-          // Allgemeine Icons
-          iconTheme: const IconThemeData(
-            color: CEDColors.primaryText,
+          // ------------------------------
+          // APP BAR
+          // ------------------------------
+          appBarTheme: AppBarTheme(
+            backgroundColor: CEDColors.surface,
+            foregroundColor: CEDColors.textPrimary,
+            elevation: 0,
+            titleTextStyle: GoogleFonts.inter(
+              color: CEDColors.textPrimary,
+              fontWeight: FontWeight.w600,
+              fontSize: 20,
+            ),
+          ),
+
+          // ------------------------------
+          // ICONS
+          // ------------------------------
+          iconTheme: IconThemeData(
+            color: CEDColors.textPrimary,
             size: 26,
           ),
 
-          // Buttons
+          // ------------------------------
+          // BUTTONS
+          // ------------------------------
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: CEDColors.buttonsBackground,
-              foregroundColor: CEDColors.primaryText,
+              backgroundColor: CEDColors.buttonPrimary,
+              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderRadius: BorderRadius.circular(12),
               ),
-              textStyle: const TextStyle(
+              textStyle: GoogleFonts.inter(
                 fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
 
-          // Alle Container-Borders
+          // ------------------------------
+          // INPUT FIELDS  (FIXED + SAFE)
+          // ------------------------------
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: CEDColors.surface,
+
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: CEDColors.border),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: CEDColors.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: CEDColors.accent, width: 2),
+            ),
+
+            labelStyle: TextStyle(color: CEDColors.textSecondary),
+            hintStyle: TextStyle(color: CEDColors.textSecondary),
+
+            iconColor: CEDColors.textPrimary,
+            prefixIconColor: CEDColors.textPrimary,
+            suffixIconColor: CEDColors.textPrimary,
+            
+            
+          ),
+
+          // ------------------------------
+          // DROPDOWN MENUS
+          // ------------------------------
+          dropdownMenuTheme: DropdownMenuThemeData(
+            textStyle: TextStyle(color: CEDColors.textPrimary),
+            menuStyle: MenuStyle(
+              backgroundColor: MaterialStateProperty.all(CEDColors.surface),
+              side: MaterialStateProperty.all(
+                BorderSide(color: CEDColors.border),
+              ),
+            ),
+          ),
+
+          // ------------------------------
+          // DIVIDERS
+          // ------------------------------
           dividerColor: CEDColors.border,
         ),
       ),

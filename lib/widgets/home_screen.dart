@@ -18,7 +18,7 @@ import 'package:cedmate/widgets/stimmung_notieren.dart';
 import 'package:cedmate/widgets/stuhlgang_notieren.dart';
 import 'package:cedmate/widgets/symptom_erfassen.dart';
 
-import 'package:cedmate/widgets/gelb_layout.dart'; // <--- WICHTIG
+import 'package:cedmate/widgets/ced_layout.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +27,6 @@ import '../services/mahlzeit_service.dart';
 import '../services/stimmung_service.dart';
 import '../services/stuhlgang_service.dart';
 import 'daten_exportieren.dart';
-import 'impressum_credits_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -113,38 +112,42 @@ class _HomeScreenState extends State<HomeScreen> {
     _aktualisiereAnzahlEintraege();
   }
 
-  // -------------------------------------------------------
-  //  THEME-BEREINIGTE Widgets (unverändert)
-  // -------------------------------------------------------
+  // -------------------------------------------------------------------------
+  //  NEW CLEAN TILE WIDGETS
+  // -------------------------------------------------------------------------
 
-  Widget _iconTextKachel(String titel, IconData icon, VoidCallback onTap) {
+  Widget _homeTile({
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+  }) {
     return Expanded(
       child: InkWell(
+        borderRadius: BorderRadius.circular(16),
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
         child: Container(
-          height: 100,
+          height: 110,
           margin: const EdgeInsets.symmetric(horizontal: 5),
           decoration: BoxDecoration(
-            border: Border.all(color: CEDColors.border),
-            borderRadius: BorderRadius.circular(12),
+            color: CEDColors.surfaceDark, // ← NEW, darker background
+            borderRadius: BorderRadius.circular(16),
+            // no border
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  border: Border.all(color: Colors.white, width: 4),
-                ),
-                child: Icon(icon, color: Colors.lightBlueAccent),
-              ),
-              const SizedBox(height: 8),
+              Icon(icon, color: CEDColors.iconPrimary, size: 30),
+              const SizedBox(height: 10),
               Text(
-                titel,
+                text,
                 style: Theme.of(context).textTheme.bodyMedium,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -153,67 +156,62 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _iconZahlTextKachel(
-    IconData icon,
-    String titel,
-    int zahl,
-    VoidCallback onTap,
-  ) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          height: 100,
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          decoration: BoxDecoration(
-            border: Border.all(color: CEDColors.border),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(color: Colors.white, width: 4),
-                  ),
-                  child: Icon(icon, color: Colors.lightBlueAccent),
-                ),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        zahl.toString(),
-                        style: Theme.of(context).textTheme.titleMedium!
-                            .copyWith(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        titel,
-                        style: Theme.of(context).textTheme.bodySmall,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+
+  Widget _homeStatTile({
+  required IconData icon,
+  required String text,
+  required int value,
+  required VoidCallback onTap,
+}) {
+  return Expanded(
+    child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Container(
+        height: 110,
+        margin: const EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+          color: CEDColors.surfaceDark, // same style as other tiles
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
-          ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: CEDColors.iconSecondary, size: 30),
+            const SizedBox(height: 8),
+
+            Text(
+              '$value',
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 4),
+
+            Text(
+              text,
+              style: Theme.of(context).textTheme.bodySmall,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  // -------------------------------------------------------
-  //  BUILD → ERSETZT Scaffold durch GelbLayout
-  // -------------------------------------------------------
+
+
+  // -------------------------------------------------------------------------
+  // BUILD
+  // -------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return GelbLayout(
+    return CEDLayout(
       title: "CEDmate",
       actions: [AusloggenButton(auth: auth, user: user)],
       child: _hatAnamnesedaten
@@ -232,13 +230,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // -------------------------------------------------------
-  //  Sub-Widgets (unverändert)
-  // -------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // CONTENT
+  // -------------------------------------------------------------------------
 
   Widget _buildKeineAnamnese(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           'Medizinisches Profil noch nicht ausgefüllt',
@@ -247,10 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 20),
         ElevatedButton(
           onPressed: () => _navigiereZurSeite(const AnamneseScreen()),
-          child: Text(
-            'Jetzt ausfüllen',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          child: Text('Jetzt ausfüllen'),
         ),
       ],
     );
@@ -258,6 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHomeContent(BuildContext context, AppUser? user) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           user != null ? 'Hallo ${user.username}' : 'Hallo',
@@ -268,177 +263,128 @@ class _HomeScreenState extends State<HomeScreen> {
           '${_heutigesDatum.day}.${_heutigesDatum.month}.${_heutigesDatum.year}',
           style: Theme.of(context).textTheme.bodySmall,
         ),
-        const SizedBox(height: 20),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Schnell erfassen',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
+
+        const SizedBox(height: 25),
+        Text('Schnell erfassen', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
+
         Row(
           children: [
-            _iconTextKachel(
-              'Symptom erfassen',
-              Icons.sick,
-              () => _navigiereZurSeite(SymptomErfassen()),
+            _homeTile(
+              icon: Icons.sick,
+              text: 'Symptom erfassen',
+              onTap: () => _navigiereZurSeite(SymptomErfassen()),
             ),
-            _iconTextKachel(
-              'Stuhlgang notieren',
-              Icons.wc,
-              () => _navigiereZurSeite(StuhlgangNotieren()),
+            _homeTile(
+              icon: Icons.wc,
+              text: 'Stuhlgang notieren',
+              onTap: () => _navigiereZurSeite(StuhlgangNotieren()),
             ),
           ],
         ),
+
         const SizedBox(height: 10),
+
         Row(
           children: [
-            _iconTextKachel(
-              'Mahlzeit Eintragen',
-              Icons.restaurant_menu,
-              () => _navigiereZurSeite(MahlzeitEintragen()),
+            _homeTile(
+              icon: Icons.restaurant_menu,
+              text: 'Mahlzeit eintragen',
+              onTap: () => _navigiereZurSeite(MahlzeitEintragen()),
             ),
-            _iconTextKachel(
-              'Stimmung notieren',
-              Icons.mood,
-              () => _navigiereZurSeite(StimmungNotieren()),
+            _homeTile(
+              icon: Icons.mood,
+              text: 'Stimmung notieren',
+              onTap: () => _navigiereZurSeite(StimmungNotieren()),
             ),
           ],
         ),
-        const Divider(height: 30, thickness: 3),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Heute in Zahlen',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
+
+        const SizedBox(height: 30),
+        Text('Heute in Zahlen', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
+
         _isLoadingEintraege
-            ? const SizedBox(
-                width: 35,
-                height: 35,
-                child: CircularProgressIndicator(strokeWidth: 3),
-              )
+            ? const Center(child: CircularProgressIndicator())
             : Column(
                 children: [
                   Row(
                     children: [
-                      _iconZahlTextKachel(
-                        Icons.sick,
-                        'Symptome',
-                        _symptomeHeute,
-                        () => _navigiereZurSeite(
-                          KalenderScreen(ausgewaehlteSeite: 0),
-                        ),
+                      _homeStatTile(
+                        icon: Icons.sick,
+                        text: 'Symptome',
+                        value: _symptomeHeute,
+                        onTap: () => _navigiereZurSeite(KalenderScreen(ausgewaehlteSeite: 0)),
                       ),
-                      _iconZahlTextKachel(
-                        Icons.wc,
-                        'Stuhlgänge',
-                        _stuhlgaengeHeute,
-                        () => _navigiereZurSeite(
-                          KalenderScreen(ausgewaehlteSeite: 1),
-                        ),
+                      _homeStatTile(
+                        icon: Icons.wc,
+                        text: 'Stuhlgänge',
+                        value: _stuhlgaengeHeute,
+                        onTap: () => _navigiereZurSeite(KalenderScreen(ausgewaehlteSeite: 1)),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      _iconZahlTextKachel(
-                        Icons.restaurant_menu,
-                        'Mahlzeiten',
-                        _mahlzeitenHeute,
-                        () => _navigiereZurSeite(
-                          KalenderScreen(ausgewaehlteSeite: 2),
-                        ),
+                      _homeStatTile(
+                        icon: Icons.restaurant_menu,
+                        text: 'Mahlzeiten',
+                        value: _mahlzeitenHeute,
+                        onTap: () => _navigiereZurSeite(KalenderScreen(ausgewaehlteSeite: 2)),
                       ),
-                      _iconZahlTextKachel(
-                        Icons.mood,
-                        'Stimmungen',
-                        _stimmungenHeute,
-                        () => _navigiereZurSeite(
-                          KalenderScreen(ausgewaehlteSeite: 3),
-                        ),
+                      _homeStatTile(
+                        icon: Icons.mood,
+                        text: 'Stimmungen',
+                        value: _stimmungenHeute,
+                        onTap: () => _navigiereZurSeite(KalenderScreen(ausgewaehlteSeite: 3)),
                       ),
                     ],
                   ),
                 ],
               ),
-        const Divider(height: 30, thickness: 3),
+
+        const SizedBox(height: 30),
+
         Row(
           children: [
-            _iconTextKachel(
-              'Toiletten finden',
-              Icons.explore,
-              () => _navigiereZurSeite(HilfeFuerUnterwegs()),
+            _homeTile(
+              icon: Icons.explore,
+              text: 'Toiletten finden',
+              onTap: () => _navigiereZurSeite(HilfeFuerUnterwegs()),
             ),
-            _iconTextKachel(
-              'Daten exportieren',
-              Icons.upload_file,
-              () => _navigiereZurSeite(DatenExportieren()),
+            _homeTile(
+              icon: Icons.upload_file,
+              text: 'Daten exportieren',
+              onTap: () => _navigiereZurSeite(DatenExportieren()),
             ),
           ],
         ),
-        const Divider(height: 30, thickness: 3),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Verschaffe dir einen Überblick',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
+
+        const SizedBox(height: 30),
+
+        Text('Verschaffe dir einen Überblick',
+            style: Theme.of(context).textTheme.titleMedium),
+
         const SizedBox(height: 10),
+
         Row(
           children: [
-            _iconTextKachel(
-              'Kalender',
-              Icons.calendar_month,
-              () => _navigiereZurSeite(KalenderScreen()),
+            _homeTile(
+              icon: Icons.calendar_month,
+              text: 'Kalender',
+              onTap: () => _navigiereZurSeite(KalenderScreen()),
             ),
-            _iconTextKachel(
-              'Statistiken',
-              Icons.bar_chart,
-              () => _navigiereZurSeite(Statistiken()),
+            _homeTile(
+              icon: Icons.bar_chart,
+              text: 'Statistiken',
+              onTap: () => _navigiereZurSeite(Statistiken()),
             ),
           ],
         ),
+
         const SizedBox(height: 100),
       ],
-    );
-  }
-
-  Widget _buildCardPage({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: Card(
-        elevation: 4,
-        margin: const EdgeInsets.all(10),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon),
-              const SizedBox(height: 10),
-              Text(title, style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 5),
-              Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodySmall,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
