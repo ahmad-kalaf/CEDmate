@@ -4,7 +4,9 @@ import 'package:cedmate/utils/loesche_eintrag.dart';
 import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../cedmate_icons.dart';
 import '../models/enums/bristol_stuhlform.dart';
+import 'CEDColors.dart';
 
 class StuhlgangNotieren extends StatefulWidget {
   final Stuhlgang? stuhlgang;
@@ -24,6 +26,16 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
 
   DateTime _eintrageZeitpunkt = DateTime.now();
   bool _isSaving = false;
+  final List<Icon> _stuhlformIcons = const [
+    Icon(Cedmate.kons_1),
+    Icon(Cedmate.kons_2),
+    Icon(Cedmate.kons_3),
+    Icon(Cedmate.kons_4),
+    Icon(Cedmate.kons_5),
+    Icon(Cedmate.kons_6),
+    Icon(Cedmate.kons_7),
+  ];
+  late final PageController _pageController;
 
   bool get isEditMode => widget.stuhlgang != null;
 
@@ -38,12 +50,18 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
       _notizenController.text = s.notizen ?? '';
       _eintrageZeitpunkt = s.eintragZeitpunkt;
     }
+    final initialIndex = BristolStuhlform.values.indexOf(_ausgewaehlteForm);
+    _pageController = PageController(
+      initialPage: initialIndex < 0 ? 0 : initialIndex,
+      viewportFraction: 0.25,
+    );
   }
 
   @override
   void dispose() {
     _haeufigkeitController.dispose();
     _notizenController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -131,37 +149,88 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
       },
       child: CEDLayout(
         title: isEditMode ? 'Eintrag bearbeiten' : 'Eintrag erfassen',
-
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              // ------------------------------
-              // BRISTOL DROPDOWN (styled)
-              // ------------------------------
-              InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: "Typ – Konsistenz",
-                  border: OutlineInputBorder(),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: CEDColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: CEDColors.border, width: 1),
                 ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<BristolStuhlform>(
-                    value: _ausgewaehlteForm,
-                    isExpanded: true,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    dropdownColor: Theme.of(context).cardColor,
-                    items: BristolStuhlform.values.map((form) {
-                      return DropdownMenuItem(
-                        value: form,
-                        child: Text(form.beschreibung),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => _ausgewaehlteForm = value);
-                      }
-                    },
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Typ – Konsistenz',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 100,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: BristolStuhlform.values.length,
+                        onPageChanged: (page) {
+                          setState(() {
+                            _ausgewaehlteForm = BristolStuhlform.values[page];
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          final form = BristolStuhlform.values[index];
+                          final isSelected = form == _ausgewaehlteForm;
+                          return GestureDetector(
+                            onTap: () {
+                              _pageController.animateToPage(
+                                index,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeOut,
+                              );
+                              setState(() {
+                                _ausgewaehlteForm = form;
+                              });
+                            },
+                            child: AnimatedOpacity(
+                              opacity: isSelected ? 1.0 : 0.3,
+                              duration: const Duration(milliseconds: 200),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? Colors.blue
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Icon(
+                                  _stuhlformIcons[index].icon,
+                                  size: 60,
+                                  color: Colors.brown,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Center(
+                      child: Text(
+                        _ausgewaehlteForm.beschreibung.substring(8),
+                        style: Theme.of(context).textTheme.labelLarge,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
