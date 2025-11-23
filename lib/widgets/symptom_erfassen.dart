@@ -4,7 +4,9 @@ import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/enums/gefuehls_intensitaet.dart';
 import '../models/symptom.dart';
+import 'CEDColors.dart';
 
 class SymptomErfassen extends StatefulWidget {
   final Symptom? symptom;
@@ -26,6 +28,21 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
   bool _isSaving = false;
 
   bool get isEditMode => widget.symptom != null;
+  final List<String> _emotionsSkala = [
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+  ];
+  late final PageController _pageController;
+  GefuehlsIntensitaet _ausgewaehlteGefuehlsIntensitaet =
+      GefuehlsIntensitaet.ausgeglichen;
 
   @override
   void initState() {
@@ -38,6 +55,14 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
       _notizenController.text = s.notizen ?? '';
       _startZeit = s.startZeit;
     }
+    final initialIndex = _intensitaetController.text.isNotEmpty
+        ? int.tryParse(_intensitaetController.text)! - 1
+        : 4;
+    _pageController = PageController(
+      initialPage: initialIndex < 0 ? 0 : initialIndex,
+      viewportFraction: 0.25,
+    );
+    _ausgewaehlteGefuehlsIntensitaet = GefuehlsIntensitaet.values[initialIndex];
   }
 
   @override
@@ -180,19 +205,106 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
                   validator: (v) =>
                       v == null || v.trim().isEmpty ? 'Bitte eingeben' : null,
                 ),
-                TextFormField(
-                  controller: _intensitaetController,
-                  decoration: const InputDecoration(
-                    labelText: 'Intensität (1–10)',
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: CEDColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: CEDColors.border, width: 1),
                   ),
-                  keyboardType: TextInputType.number,
-                  validator: (v) {
-                    final i = int.tryParse(v ?? '');
-                    if (i == null || i < 1 || i > 10) {
-                      return 'Wert zwischen 1 und 10';
-                    }
-                    return null;
-                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Gefühls-Intensität',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 100,
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: GefuehlsIntensitaet.values.length,
+                          onPageChanged: (page) {
+                            setState(() {
+                              _ausgewaehlteGefuehlsIntensitaet =
+                                  GefuehlsIntensitaet.values[page];
+                              _intensitaetController.text = (page + 1)
+                                  .toString();
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            final emotion = GefuehlsIntensitaet.values[index];
+                            final isSelected =
+                                emotion == _ausgewaehlteGefuehlsIntensitaet;
+
+                            return GestureDetector(
+                              onTap: () {
+                                _pageController.animateToPage(
+                                  index,
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.easeOut,
+                                );
+                                setState(() {
+                                  _ausgewaehlteGefuehlsIntensitaet = emotion;
+                                  _intensitaetController.text = (index + 1)
+                                      .toString();
+                                });
+                              },
+                              child: AnimatedOpacity(
+                                opacity: isSelected ? 1.0 : 0.3,
+                                duration: const Duration(milliseconds: 200),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: isSelected
+                                        ? Border.all(
+                                            color: Colors.black,
+                                            width: 3,
+                                          )
+                                        : null,
+                                    color: isSelected
+                                        ? Colors.blue
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      _emotionsSkala[index],
+                                      style: TextStyle(
+                                        fontSize: isSelected ? 48 : 32,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // ---------- Beschreibung unten ----------
+                      Center(
+                        child: Text(
+                          _ausgewaehlteGefuehlsIntensitaet.beschreibung,
+                          style: Theme.of(context).textTheme.labelLarge,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Row(
