@@ -7,13 +7,10 @@ import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
 import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
 import 'package:cedmate/widgets/impressum_credits_screen.dart';
 import 'package:cedmate/widgets/kalender_screen.dart';
-import 'package:cedmate/widgets/mahlzeit_eintragen.dart';
 import 'package:cedmate/widgets/profil_screen.dart';
 import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
 import 'package:cedmate/widgets/statistiken.dart';
 import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_monat.dart';
-import 'package:cedmate/widgets/stuhlgang_notieren.dart';
-import 'package:cedmate/widgets/symptome_fuer_datum.dart';
 import 'package:cedmate/widgets/symptome_fuer_monat.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -246,8 +243,8 @@ class CEDmateApp extends StatelessWidget {
           dropdownMenuTheme: DropdownMenuThemeData(
             textStyle: TextStyle(color: CEDColors.textPrimary),
             menuStyle: MenuStyle(
-              backgroundColor: MaterialStateProperty.all(CEDColors.surface),
-              side: MaterialStateProperty.all(
+              backgroundColor: WidgetStateProperty.all(CEDColors.surface),
+              side: WidgetStateProperty.all(
                 BorderSide(color: CEDColors.border),
               ),
             ),

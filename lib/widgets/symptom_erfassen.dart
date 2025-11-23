@@ -4,7 +4,7 @@ import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/enums/gefuehls_intensitaet.dart';
+import '../models/enums/symptom_intensitaet.dart';
 import '../models/symptom.dart';
 import 'CEDColors.dart';
 
@@ -41,8 +41,8 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
     '10',
   ];
   late final PageController _pageController;
-  GefuehlsIntensitaet _ausgewaehlteGefuehlsIntensitaet =
-      GefuehlsIntensitaet.ausgeglichen;
+  SymptomIntensitaet _ausgewaehlteGefuehlsIntensitaet =
+      SymptomIntensitaet.mittel;
 
   @override
   void initState() {
@@ -62,7 +62,7 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
       initialPage: initialIndex < 0 ? 0 : initialIndex,
       viewportFraction: 0.25,
     );
-    _ausgewaehlteGefuehlsIntensitaet = GefuehlsIntensitaet.values[initialIndex];
+    _ausgewaehlteGefuehlsIntensitaet = SymptomIntensitaet.values[initialIndex];
   }
 
   @override
@@ -218,7 +218,7 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
                       Align(
                         alignment: Alignment.center,
                         child: Text(
-                          'Gefühls-Intensität',
+                          'Intensität',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ),
@@ -227,17 +227,17 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
                         height: 100,
                         child: PageView.builder(
                           controller: _pageController,
-                          itemCount: GefuehlsIntensitaet.values.length,
+                          itemCount: SymptomIntensitaet.values.length,
                           onPageChanged: (page) {
                             setState(() {
                               _ausgewaehlteGefuehlsIntensitaet =
-                                  GefuehlsIntensitaet.values[page];
+                                  SymptomIntensitaet.values[page];
                               _intensitaetController.text = (page + 1)
                                   .toString();
                             });
                           },
                           itemBuilder: (context, index) {
-                            final emotion = GefuehlsIntensitaet.values[index];
+                            final emotion = SymptomIntensitaet.values[index];
                             final isSelected =
                                 emotion == _ausgewaehlteGefuehlsIntensitaet;
 
