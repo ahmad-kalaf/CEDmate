@@ -190,6 +190,7 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
         }
       },
       child: CEDLayout(
+        showDrawer: false,
         title: isEditMode ? 'Symptom bearbeiten' : 'Symptom erfassen',
         child: Form(
           key: _formKey,

@@ -141,6 +141,7 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
         }
       },
       child: CEDLayout(
+        showDrawer: false,
         title: isEditMode ? 'Eintrag bearbeiten' : 'Eintrag erfassen',
         child: Form(
           key: _formKey,

@@ -147,6 +147,7 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
         }
       },
       child: CEDLayout(
+        showDrawer: false,
         title: isEditMode ? 'Eintrag bearbeiten' : 'Mahlzeit erfassen',
         child: Form(
           key: _formKey,
