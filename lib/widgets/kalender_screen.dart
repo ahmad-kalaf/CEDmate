@@ -71,14 +71,17 @@ class _KalenderScreenState extends State<KalenderScreen> {
         title: const Text('Kalender'),
         actionsPadding: EdgeInsets.all(10),
         actions: [
-          ElevatedButton.icon(
+          TextButton.icon(
             onPressed: () => _pickDate(context),
             icon: const Icon(Icons.calendar_today, size: 14),
+            style: ButtonStyle(
+              foregroundColor: WidgetStatePropertyAll(CEDColors.background),
+              side: WidgetStatePropertyAll(BorderSide(color:CEDColors.background, width: 3)),
+            ),
             label: Text(
               _ausgewaehtesMonatJahr != null
                   ? "${_ausgewaehtesMonatJahr!.day.toString().padLeft(2, '0')}.${_ausgewaehtesMonatJahr!.month.toString().padLeft(2, '0')}.${_ausgewaehtesMonatJahr!.year}"
                   : "Datum wählen",
-              style: const TextStyle(fontSize: 12),
             ),
           ),
         ],
