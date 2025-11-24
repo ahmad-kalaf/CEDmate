@@ -281,7 +281,7 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
                                     child: Text(
                                       _emotionsSkala[index],
                                       style: TextStyle(
-                                        fontSize: isSelected ? 48 : 32,
+                                        fontSize: 25,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
