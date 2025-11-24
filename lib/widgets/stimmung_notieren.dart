@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/stimmung.dart';
 import '../utils/loesche_eintrag.dart';
+import 'CEDColors.dart';
 
 class StimmungNotieren extends StatefulWidget {
   final Stimmung? stimmung;
@@ -27,6 +28,14 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
   bool _isSaving = false;
 
   bool get isEditMode => widget.stimmung != null;
+  late final PageController _pageController;
+  final List<String> _moodDescriptions = [
+    'Sehr schlecht',
+    'Schlecht',
+    'Neutral',
+    'Gut',
+    'Sehr gut',
+  ];
 
   @override
   void initState() {
@@ -41,6 +50,15 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
     } else {
       _stimmungLevel = StimmungLevel.neutral;
     }
+    final initialIndex = widget.stimmung != null
+        ? widget.stimmung!.level.index
+        : 2;
+    _pageController = PageController(
+      viewportFraction: 0.3,
+      initialPage: widget.stimmung != null
+          ? (widget.stimmung!.level.index)
+          : 2,
+    );
   }
 
   @override
@@ -150,23 +168,102 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                DropdownButtonFormField<StimmungLevel>(
-                  initialValue: _stimmungLevel,
-                  decoration: const InputDecoration(
-                    labelText: 'Stimmung',
-                    border: OutlineInputBorder(),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: CEDColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: CEDColors.border, width: 1),
                   ),
-                  items: StimmungLevel.values.map((level) {
-                    return DropdownMenuItem(
-                      value: level,
-                      child: Text(level.name),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() => _stimmungLevel = value);
-                    }
-                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Stimmung',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 100,
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: StimmungLevel.values.length,
+                          onPageChanged: (page) {
+                            setState(() {
+                              _stimmungLevel =
+                              StimmungLevel.values[page];
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            final mood = StimmungLevel.values[index];
+                            final isSelected =
+                                mood == _stimmungLevel;
+
+                            return GestureDetector(
+                              onTap: () {
+                                _pageController.animateToPage(
+                                  index,
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Curves.easeOut,
+                                );
+                                setState(() {
+                                  _stimmungLevel = mood;
+                                });
+                              },
+                              child: AnimatedOpacity(
+                                opacity: isSelected ? 1.0 : 0.3,
+                                duration: const Duration(milliseconds: 200),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: isSelected
+                                        ? Border.all(
+                                      color: Colors.black,
+                                      width: 3,
+                                    )
+                                        : null,
+                                    color: isSelected
+                                        ? Colors.blue
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      _moodDescriptions[index],
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // ---------- Beschreibung unten ----------
+                      Center(
+                        child: Text(
+                          _moodDescriptions[_stimmungLevel.index],
+                          style: Theme.of(context).textTheme.labelLarge,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
