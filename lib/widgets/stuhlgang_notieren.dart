@@ -148,6 +148,7 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
         if (verlassen == true && mounted) Navigator.pop(context);
       },
       child: CEDLayout(
+        showDrawer: false,
         title: isEditMode ? 'Eintrag bearbeiten' : 'Eintrag erfassen',
         child: Form(
           key: _formKey,
