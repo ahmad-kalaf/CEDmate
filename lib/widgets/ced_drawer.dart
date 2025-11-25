@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:cedmate/widgets/CEDColors.dart';
 
@@ -110,16 +112,31 @@ class CEDDrawer extends StatelessWidget {
     IconData icon,
     VoidCallback onTap,
   ) {
-    return ListTile(
-      leading: Icon(icon, color: CEDColors.accent),
-      title: Text(title, style: TextStyle(color: CEDColors.textPrimary)),
-      horizontalTitleGap: 12,
-      onTap: () {
-        Navigator.pop(context); // Close the drawer
-        onTap();
-      },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      selectedTileColor: CEDColors.surface,
+    return Container(
+      margin: EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            CEDColors.background.withValues(alpha: 0.75),
+            CEDColors.background.withValues(alpha: 0.25),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(8),
+        border: BoxBorder.all(color: CEDColors.border),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: CEDColors.iconPrimary),
+        title: Text(title, style: TextStyle(color: CEDColors.textPrimary)),
+        horizontalTitleGap: 12,
+        onTap: () {
+          Navigator.pop(context); // Close the drawer
+          onTap();
+        },
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        selectedTileColor: CEDColors.surface,
+      ),
     );
   }
 }
