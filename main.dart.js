@@ -52747,7 +52747,7 @@ n=A.Y("CEDmate",p,p,p,n==null?p:n.c0(B.ja),p,p,p)
 s=A.M(a).ok.Q
 r=t.p
 return new A.Vv(B.bw,A.re(!0,A.bS(A.b([A.eY(p,A.cw(A.b([o,B.acG,A.bS(A.b([n,B.pC,A.Y("Erfassen. Verstehen. Verbessern.",p,p,p,s==null?p:s.c0(B.rB),p,p,p)],r),B.ap,B.q,B.u,0,B.E)],r),B.C,B.q,B.u,0,p),B.A,B.bw,p,p,p,p,p,B.tG,p,p,p),B.c8,A.de(A.asY(A.b([q.lQ(a,"Dashboard",B.Tb,new A.aiB(a)),q.lQ(a,"Mein Profil",B.Ti,new A.aiC(a)),q.lQ(a,"Symptom-Radar",B.Tm,new A.aiD(a)),q.lQ(a,"Stuhl-Tagebuch",B.jQ,new A.aiE(a)),q.lQ(a,"Ess-Tagebuch",B.Tj,new A.aiF(a)),q.lQ(a,"Seelen-Log",B.Tl,new A.aiG(a)),q.lQ(a,"Toiletten finden",B.Tg,new A.aiH(a)),q.lQ(a,"Daten exportieren",B.Tc,new A.aiI(a)),q.lQ(a,"Kalender",B.nX,new A.aiJ(a)),q.lQ(a,"Statistiken",B.ui,new A.aiK(a)),q.lQ(a,"Impressum & Credits",B.Td,new A.aiL(a))],r),B.ai,p,!1),1)],r),B.C,B.q,B.u,0,B.E),B.ai,!0),p)},
-lQ(a,b,c,d){var s=null,r=A.b([B.fc.HR(0.75),B.fc.HR(0.25)],t.t_),q=A.cr(8),p=A.l9(B.aw,B.t,1),o=A.hh(c,B.ja,s,s),n=A.Y(b,s,s,s,A.cU(s,s,B.aw,s,s,s,s,s,s,s,s,s,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s,s)
+lQ(a,b,c,d){var s=null,r=A.b([B.fc.HR(0.65),B.fc.HR(0.15)],t.t_),q=A.cr(8),p=A.l9(B.aw,B.t,1),o=A.hh(c,B.ja,s,s),n=A.Y(b,s,s,s,A.cU(s,s,B.aw,s,s,s,s,s,s,s,s,s,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s,s)
 return A.eY(s,A.od(s,12,o,new A.aiA(a,d),B.bw,new A.cf(A.cr(8),B.o),s,n,s),B.A,s,s,new A.d_(s,s,p,q,s,new A.yU(B.ds,B.qQ,B.eP,r,s,s),B.ah),s,s,new A.aJ(3,3,3,3),s,s,s,s)}}
 A.aiB.prototype={
 $0(){A.mO(this.a,"/home",t.X)},
