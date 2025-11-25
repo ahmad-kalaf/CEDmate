@@ -266,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.sick,
               text: 'Symptom erfassen',
               onTap: () => _navigiereZurSeite(SymptomErfassen()),
-              color: CEDColors.service_sympton,
+              color: CEDColors.service_symptom,
             ),
             _homeTile(
               icon: Icons.wc,
