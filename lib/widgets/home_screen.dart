@@ -114,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required IconData icon,
     required String text,
     required VoidCallback onTap,
+    required Color color,
   }) {
     return Expanded(
       child: InkWell(
@@ -123,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 110,
           margin: const EdgeInsets.symmetric(horizontal: 5),
           decoration: BoxDecoration(
-            color: CEDColors.surfaceDark, // ← NEW, darker background
+            color: color, // use passed color
             borderRadius: BorderRadius.circular(16),
             // no border
             boxShadow: [
@@ -265,11 +266,13 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.sick,
               text: 'Symptom erfassen',
               onTap: () => _navigiereZurSeite(SymptomErfassen()),
+              color: CEDColors.service_sympton,
             ),
             _homeTile(
               icon: Icons.wc,
               text: 'Stuhlgang notieren',
               onTap: () => _navigiereZurSeite(StuhlgangNotieren()),
+              color: CEDColors.service_stuhlgang,
             ),
           ],
         ),
@@ -282,11 +285,13 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.restaurant_menu,
               text: 'Mahlzeit eintragen',
               onTap: () => _navigiereZurSeite(MahlzeitEintragen()),
+              color: CEDColors.service_mahlzeit,
             ),
             _homeTile(
               icon: Icons.mood,
               text: 'Stimmung notieren',
               onTap: () => _navigiereZurSeite(StimmungNotieren()),
+              color: CEDColors.service_stimmung,
             ),
           ],
         ),
@@ -358,11 +363,13 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.explore,
               text: 'Toiletten finden',
               onTap: () => _navigiereZurSeite(HilfeFuerUnterwegs()),
+              color: CEDColors.surfaceDark
             ),
             _homeTile(
               icon: Icons.upload_file,
               text: 'Daten exportieren',
               onTap: () => _navigiereZurSeite(DatenExportieren()),
+              color: CEDColors.surfaceDark
             ),
           ],
         ),
@@ -382,11 +389,13 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.calendar_month,
               text: 'Kalender',
               onTap: () => _navigiereZurSeite(KalenderScreen()),
+              color: CEDColors.surfaceDark
             ),
             _homeTile(
               icon: Icons.bar_chart,
               text: 'Statistiken',
               onTap: () => _navigiereZurSeite(Statistiken()),
+              color: CEDColors.surfaceDark
             ),
           ],
         ),

@@ -8,6 +8,12 @@ class CEDColors {
   static const primary = Color.fromARGB(255, 114, 131, 110); // 
   static const accent = Color.fromARGB(255, 119, 136, 115);  // 
 
+  // SERVICES
+  static const service_sympton = Color.fromARGB(255, 167, 205, 232);
+  static const service_stuhlgang = Color.fromARGB(255, 232, 190, 167);
+  static const service_mahlzeit = Color.fromARGB(201, 215, 167, 232);
+  static const service_stimmung = Color.fromARGB(255, 232, 227, 167);
+
   // BACKGROUND
   static const background = Color.fromARGB(255, 112, 128, 108);
   static const surface = Color.fromARGB(255, 241, 243, 224);   // for cards/panels
