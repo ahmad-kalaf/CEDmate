@@ -30,6 +30,20 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
 
   bool get isEditMode => widget.mahlzeit != null;
 
+  final List<String> vorschlaegeZutaten = [
+    'Gluten',
+    'Laktose',
+    'Nüsse',
+    'Eier',
+    'Soja',
+    'Fisch',
+    'Schalentiere',
+    'Sellerie',
+    'Senf',
+    'Sesam',
+    'Schwefeldioxid/Sulfite',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -179,6 +193,7 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
                 context: context,
                 controller: _zutatenController,
                 items: _zutaten,
+                suggestions: vorschlaegeZutaten,
                 onAdd: () => _addItem(_zutatenController, _zutaten),
                 onRemove: (v) => _removeItem(_zutaten, v),
               ),

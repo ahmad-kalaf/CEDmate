@@ -6,6 +6,7 @@ Widget buildListSection({
   required BuildContext context,
   required TextEditingController controller,
   required List<String> items,
+  List<String>? suggestions,
   required VoidCallback onAdd,
   required void Function(String) onRemove,
 }) {
@@ -25,18 +26,54 @@ Widget buildListSection({
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: 5),
-          TextFormField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: 'Eintrag hinzufügen',
-              border: const UnderlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: onAdd,
-                tooltip: 'Hinzufügen',
-              ),
-            ),
-            onFieldSubmitted: (_) => onAdd(),
+          Autocomplete<String>(
+            optionsViewBuilder: (context, onSelected, options) {
+              return Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  elevation: 4,
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    child: ListView(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      children: options.map((option) {
+                        return ListTile(
+                          title: Text(option),
+                          onTap: () => onSelected(option),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              );
+            },
+
+            optionsBuilder: (text) {
+              if (text.text.isEmpty) return [];
+              if (suggestions == null) return [];
+              return suggestions!.where(
+                (s) => s.toLowerCase().contains(text.text.toLowerCase()),
+              );
+            },
+
+            fieldViewBuilder:
+                (context, textController, focusNode, onFieldSubmitted) {
+                  return TextFormField(
+                    controller: textController,
+                    focusNode: focusNode,
+                    decoration: InputDecoration(
+                      labelText: 'Eintrag hinzufügen',
+                      border: const UnderlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: onAdd,
+                      ),
+                    ),
+                    onChanged: (value) => controller.text = value,
+                    onFieldSubmitted: (_) => onAdd(),
+                  );
+                },
           ),
           const SizedBox(height: 5),
           SizedBox(
