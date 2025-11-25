@@ -38,6 +38,45 @@ class _AnamneseScreenState extends State<AnamneseScreen> {
   Gender? _selectedGender;
   Diagnose? _selectedDiagnose;
 
+final List<String> vorschlaegeSymptomeImSchub = [
+  'Bauchschmerzen',
+  'Durchfall',
+  'Blut im Stuhl',
+  'Fieber',
+  'Müdigkeit',
+  'Gewichtsverlust',
+  'Übelkeit',
+  'Gelenkschmerzen',
+  'Hautausschlag',
+  'Appetitlosigkeit',
+  'Bauchkrämpfe',
+];
+final List<String> vorschlaegeSchubAusloeser = [
+  'Stress',
+  'Infektion',
+  'Ernährungsumstellung',
+  'Medikamentenwechsel',
+  'Schlafmangel',
+  'Nikotin',
+  'Alkohol',
+  'Reizende Lebensmittel',
+  'NSAID-Einnahme',
+  'Hormonelle Veränderungen',
+];
+final List<String> vorschlaegeWeitereErkrankungen = [
+  'Bluthochdruck',
+  'Diabetes mellitus',
+  'Arthritis',
+  'Osteoporose',
+  'Psoriasis',
+  'Asthma',
+  'Migräne',
+  'Depression',
+  'Schilddrüsenerkrankung',
+  'Reizdarmsyndrom',
+  'Herz-Kreislauf-Erkrankungen',
+];
+
   @override
   void initState() {
     super.initState();
@@ -226,6 +265,7 @@ class _AnamneseScreenState extends State<AnamneseScreen> {
                       context: context,
                       controller: _symptomeImSchubTextController,
                       items: _symptomeImSchub,
+                      suggestions: vorschlaegeSymptomeImSchub,
                       onAdd: () => _addItem(
                         _symptomeImSchubTextController,
                         _symptomeImSchub,
@@ -240,6 +280,7 @@ class _AnamneseScreenState extends State<AnamneseScreen> {
                       context: context,
                       controller: _schubausloeserTextController,
                       items: _schubausloeser,
+                      suggestions: vorschlaegeSchubAusloeser,
                       onAdd: () => _addItem(
                         _schubausloeserTextController,
                         _schubausloeser,
@@ -254,6 +295,7 @@ class _AnamneseScreenState extends State<AnamneseScreen> {
                       context: context,
                       controller: _weitereErkrankungenTextController,
                       items: _weitereErkrankungen,
+                      suggestions: vorschlaegeWeitereErkrankungen,
                       onAdd: () => _addItem(
                         _weitereErkrankungenTextController,
                         _weitereErkrankungen,
