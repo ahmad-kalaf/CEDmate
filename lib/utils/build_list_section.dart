@@ -27,6 +27,9 @@ Widget buildListSection({
           ),
           const SizedBox(height: 5),
           Autocomplete<String>(
+            onSelected: (option) {
+              controller.text = option;
+            },
             optionsViewBuilder: (context, onSelected, options) {
               return Align(
                 alignment: Alignment.topLeft,
@@ -52,28 +55,41 @@ Widget buildListSection({
             optionsBuilder: (text) {
               if (text.text.isEmpty) return [];
               if (suggestions == null) return [];
-              return suggestions!.where(
+              return suggestions.where(
                 (s) => s.toLowerCase().contains(text.text.toLowerCase()),
               );
             },
-
             fieldViewBuilder:
                 (context, textController, focusNode, onFieldSubmitted) {
-                  return TextFormField(
-                    controller: textController,
-                    focusNode: focusNode,
-                    decoration: InputDecoration(
-                      labelText: 'Eintrag hinzufügen',
-                      border: const UnderlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: onAdd,
-                      ),
-                    ),
-                    onChanged: (value) => controller.text = value,
-                    onFieldSubmitted: (_) => onAdd(),
-                  );
+              return TextFormField(
+                controller: textController,
+                focusNode: focusNode,
+                decoration: InputDecoration(
+                  labelText: 'Eintrag hinzufügen',
+                  border: const UnderlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () {
+                      // Wert in deinen externen Controller kopieren
+                      controller.text = textController.text;
+                      onAdd();
+                      // Beide löschen
+                      textController.clear();
+                      controller.clear();
+                    },
+                  ),
+                ),
+                onChanged: (value) {
+                  controller.text = value;
                 },
+                onFieldSubmitted: (value) {
+                  controller.text = value;
+                  onAdd();
+                  textController.clear();
+                  controller.clear();
+                },
+              );
+            },
           ),
           const SizedBox(height: 5),
           SizedBox(
