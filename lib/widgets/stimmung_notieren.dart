@@ -230,7 +230,7 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
                                     )
                                         : null,
                                     color: isSelected
-                                        ? Colors.blue
+                                        ? CEDColors.primary
                                         : Colors.white,
                                     borderRadius: BorderRadius.circular(20),
                                   ),

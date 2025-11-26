@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cedmate/widgets/CEDColors.dart';
 import 'package:flutter/material.dart';
 
 /// Zeigt eine horizontale Scroll-Leiste mit allen Tagen eines Monats.
@@ -132,15 +133,15 @@ class _DatumRadState extends State<DatumRad> {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? Colors.amberAccent
+                        ? CEDColors.surfaceDark
                         : isToday
-                        ? Colors.blueAccent
-                        : Colors.grey[200],
+                        ? CEDColors.primary
+                        : CEDColors.surface,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: Colors.blue.withOpacity(0.4),
+                              color: CEDColors.primary.withOpacity(0.4),
                               blurRadius: 6,
                               spreadRadius: 1,
                             ),
@@ -162,19 +163,19 @@ class _DatumRadState extends State<DatumRad> {
                             'So',
                           ][date.weekday - 1],
                           style: TextStyle(
-                            color: isToday ? Colors.white : Colors.black54,
+                            color: isToday ? CEDColors.textPrimary : CEDColors.textPrimary,
                             fontSize: 10,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           '${date.day}.${date.month}',
                           style: TextStyle(
-                            color: isToday ? Colors.white : Colors.black,
+                            color: isToday ? CEDColors.textPrimary : CEDColors.textPrimary,
                             fontSize: isSelected ? 16 : 14,
                             fontWeight: isSelected
-                                ? FontWeight.bold
+                                ? FontWeight.w900
                                 : FontWeight.normal,
                           ),
                         ),

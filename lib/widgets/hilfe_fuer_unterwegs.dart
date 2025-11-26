@@ -294,7 +294,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
                       height: 40,
                       child: const Icon(
                         Icons.my_location,
-                        color: Colors.blueAccent,
+                        color: CEDColors.primaryAccent,
                       ),
                     ),
                     ..._toilettenListe.map(
@@ -386,7 +386,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
               right: 20,
               child: FloatingActionButton(
                 backgroundColor: Colors.white,
-                foregroundColor: Colors.blueAccent,
+                foregroundColor: CEDColors.primaryAccent,
                 shape: const CircleBorder(),
                 tooltip: 'Zum aktuellen Standort',
                 onPressed: () async {
@@ -428,7 +428,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
                   child: CircularProgressIndicator(
                     strokeWidth: 4,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.blueAccent,
+                      CEDColors.primaryAccent,
                     ),
                   ),
                 ),

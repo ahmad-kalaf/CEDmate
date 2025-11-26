@@ -23,7 +23,7 @@ class ProfilScreen extends StatelessWidget {
           Card(
             margin: const EdgeInsets.all(10),
             elevation: 10,
-            shadowColor: Colors.blue,
+            shadowColor: CEDColors.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
@@ -66,7 +66,7 @@ class ProfilScreen extends StatelessWidget {
           Card(
             margin: const EdgeInsets.all(10),
             elevation: 10,
-            shadowColor: Colors.blue,
+            shadowColor: CEDColors.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
@@ -112,7 +112,7 @@ class ProfilScreen extends StatelessWidget {
           Card(
             margin: const EdgeInsets.all(10),
             elevation: 10,
-            shadowColor: Colors.blue,
+            shadowColor: CEDColors.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
@@ -189,7 +189,7 @@ class ProfilScreen extends StatelessWidget {
           Card(
             margin: const EdgeInsets.all(10),
             elevation: 10,
-            shadowColor: Colors.blue,
+            shadowColor: CEDColors.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),

@@ -163,7 +163,7 @@ class _KalenderScreenState extends State<KalenderScreen> {
       onPressed: () => setState(() => _ausgewaehlteSeite = index),
       style: ButtonStyle(
         backgroundColor: WidgetStatePropertyAll(
-          _ausgewaehlteSeite == index ? Colors.amberAccent : Colors.transparent,
+          _ausgewaehlteSeite == index ? CEDColors.surfaceDark : Colors.transparent,
         ),
       ),
       child: Text(label),

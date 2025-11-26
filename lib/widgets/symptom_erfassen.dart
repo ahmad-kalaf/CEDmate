@@ -272,7 +272,7 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
                                           )
                                         : null,
                                     color: isSelected
-                                        ? Colors.blue
+                                        ? CEDColors.primary
                                         : Colors.white,
                                     borderRadius: BorderRadius.circular(20),
                                   ),

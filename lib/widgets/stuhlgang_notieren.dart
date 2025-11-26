@@ -207,7 +207,7 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? Colors.blue
+                                      ? CEDColors.primary
                                       : Colors.white,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
