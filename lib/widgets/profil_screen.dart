@@ -4,6 +4,7 @@ import 'package:cedmate/widgets/anamnese_screen.dart';
 import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cedmate/widgets/CEDColors.dart';
 
 class ProfilScreen extends StatelessWidget {
   const ProfilScreen({super.key});

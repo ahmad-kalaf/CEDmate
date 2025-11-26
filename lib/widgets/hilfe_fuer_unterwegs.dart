@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
+import 'package:cedmate/widgets/CEDColors.dart';  
 
 /// Modell einer Toilette (mit Position und Zusatzinformationen)
 class Toilette {
@@ -294,7 +295,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
                       height: 40,
                       child: const Icon(
                         Icons.my_location,
-                        color: CEDColors.primaryAccent,
+                        color: CEDColors.accent,
                       ),
                     ),
                     ..._toilettenListe.map(
@@ -386,7 +387,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
               right: 20,
               child: FloatingActionButton(
                 backgroundColor: Colors.white,
-                foregroundColor: CEDColors.primaryAccent,
+                foregroundColor: CEDColors.accent,
                 shape: const CircleBorder(),
                 tooltip: 'Zum aktuellen Standort',
                 onPressed: () async {
@@ -428,7 +429,7 @@ class _HilfeFuerUnterwegsState extends State<HilfeFuerUnterwegs> {
                   child: CircularProgressIndicator(
                     strokeWidth: 4,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      CEDColors.primaryAccent,
+                      CEDColors.accent,
                     ),
                   ),
                 ),
