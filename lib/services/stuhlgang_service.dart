@@ -23,8 +23,8 @@ class StuhlgangService {
     String? auffaelligkeiten,
     String? notizen,
   }) async {
-    if (haeufigkeit <= 0) {
-      throw ArgumentError('Häufigkeit muss größer als 0 sein.');
+    if (haeufigkeit < 0) {
+      throw ArgumentError('Häufigkeit muss mind. 0 sein.');
     }
 
     final eintrag = Stuhlgang(

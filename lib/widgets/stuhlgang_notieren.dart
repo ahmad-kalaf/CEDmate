@@ -27,6 +27,7 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
   DateTime _eintrageZeitpunkt = DateTime.now();
   bool _isSaving = false;
   final List<Icon> _stuhlformIcons = const [
+    Icon(Icons.not_interested),
     Icon(Cedmate.kons_1),
     Icon(Cedmate.kons_2),
     Icon(Cedmate.kons_3),
@@ -180,6 +181,11 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
                         onPageChanged: (page) {
                           setState(() {
                             _ausgewaehlteForm = BristolStuhlform.values[page];
+                            if(_ausgewaehlteForm == BristolStuhlform.typ0) {
+                              _haeufigkeitController.text = '0';
+                            } else if(_haeufigkeitController.text.isNotEmpty && int.tryParse(_haeufigkeitController.text)! < 1) {
+                              _haeufigkeitController.text = '1';
+                            }
                           });
                         },
                         itemBuilder: (context, index) {
@@ -241,15 +247,31 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
               // HÄUFIGKEIT
               // ------------------------------
               TextFormField(
+                onChanged: (value) {
+                  if(value.isEmpty) return;
+                  final parsed = int.tryParse(value);
+                  if(parsed == null) return;
+                  if(parsed == 0) {
+                    setState(() {
+                      _ausgewaehlteForm = BristolStuhlform.values[0];
+                      _pageController.jumpToPage(0);
+                    });
+                  } else if(_ausgewaehlteForm == BristolStuhlform.typ0 && parsed > 0) {
+                    setState(() {
+                      _ausgewaehlteForm = BristolStuhlform.typ1;
+                      _pageController.jumpToPage(1);
+                    });
+                  }
+                },
                 controller: _haeufigkeitController,
                 decoration: const InputDecoration(
-                  labelText: 'Häufigkeit pro Tag (min. 1)',
+                  labelText: 'Häufigkeit pro Tag (min. 0)',
                 ),
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   final i = int.tryParse(v ?? '');
-                  if (i == null || i < 1) {
-                    return 'Bitte mindestens 1 eingeben.';
+                  if (i == null || i < 0) {
+                    return 'Bitte mindestens 0 eingeben.';
                   }
                   return null;
                 },
