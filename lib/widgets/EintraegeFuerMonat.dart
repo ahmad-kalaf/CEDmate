@@ -25,7 +25,6 @@ class _EintraegeFuerMonatState<T> extends State<EintraegeFuerMonat<T>> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const CEDDrawer(),
       appBar: AppBar(title: Text(widget.title)),
       body: SingleChildScrollView(
         child: Center(

@@ -8,6 +8,7 @@ import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
 import 'package:cedmate/widgets/impressum_credits_screen.dart';
 import 'package:cedmate/widgets/kalender_screen.dart';
 import 'package:cedmate/widgets/profil_screen.dart';
+import 'package:cedmate/widgets/rueckblick_screen.dart';
 import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
 import 'package:cedmate/widgets/statistiken.dart';
 import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_monat.dart';
@@ -125,6 +126,7 @@ class CEDmateApp extends StatelessWidget {
           '/': (_) => const AuthGate(),
           '/home': (_) => const HomeScreen(),
           '/profil': (_) => const ProfilScreen(),
+          '/rueckblick': (_) => const RueckblickScreen(),
           '/symptomeMonat': (_) => SymptomeFuerMonat(),
           '/stuhlMonat': (_) => const StuhlgangEintraegeFuerMonat(),
           '/essenMonat': (_) => EssTagebuchFuerMonat(),

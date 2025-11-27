@@ -25,23 +25,9 @@ class CEDDrawer extends StatelessWidget {
                   _drawerItem(context, 'Mein Profil', Icons.person, () {
                     Navigator.pushNamed(context, '/profil');
                   }),
-                  _drawerItem(context, 'Symptom-Radar', Icons.show_chart, () {
-                    Navigator.pushNamed(context, '/symptomeMonat');
+                  _drawerItem(context, 'Rückblick', Icons.history_edu, () {
+                    Navigator.pushNamed(context, '/rueckblick');
                   }),
-                  _drawerItem(context, 'Stuhl-Tagebuch', Icons.wc, () {
-                    Navigator.pushNamed(context, '/stuhlMonat');
-                  }),
-                  _drawerItem(context, 'Ess-Tagebuch', Icons.restaurant, () {
-                    Navigator.pushNamed(context, '/essenMonat');
-                  }),
-                  _drawerItem(
-                    context,
-                    'Seelen-Log',
-                    Icons.sentiment_satisfied,
-                    () {
-                      Navigator.pushNamed(context, '/stimmungMonat');
-                    },
-                  ),
                   _drawerItem(context, 'Toiletten finden', Icons.map, () {
                     Navigator.pushNamed(context, '/hilfeUnterwegs');
                   }),
