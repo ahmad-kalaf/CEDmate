@@ -17,7 +17,7 @@ import 'enums/bristol_stuhlform.dart';
 /// - Zeitpunkt des Eintrags (wird automatisch gesetzt, falls nicht übergeben)
 class Stuhlgang {
   final String? id;
-  final BristolStuhlform konsistenz; // ✅ enum statt String
+  final BristolStuhlform konsistenz;
   final int haeufigkeit;
   final String? auffaelligkeiten;
   final String? notizen;
@@ -51,7 +51,7 @@ class Stuhlgang {
   /// Model → Firestore
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{
-      'konsistenz': konsistenz.name, // ✅ enum als String speichern
+      'konsistenz': konsistenz.name, // enum als String speichern
       'haeufigkeit': haeufigkeit,
       'eintragZeitpunkt': Timestamp.fromDate(eintragZeitpunkt),
     };

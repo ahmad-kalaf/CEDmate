@@ -2,6 +2,7 @@
 ///
 /// Quelle: https://de.wikipedia.org/wiki/Bristol-Stuhlformen-Skala
 enum BristolStuhlform {
+  typ0, // Stuhlgang nicht möglich / kein Stuhlgang
   typ1, // einzelne, harte Klumpen (Verstopfung)
   typ2, // wurstförmig, aber klumpig
   typ3, // wurstförmig mit Rissen
@@ -15,6 +16,8 @@ enum BristolStuhlform {
 extension BristolBeschreibung on BristolStuhlform {
   String get beschreibung {
     switch (this) {
+      case BristolStuhlform.typ0:
+        return '####### Kein Stuhlgang';
       case BristolStuhlform.typ1:
         return 'Typ 1 – Harte, getrennte Klumpen';
       case BristolStuhlform.typ2:
