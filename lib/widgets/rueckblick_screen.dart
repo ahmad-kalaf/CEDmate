@@ -9,7 +9,7 @@ class RueckblickScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    Widget _rectCardItem({
+    Widget rectCardItem({
       required IconData icon,
       required String text,
       required VoidCallback onTap,
@@ -58,10 +58,10 @@ class RueckblickScreen extends StatelessWidget {
         const SizedBox(height: 20),
         Row(
           children: [
-            _rectCardItem(icon: Icons.show_chart, text: 'Symptom-Radar', onTap: (){
+            rectCardItem(icon: Icons.show_chart, text: 'Symptom-Radar', onTap: (){
               Navigator.pushNamed(context, '/symptomeMonat');
             }),
-            _rectCardItem(icon: Icons.wc, text: 'Stuhl-Tagebuch', onTap: () {
+            rectCardItem(icon: Icons.wc, text: 'Stuhl-Tagebuch', onTap: () {
               Navigator.pushNamed(context, '/stuhlMonat');
             }),
           ],
@@ -69,10 +69,10 @@ class RueckblickScreen extends StatelessWidget {
         const SizedBox(height: 10),
         Row(
           children: [
-            _rectCardItem(icon: Icons.restaurant,text: 'Ess-Tagebuch',onTap: () {
+            rectCardItem(icon: Icons.restaurant,text: 'Ess-Tagebuch',onTap: () {
               Navigator.pushNamed(context, '/essenMonat');
             }),
-            _rectCardItem(
+            rectCardItem(
               icon:  Icons.sentiment_satisfied,
               text: 'Seelen-Log',
               onTap:() {
