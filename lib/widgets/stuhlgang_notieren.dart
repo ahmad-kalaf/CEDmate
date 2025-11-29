@@ -2,6 +2,7 @@ import 'package:cedmate/models/stuhlgang.dart';
 import 'package:cedmate/services/stuhlgang_service.dart';
 import 'package:cedmate/utils/loesche_eintrag.dart';
 import 'package:cedmate/widgets/ced_layout.dart';
+import 'package:cedmate/widgets/icon_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../cedmate_icons.dart';
@@ -19,26 +20,42 @@ class StuhlgangNotieren extends StatefulWidget {
 
 class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
   final _formKey = GlobalKey<FormState>();
-
   BristolStuhlform _ausgewaehlteForm = BristolStuhlform.typ4;
   final _haeufigkeitController = TextEditingController();
   final _notizenController = TextEditingController();
-
-  DateTime _eintrageZeitpunkt = DateTime.now();
+  DateTime _eintrageZeitpunkt = DateTime.now(); // wird aktuell nicht benutzt
   bool _isSaving = false;
   final List<Icon> _stuhlformIcons = const [
-    Icon(Icons.not_interested),
-    Icon(Cedmate.kons_1),
-    Icon(Cedmate.kons_2),
-    Icon(Cedmate.kons_3),
-    Icon(Cedmate.kons_4),
-    Icon(Cedmate.kons_5),
-    Icon(Cedmate.kons_6),
-    Icon(Cedmate.kons_7),
+    Icon(Icons.not_interested, color: Colors.brown),
+    Icon(Cedmate.kons_1, color: Colors.brown),
+    Icon(Cedmate.kons_2, color: Colors.brown),
+    Icon(Cedmate.kons_3, color: Colors.brown),
+    Icon(Cedmate.kons_4, color: Colors.brown),
+    Icon(Cedmate.kons_5, color: Colors.brown),
+    Icon(Cedmate.kons_6, color: Colors.brown),
+    Icon(Cedmate.kons_7, color: Colors.brown),
   ];
-  late final PageController _pageController;
+  late final PageController _pageControllerKonsistenz;
+  late final PageController _pageControllerSchmerzLevel;
+  final List<Icon> _schmerzLevelIcons = const [
+    Icon(Icons.sentiment_very_satisfied_outlined),
+    Icon(Icons.sentiment_satisfied),
+    Icon(Icons.sentiment_neutral),
+    Icon(Icons.sentiment_dissatisfied),
+    Icon(Icons.sentiment_very_dissatisfied),
+    Icon(Icons.sentiment_very_dissatisfied_sharp),
+  ];
+  final List<String> _schmerzLevelDescriptions = const [
+    'Kein Schmerz',
+    'Leichter Schmerz',
+    'Mittlerer Schmerz',
+    'Starker Schmerz',
+    'Sehr starker Schmerz',
+    'Stärkster vorstellbarer Schmerz',
+  ];
 
   bool get isEditMode => widget.stuhlgang != null;
+  int _schmerzLevel = 1;
 
   @override
   void initState() {
@@ -50,10 +67,17 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
       _haeufigkeitController.text = s.haeufigkeit.toString();
       _notizenController.text = s.notizen ?? '';
       _eintrageZeitpunkt = s.eintragZeitpunkt;
+      _schmerzLevel = s.schmerzLevel;
     }
-    final initialIndex = BristolStuhlform.values.indexOf(_ausgewaehlteForm);
-    _pageController = PageController(
-      initialPage: initialIndex < 0 ? 0 : initialIndex,
+    final initialIndexKonsistenz = BristolStuhlform.values.indexOf(
+      _ausgewaehlteForm,
+    );
+    _pageControllerKonsistenz = PageController(
+      initialPage: initialIndexKonsistenz < 0 ? 0 : initialIndexKonsistenz,
+      viewportFraction: 0.25,
+    );
+    _pageControllerSchmerzLevel = PageController(
+      initialPage: _schmerzLevel - 1,
       viewportFraction: 0.25,
     );
   }
@@ -62,7 +86,7 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
   void dispose() {
     _haeufigkeitController.dispose();
     _notizenController.dispose();
-    _pageController.dispose();
+    _pageControllerKonsistenz.dispose();
     super.dispose();
   }
 
@@ -84,6 +108,7 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
           konsistenz: _ausgewaehlteForm,
           haeufigkeit: haeufigkeit,
           notizen: notizen,
+          schmerzLevel: _schmerzLevel,
         );
 
         await service.aktualisiereStuhlgang(aktualisiert);
@@ -98,6 +123,7 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
           konsistenz: _ausgewaehlteForm,
           haeufigkeit: haeufigkeit,
           notizen: notizen,
+          schmerzLevel: _schmerzLevel,
         );
 
         if (mounted) {
@@ -155,111 +181,59 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
           key: _formKey,
           child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: CEDColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: CEDColors.border, width: 1),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        'Typ – Konsistenz',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 100,
-                      child: PageView.builder(
-                        controller: _pageController,
-                        itemCount: BristolStuhlform.values.length,
-                        onPageChanged: (page) {
-                          setState(() {
-                            _ausgewaehlteForm = BristolStuhlform.values[page];
-                            if(_ausgewaehlteForm == BristolStuhlform.typ0) {
-                              _haeufigkeitController.text = '0';
-                            } else if(_haeufigkeitController.text.isNotEmpty && int.tryParse(_haeufigkeitController.text)! < 1) {
-                              _haeufigkeitController.text = '1';
-                            }
-                          });
-                        },
-                        itemBuilder: (context, index) {
-                          final form = BristolStuhlform.values[index];
-                          final isSelected = form == _ausgewaehlteForm;
-                          return GestureDetector(
-                            onTap: () {
-                              _pageController.animateToPage(
-                                index,
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.easeOut,
-                              );
-                              setState(() {
-                                _ausgewaehlteForm = form;
-                              });
-                            },
-                            child: AnimatedOpacity(
-                              opacity: isSelected ? 1.0 : 0.3,
-                              duration: const Duration(milliseconds: 200),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? Colors.blue
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Icon(
-                                  _stuhlformIcons[index].icon,
-                                  size: 60,
-                                  color: Colors.brown,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Center(
-                      child: Text(
-                        _ausgewaehlteForm.beschreibung.substring(8),
-                        style: Theme.of(context).textTheme.labelLarge,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
+              // ------------------------------
+              // KONSISTENZ
+              // ------------------------------
+              IconSelector(
+                pageController: _pageControllerKonsistenz,
+                title: 'Typ - Konsistenz',
+                selectedValue: _ausgewaehlteForm,
+                values: BristolStuhlform.values,
+                icons: _stuhlformIcons,
+                onChanged: (value) {
+                  setState(() {
+                    _ausgewaehlteForm = value;
+                    if (value == BristolStuhlform.typ0) {
+                      _haeufigkeitController.text = '0';
+                    } else if (_haeufigkeitController.text.isNotEmpty &&
+                        int.tryParse(_haeufigkeitController.text)! < 1) {
+                      _haeufigkeitController.text = '1';
+                    }
+                  });
+                },
+                description: _ausgewaehlteForm.beschreibung,
+                colors: [
+                  Colors.white,
+                  Colors.white,
+                  Colors.white,
+                  Colors.white,
+                  Colors.white,
+                  Colors.white,
+                  Colors.white,
+                  Colors.white,
+                  Colors.white,
+                  Colors.white,
+                ],
               ),
-
               const SizedBox(height: 16),
-
               // ------------------------------
               // HÄUFIGKEIT
               // ------------------------------
               TextFormField(
                 onChanged: (value) {
-                  if(value.isEmpty) return;
+                  if (value.isEmpty) return;
                   final parsed = int.tryParse(value);
-                  if(parsed == null) return;
-                  if(parsed == 0) {
+                  if (parsed == null) return;
+                  if (parsed == 0) {
                     setState(() {
                       _ausgewaehlteForm = BristolStuhlform.values[0];
-                      _pageController.jumpToPage(0);
+                      _pageControllerKonsistenz.jumpToPage(0);
                     });
-                  } else if(_ausgewaehlteForm == BristolStuhlform.typ0 && parsed > 0) {
+                  } else if (_ausgewaehlteForm == BristolStuhlform.typ0 &&
+                      parsed > 0) {
                     setState(() {
                       _ausgewaehlteForm = BristolStuhlform.typ1;
-                      _pageController.jumpToPage(1);
+                      _pageControllerKonsistenz.jumpToPage(1);
                     });
                   }
                 },
@@ -278,6 +252,32 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
               ),
 
               const SizedBox(height: 16),
+              // ------------------------------
+              // SCHMERZLEVEL
+              // ------------------------------
+              IconSelector(
+                pageController: _pageControllerSchmerzLevel,
+                title: 'Schmerzlevel',
+                selectedValue: _schmerzLevel,
+                description: _schmerzLevelDescriptions[_schmerzLevel - 1],
+                values: [1, 2, 3, 4, 5, 6],
+                icons: _schmerzLevelIcons,
+                onChanged: (value) {
+                  setState(() {
+                    _schmerzLevel = value;
+                  });
+                },
+                colors: [
+                  Colors.green,
+                  Colors.lightGreen,
+                  Colors.yellow,
+                  Colors.orange.shade400, // dunkleres Orange
+                  Colors.orange.shade800, // sehr dunkles Orange
+                  Colors.red.shade700,
+                ],
+              ),
+
+              const SizedBox(height: 16),
 
               // ------------------------------
               // NOTIZEN
@@ -285,7 +285,9 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
               TextFormField(
                 controller: _notizenController,
                 decoration: const InputDecoration(
-                  labelText: 'Notizen (optional)',
+                  labelText: 'Notizen / Auffälligkeiten:',
+                  hintText: 'z.B. Blut, Schleim etc.',
+                  hintStyle: TextStyle(color: Colors.grey),
                 ),
                 maxLines: 3,
               ),

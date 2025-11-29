@@ -17,21 +17,21 @@ extension BristolBeschreibung on BristolStuhlform {
   String get beschreibung {
     switch (this) {
       case BristolStuhlform.typ0:
-        return '####### Kein Stuhlgang';
+        return 'Kein Stuhlgang';
       case BristolStuhlform.typ1:
-        return 'Typ 1 – Harte, getrennte Klumpen';
+        return 'Harte, getrennte Klumpen';
       case BristolStuhlform.typ2:
-        return 'Typ 2 – Wurstförmig, aber klumpig';
+        return 'Wurstförmig, aber klumpig';
       case BristolStuhlform.typ3:
-        return 'Typ 3 – Wurstförmig mit Rissen';
+        return 'Wurstförmig mit Rissen';
       case BristolStuhlform.typ4:
-        return 'Typ 4 – Glatt und weich (normal)';
+        return 'Glatt und weich (normal)';
       case BristolStuhlform.typ5:
-        return 'Typ 5 – Weiche Klümpchen';
+        return 'Weiche Klümpchen';
       case BristolStuhlform.typ6:
-        return 'Typ 6 – Breiig';
+        return 'Breiig';
       case BristolStuhlform.typ7:
-        return 'Typ 7 – Wässrig, keine festen Bestandteile';
+        return 'Wässrig, keine festen Bestandteile';
     }
   }
 

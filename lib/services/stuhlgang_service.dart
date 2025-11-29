@@ -20,11 +20,15 @@ class StuhlgangService {
   Future<void> erfasseStuhlgang({
     required BristolStuhlform konsistenz,
     required int haeufigkeit,
+    required int schmerzLevel,
     String? auffaelligkeiten,
     String? notizen,
   }) async {
     if (haeufigkeit < 0) {
       throw ArgumentError('Häufigkeit muss mind. 0 sein.');
+    }
+    if (schmerzLevel < 1 || schmerzLevel > 6) {
+      throw ArgumentError('Schmerzlevel muss zwischen 1 und 6 liegen.');
     }
 
     final eintrag = Stuhlgang(
@@ -32,6 +36,7 @@ class StuhlgangService {
       haeufigkeit: haeufigkeit,
       auffaelligkeiten: auffaelligkeiten?.trim(),
       notizen: notizen?.trim(),
+      schmerzLevel: schmerzLevel,
     );
 
     await _repo.add(_auth.currentUserId, eintrag);
@@ -64,8 +69,11 @@ class StuhlgangService {
     if (eintrag.id == null) {
       throw ArgumentError('Stuhlgang-ID darf nicht null sein.');
     }
-    if (eintrag.haeufigkeit <= 0) {
-      throw ArgumentError('Häufigkeit muss größer als 0 sein.');
+    if (eintrag.haeufigkeit < 0) {
+      throw ArgumentError('Häufigkeit muss mind. 0 sein.');
+    }
+    if (eintrag.schmerzLevel < 1 || eintrag.schmerzLevel > 6) {
+      throw ArgumentError('Schmerzlevel muss zwischen 1 und 6 liegen.');
     }
 
     await _repo.update(_auth.currentUserId, eintrag.id!, eintrag);

@@ -19,6 +19,7 @@ class Stuhlgang {
   final String? id;
   final BristolStuhlform konsistenz;
   final int haeufigkeit;
+  final int schmerzLevel; // 1 (kein Schmerz) bis 5 (starker Schmerz)
   final String? auffaelligkeiten;
   final String? notizen;
   final DateTime eintragZeitpunkt;
@@ -27,6 +28,7 @@ class Stuhlgang {
     this.id,
     required this.konsistenz,
     required this.haeufigkeit,
+    required this.schmerzLevel,
     this.auffaelligkeiten,
     this.notizen,
     DateTime? eintragZeitpunkt,
@@ -45,6 +47,7 @@ class Stuhlgang {
       auffaelligkeiten: _bereinigeOptionalenString(data['auffaelligkeiten']),
       notizen: _bereinigeOptionalenString(data['notizen']),
       eintragZeitpunkt: _parseZeitstempel(data['eintragZeitpunkt']),
+      schmerzLevel: (data['schmerzLevel'] as int?) ?? 1,
     );
   }
 
@@ -54,6 +57,7 @@ class Stuhlgang {
       'konsistenz': konsistenz.name, // enum als String speichern
       'haeufigkeit': haeufigkeit,
       'eintragZeitpunkt': Timestamp.fromDate(eintragZeitpunkt),
+      'schmerzLevel': schmerzLevel,
     };
     if (_istNichtLeer(auffaelligkeiten))
       map['auffaelligkeiten'] = auffaelligkeiten;
@@ -83,6 +87,7 @@ class Stuhlgang {
     String? auffaelligkeiten,
     String? notizen,
     DateTime? eintragZeitpunkt,
+    int? schmerzLevel,
   }) {
     return Stuhlgang(
       id: id ?? this.id,
@@ -91,6 +96,7 @@ class Stuhlgang {
       auffaelligkeiten: auffaelligkeiten ?? this.auffaelligkeiten,
       notizen: notizen ?? this.notizen,
       eintragZeitpunkt: eintragZeitpunkt ?? this.eintragZeitpunkt,
+      schmerzLevel: schmerzLevel ?? this.schmerzLevel,
     );
   }
 }
