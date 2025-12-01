@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'enums/stimmung_level.dart';
 
 /// Repräsentiert einen Stimmungseintrag (SeelenLog).
 class Stimmung {
   final String? id;
-  final StimmungLevel level;
+  final int level; // 1–5
   final int stresslevel; // 1–10
-  final String? notiz; // optionaler Freitext
-  final List<String>? tags; // optional (z.\b. Angst, Wut, Freude)
+  final String? notiz;
+  final List<String>? tags;
   final DateTime stimmungsZeitpunkt;
 
   Stimmung({
@@ -17,7 +16,8 @@ class Stimmung {
     this.notiz,
     this.tags,
     DateTime? stimmungsZeitpunkt,
-  }) : assert(stresslevel >= 1 && stresslevel <= 10),
+  }) : assert(level >= 1 && level <= 5),
+       assert(stresslevel >= 1 && stresslevel <= 10),
        stimmungsZeitpunkt = stimmungsZeitpunkt ?? DateTime.now();
 
   /// Firestore → Model
@@ -52,7 +52,8 @@ class Stimmung {
 
     return Stimmung(
       id: doc.id,
-      level: parseStimmungLevel(data['stimmungsLevel']),
+      level: (data['stimmungsLevel'] as int?) ?? 3,
+      // Default 3 = neutral
       stresslevel: (data['stresslevel'] as int?) ?? 5,
       notiz: cleanOptional(data['tagebuch']),
       tags: (data['tags'] != null) ? toStringList(data['tags']) : null,
@@ -63,7 +64,7 @@ class Stimmung {
   /// Model → Firestore
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{
-      'stimmungsLevel': level.name,
+      'stimmungsLevel': level,
       'stresslevel': stresslevel,
       'stimmungsZeitpunkt': Timestamp.fromDate(stimmungsZeitpunkt),
     };
@@ -78,7 +79,7 @@ class Stimmung {
 
   Stimmung copyWith({
     String? id,
-    StimmungLevel? level,
+    int? level,
     int? stresslevel,
     String? tagebuch,
     List<String>? tags,

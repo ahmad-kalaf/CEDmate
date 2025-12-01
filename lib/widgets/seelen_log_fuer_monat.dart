@@ -8,6 +8,14 @@ import 'EintraegeFuerMonat.dart';
 class StimmungFuerMonat extends StatelessWidget {
   const StimmungFuerMonat({super.key});
 
+  final List<String> _moodDescriptions = const [
+    'Wütend',
+    'Traurig',
+    'Gleichmütig',
+    'Gut',
+    'Dankbar',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final stimmungService = context.read<StimmungService>();
@@ -110,7 +118,7 @@ class StimmungFuerMonat extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            '${index + 1}) ${stimmung.level.name.toUpperCase()}',
+                            '${index + 1}) ${_moodDescriptions[stimmung.level - 1]}',
                             style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,

@@ -27,6 +27,7 @@ dependencies:
   connectivity_plus: ^6.1.0
   flutter_map_cancellable_tile_provider: ^3.1.1
   google_fonts: ^6.3.2
+  flutter_svg: ^2.2.3
 
 dev_dependencies:
   flutter_test:
@@ -38,6 +39,11 @@ flutter:
 
   assets:
     - assets/fonts/
+    - assets/mood_verybad.svg
+    - assets/mood_bad.svg
+    - assets/mood_meh.svg
+    - assets/mood_good.svg
+    - assets/mood_verygood.svg
 
   fonts:
     - family: Cedmate
