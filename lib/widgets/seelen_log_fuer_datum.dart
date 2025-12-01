@@ -14,13 +14,14 @@ class SeelenLogFuerDatum extends StatefulWidget {
 }
 
 class _SeelenLogFuerDatumState extends State<SeelenLogFuerDatum> {
-  final List<String> _moodDescriptions = [
-    'Sehr schlecht',
-    'Schlecht',
-    'Neutral',
+  final List<String> _moodDescriptions = const [
+    'Wütend',
+    'Traurig',
+    'Gleichmütig',
     'Gut',
-    'Sehr gut',
+    'Dankbar',
   ];
+
   void _zeigeDialogMitTags(BuildContext context, List<String> tags) {
     showDialog(
       context: context,
@@ -139,7 +140,7 @@ class _SeelenLogFuerDatumState extends State<SeelenLogFuerDatum> {
                           children: [
                             Expanded(
                               child: Text(
-                                '${index + 1}) ${_moodDescriptions[stimmung.level.index]}',
+                                '${index + 1}) ${_moodDescriptions[stimmung.level - 1]}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,

@@ -1,12 +1,13 @@
-import 'package:cedmate/models/enums/stimmung_level.dart';
 import 'package:cedmate/services/stimmung_service.dart';
 import 'package:cedmate/utils/build_list_section.dart';
 import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import '../cedmate_icons.dart';
 import '../models/stimmung.dart';
 import '../utils/loesche_eintrag.dart';
-import 'CEDColors.dart';
+import 'icon_selector.dart';
 
 class StimmungNotieren extends StatefulWidget {
   final Stimmung? stimmung;
@@ -19,7 +20,7 @@ class StimmungNotieren extends StatefulWidget {
 
 class _StimmungNotierenState extends State<StimmungNotieren> {
   final _formKey = GlobalKey<FormState>();
-  late StimmungLevel _stimmungLevel;
+  late int _stimmungLevel;
   final _stresslevelController = TextEditingController();
   final _notizController = TextEditingController();
   final _tagsController = TextEditingController();
@@ -28,13 +29,12 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
   bool _isSaving = false;
 
   bool get isEditMode => widget.stimmung != null;
-  late final PageController _pageController;
   final List<String> _moodDescriptions = [
-    'Sehr schlecht',
-    'Schlecht',
-    'Neutral',
+    'Wütend',
+    'Traurig',
+    'Gleichmütig',
     'Gut',
-    'Sehr gut',
+    'Dankbar',
   ];
 
   @override
@@ -43,22 +43,13 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
     // Falls wir bearbeiten, vorhandene Werte übernehmen
     if (isEditMode) {
       final s = widget.stimmung!;
-      _stimmungLevel = s.level;
-      _stresslevelController.text = s.stresslevel.toString() ?? '';
+      _stimmungLevel = s.level; // jetzt int
+      _stresslevelController.text = s.stresslevel.toString();
       _notizController.text = s.notiz ?? '';
       _tags.addAll(s.tags ?? []);
     } else {
-      _stimmungLevel = StimmungLevel.neutral;
+      _stimmungLevel = 3; // neutral = 3 (1–5 Skala)
     }
-    final initialIndex = widget.stimmung != null
-        ? widget.stimmung!.level.index
-        : 2;
-    _pageController = PageController(
-      viewportFraction: 0.3,
-      initialPage: widget.stimmung != null
-          ? (widget.stimmung!.level.index)
-          : 2,
-    );
   }
 
   @override
@@ -168,102 +159,64 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: CEDColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: CEDColors.border, width: 1),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Stimmung',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
+                IconSelector<int>(
+                  title: "Stimmung",
+                  selectedValue: _stimmungLevel,
+                  description: _moodDescriptions[_stimmungLevel - 1],
+                  values: const [1, 2, 3, 4, 5],
+                  icons: [
+                    SvgPicture.asset(
+                      'assets/mood_verybad.svg',
+                      width: 40,
+                      height: 40,
+                      colorFilter: ColorFilter.mode(
+                        Colors.blueAccent,
+                        BlendMode.srcIn,
                       ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 100,
-                        child: PageView.builder(
-                          controller: _pageController,
-                          itemCount: StimmungLevel.values.length,
-                          onPageChanged: (page) {
-                            setState(() {
-                              _stimmungLevel =
-                              StimmungLevel.values[page];
-                            });
-                          },
-                          itemBuilder: (context, index) {
-                            final mood = StimmungLevel.values[index];
-                            final isSelected =
-                                mood == _stimmungLevel;
-
-                            return GestureDetector(
-                              onTap: () {
-                                _pageController.animateToPage(
-                                  index,
-                                  duration: const Duration(milliseconds: 200),
-                                  curve: Curves.easeOut,
-                                );
-                                setState(() {
-                                  _stimmungLevel = mood;
-                                });
-                              },
-                              child: AnimatedOpacity(
-                                opacity: isSelected ? 1.0 : 0.3,
-                                duration: const Duration(milliseconds: 200),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    border: isSelected
-                                        ? Border.all(
-                                      color: Colors.black,
-                                      width: 3,
-                                    )
-                                        : null,
-                                    color: isSelected
-                                        ? Colors.blue
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      _moodDescriptions[index],
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                    ),
+                    SvgPicture.asset(
+                      'assets/mood_bad.svg',
+                      width: 40,
+                      height: 40,
+                      colorFilter: ColorFilter.mode(
+                        Colors.blueAccent,
+                        BlendMode.srcIn,
                       ),
-
-                      const SizedBox(height: 8),
-
-                      // ---------- Beschreibung unten ----------
-                      Center(
-                        child: Text(
-                          _moodDescriptions[_stimmungLevel.index],
-                          style: Theme.of(context).textTheme.labelLarge,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                    ),
+                    SvgPicture.asset(
+                      'assets/mood_meh.svg',
+                      width: 40,
+                      height: 40,
+                      colorFilter: ColorFilter.mode(
+                        Colors.blueAccent,
+                        BlendMode.srcIn,
                       ),
-                    ],
-                  ),
+                    ),
+                    SvgPicture.asset(
+                      'assets/mood_good.svg',
+                      width: 40,
+                      height: 40,
+                      colorFilter: ColorFilter.mode(
+                        Colors.blueAccent,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    SvgPicture.asset(
+                      'assets/mood_verygood.svg',
+                      width: 40,
+                      height: 40,
+                      colorFilter: ColorFilter.mode(
+                        Colors.blueAccent,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ],
+                  colors: List.filled(5, Colors.transparent),
+                  onChanged: (value) {
+                    setState(() {
+                      _stimmungLevel = value;
+                    });
+                  },
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
