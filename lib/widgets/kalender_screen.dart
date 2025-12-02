@@ -230,10 +230,10 @@ class _KalenderScreenState extends State<KalenderScreen> {
                     alignment: WrapAlignment.center,
                     spacing: 5,
                     children: [
-                      _buildButton('Symptome', 0, Colors.red),
-                      _buildButton('Stuhlgang', 1, Colors.orange),
-                      _buildButton('Mahlzeiten', 2, Colors.blue),
-                      _buildButton('Stimmung', 3, Colors.green),
+                      _buildButton('Symptome', 0, CEDColors.eventSymptom),
+                      _buildButton('Stuhlgang', 1, CEDColors.eventStuhlgang),
+                      _buildButton('Mahlzeiten', 2, CEDColors.eventMahlzeit),
+                      _buildButton('Stimmung', 3, CEDColors.eventStimmung),
                     ],
                   ),
                   const Divider(height: 16),
@@ -459,10 +459,10 @@ class _CalendarDialogState extends State<_CalendarDialog> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: events.map((e) {
                         final color = switch (e) {
-                          "symptom" => Colors.red,
-                          "stuhlgang" => Colors.orange,
-                          "mahlzeit" => Colors.blue,
-                          "stimmung" => Colors.green,
+                          "symptom" => CEDColors.eventSymptom,
+                          "stuhlgang" => CEDColors.eventStuhlgang,
+                          "mahlzeit" => CEDColors.eventMahlzeit,
+                          "stimmung" => CEDColors.eventStimmung,
                           _ => Colors.grey,
                         };
                         return Container(

@@ -101,14 +101,7 @@ class CEDDrawer extends StatelessWidget {
     return Container(
       margin: EdgeInsets.all(3),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            CEDColors.background.withValues(alpha: 0.65),
-            CEDColors.background.withValues(alpha: 0.15),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: CEDColors.surfaceDark,
         borderRadius: BorderRadius.circular(8),
         border: BoxBorder.all(color: CEDColors.border),
       ),

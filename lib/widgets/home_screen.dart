@@ -114,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required IconData icon,
     required String text,
     required VoidCallback onTap,
+    required Color iconColor,
   }) {
     return Expanded(
       child: InkWell(
@@ -123,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 110,
           margin: const EdgeInsets.symmetric(horizontal: 5),
           decoration: BoxDecoration(
-            color: CEDColors.surfaceDark, // ← NEW, darker background
+            color: CEDColors.surfaceDark,
             borderRadius: BorderRadius.circular(16),
             // no border
             boxShadow: [
@@ -137,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: CEDColors.iconPrimary, size: 30),
+              Icon(icon, color: iconColor, size: 30),
               const SizedBox(height: 10),
               Text(text, style: Theme.of(context).textTheme.bodyMedium),
             ],
@@ -152,6 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String text,
     required int value,
     required VoidCallback onTap,
+    required Color iconColor,
   }) {
     return Expanded(
       child: InkWell(
@@ -174,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: CEDColors.iconSecondary, size: 30),
+              Icon(icon, color: iconColor, size: 30),
               const SizedBox(height: 8),
 
               Text(
@@ -265,11 +267,13 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.sick,
               text: 'Symptom erfassen',
               onTap: () => _navigiereZurSeite(SymptomErfassen()),
+              iconColor: CEDColors.eventSymptom,
             ),
             _homeTile(
               icon: Icons.wc,
               text: 'Stuhlgang notieren',
               onTap: () => _navigiereZurSeite(StuhlgangNotieren()),
+              iconColor: CEDColors.eventStuhlgang,
             ),
           ],
         ),
@@ -282,11 +286,13 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.restaurant_menu,
               text: 'Mahlzeit eintragen',
               onTap: () => _navigiereZurSeite(MahlzeitEintragen()),
+              iconColor: CEDColors.eventMahlzeit,
             ),
             _homeTile(
               icon: Icons.mood,
               text: 'Stimmung notieren',
               onTap: () => _navigiereZurSeite(StimmungNotieren()),
+              iconColor: CEDColors.eventStimmung,
             ),
           ],
         ),
@@ -308,6 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () => _navigiereZurSeite(
                           KalenderScreen(ausgewaehlteSeite: 0),
                         ),
+                        iconColor: CEDColors.eventSymptom,
                       ),
                       _homeStatTile(
                         icon: Icons.wc,
@@ -316,6 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () => _navigiereZurSeite(
                           KalenderScreen(ausgewaehlteSeite: 1),
                         ),
+                        iconColor: CEDColors.eventStuhlgang,
                       ),
                     ],
                   ),
@@ -329,6 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () => _navigiereZurSeite(
                           KalenderScreen(ausgewaehlteSeite: 2),
                         ),
+                        iconColor: CEDColors.eventMahlzeit,
                       ),
                       _homeStatTile(
                         icon: Icons.mood,
@@ -337,6 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () => _navigiereZurSeite(
                           KalenderScreen(ausgewaehlteSeite: 3),
                         ),
+                        iconColor: CEDColors.eventStimmung,
                       ),
                     ],
                   ),
@@ -358,11 +368,13 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.explore,
               text: 'Toiletten finden',
               onTap: () => _navigiereZurSeite(HilfeFuerUnterwegs()),
+              iconColor: CEDColors.iconPrimary,
             ),
             _homeTile(
               icon: Icons.upload_file,
               text: 'Daten exportieren',
               onTap: () => _navigiereZurSeite(DatenExportieren()),
+              iconColor: CEDColors.iconPrimary,
             ),
           ],
         ),
@@ -382,11 +394,13 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.calendar_month,
               text: 'Kalender',
               onTap: () => _navigiereZurSeite(KalenderScreen()),
+              iconColor: CEDColors.iconPrimary,
             ),
             _homeTile(
               icon: Icons.bar_chart,
               text: 'Statistiken',
               onTap: () => _navigiereZurSeite(Statistiken()),
+              iconColor: CEDColors.iconPrimary,
             ),
           ],
         ),
