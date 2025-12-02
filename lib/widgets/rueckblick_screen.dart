@@ -8,11 +8,11 @@ class RueckblickScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     Widget rectCardItem({
       required IconData icon,
       required String text,
       required VoidCallback onTap,
+      required Color iconColor,
     }) {
       return Expanded(
         child: InkWell(
@@ -36,7 +36,7 @@ class RueckblickScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: CEDColors.iconPrimary, size: 30),
+                Icon(icon, color: iconColor, size: 30),
                 const SizedBox(height: 10),
                 Text(text, style: Theme.of(context).textTheme.bodyMedium),
               ],
@@ -47,50 +47,68 @@ class RueckblickScreen extends StatelessWidget {
     }
 
     return CEDLayout(
-      title: 'Rückblick', child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Du kannst dir hier einen Überblick über deine Einträge der letzten Monate verschaffen:',
-          style: Theme.of(context).textTheme.bodyLarge,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            rectCardItem(icon: Icons.show_chart, text: 'Symptom-Radar', onTap: (){
-              Navigator.pushNamed(context, '/symptomeMonat');
-            }),
-            rectCardItem(icon: Icons.wc, text: 'Stuhl-Tagebuch', onTap: () {
-              Navigator.pushNamed(context, '/stuhlMonat');
-            }),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            rectCardItem(icon: Icons.restaurant,text: 'Ess-Tagebuch',onTap: () {
-              Navigator.pushNamed(context, '/essenMonat');
-            }),
-            rectCardItem(
-              icon:  Icons.sentiment_satisfied,
-              text: 'Seelen-Log',
-              onTap:() {
-                Navigator.pushNamed(context, '/stimmungMonat');
-              },
-            ),
-          ],
-        )
-      ],
-    ),);
+      title: 'Rückblick',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Du kannst dir hier einen Überblick über deine Einträge der letzten Monate verschaffen:',
+            style: Theme.of(context).textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              rectCardItem(
+                icon: Icons.show_chart,
+                text: 'Symptom-Radar',
+                onTap: () {
+                  Navigator.pushNamed(context, '/symptomeMonat');
+                },
+                iconColor: CEDColors.eventSymptom,
+              ),
+              rectCardItem(
+                icon: Icons.wc,
+                text: 'Stuhl-Tagebuch',
+                onTap: () {
+                  Navigator.pushNamed(context, '/stuhlMonat');
+                },
+                iconColor: CEDColors.eventStuhlgang,
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              rectCardItem(
+                icon: Icons.restaurant,
+                text: 'Ess-Tagebuch',
+                onTap: () {
+                  Navigator.pushNamed(context, '/essenMonat');
+                },
+                iconColor: CEDColors.eventMahlzeit,
+              ),
+              rectCardItem(
+                icon: Icons.sentiment_satisfied,
+                text: 'Seelen-Log',
+                onTap: () {
+                  Navigator.pushNamed(context, '/stimmungMonat');
+                },
+                iconColor: CEDColors.eventStimmung,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _drawerItem(
-      BuildContext context,
-      String title,
-      IconData icon,
-      VoidCallback onTap,
-      ) {
+    BuildContext context,
+    String title,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
     return Container(
       margin: EdgeInsets.all(3),
       decoration: BoxDecoration(
