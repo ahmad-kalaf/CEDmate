@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cedmate/widgets/CEDColors.dart';
 import 'package:flutter/material.dart';
 
 /// Zeigt eine horizontale Scroll-Leiste mit allen Tagen eines Monats.
@@ -198,10 +199,10 @@ class _DatumRadState extends State<DatumRad> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: events.map((e) {
                               final color = switch (e) {
-                                "symptom" => Colors.red,
-                                "stuhlgang" => Colors.orange,
-                                "mahlzeit" => Colors.blue,
-                                "stimmung" => Colors.green,
+                                "symptom" => CEDColors.eventSymptom,
+                                "stuhlgang" => CEDColors.eventStuhlgang,
+                                "mahlzeit" => CEDColors.eventMahlzeit,
+                                "stimmung" => CEDColors.eventStimmung,
                                 _ => Colors.grey,
                               };
                               return Container(

@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 
-
 //COLOUR PALLETTE:_------------------------------------------------------------
 
 class CEDColors {
+  // COLORS FOR CALENDAR EVENTS
+  static const eventSymptom = Color(0xFFE57373);
+  static const eventStuhlgang = Color(0xFFFFB74D);
+  static const eventMahlzeit = Color(0xFF64B5F6);
+  static const eventStimmung = Color(0xFF81C784);
+
   // BRAND COLORS
-  static const primary = Color.fromARGB(255, 114, 131, 110); // 
-  static const accent = Color.fromARGB(255, 119, 136, 115);  // 
+  static const primary = Color.fromARGB(255, 114, 131, 110); //
+  static const accent = Color.fromARGB(255, 119, 136, 115); //
 
   // BACKGROUND
   static const background = Color.fromARGB(255, 112, 128, 108);
-  static const surface = Color.fromARGB(255, 241, 243, 224);   // for cards/panels
+  static const surface = Color.fromARGB(255, 241, 243, 224); // for cards/panels
   static const surfaceDark = Color.fromARGB(255, 210, 220, 182);
 
   // TEXT
