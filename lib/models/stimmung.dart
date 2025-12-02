@@ -24,6 +24,14 @@ class Stimmung {
   factory Stimmung.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
 
+    int parseInt(dynamic v, {int fallback = 0}) {
+      if (v == null) return fallback;
+      if (v is int) return v;
+      if (v is double) return v.toInt();
+      if (v is String) return int.tryParse(v) ?? fallback;
+      return fallback;
+    }
+
     List<String> toStringList(dynamic value) {
       if (value is List) {
         return value
@@ -52,9 +60,8 @@ class Stimmung {
 
     return Stimmung(
       id: doc.id,
-      level: (data['stimmungsLevel'] as int?) ?? 3,
-      // Default 3 = neutral
-      stresslevel: (data['stresslevel'] as int?) ?? 5,
+      level: parseInt(data['stimmungsLevel'], fallback: 3),
+      stresslevel: parseInt(data['stresslevel'], fallback: 5),
       notiz: cleanOptional(data['tagebuch']),
       tags: (data['tags'] != null) ? toStringList(data['tags']) : null,
       stimmungsZeitpunkt: parseZeit(data['stimmungsZeitpunkt']),

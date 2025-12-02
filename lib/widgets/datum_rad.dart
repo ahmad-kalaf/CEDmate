@@ -8,6 +8,7 @@ class DatumRad extends StatefulWidget {
   final int year;
   final int month;
   final int? initialDay;
+  final Map<String, List<String>> events;
 
   const DatumRad({
     super.key,
@@ -15,6 +16,7 @@ class DatumRad extends StatefulWidget {
     required this.year,
     required this.month,
     this.initialDay,
+    this.events = const {},
   });
 
   @override
@@ -25,6 +27,9 @@ class _DatumRadState extends State<DatumRad> {
   late final PageController _controller;
   late final List<DateTime> _dates;
   int _currentIndex = 0;
+
+  String _key(DateTime d) =>
+      "${d.year}-${d.month.toString().padLeft(2, "0")}-${d.day.toString().padLeft(2, "0")}";
 
   @override
   void initState() {
@@ -111,6 +116,7 @@ class _DatumRadState extends State<DatumRad> {
                 date.day == DateTime.now().day &&
                 date.month == DateTime.now().month &&
                 date.year == DateTime.now().year;
+            final events = widget.events[_key(date)] ?? [];
             return GestureDetector(
               onTap: () {
                 setState(() => _currentIndex = index); // Markiere als gewählt
@@ -147,39 +153,72 @@ class _DatumRadState extends State<DatumRad> {
                           ]
                         : [],
                   ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          const [
-                            'Mo',
-                            'Di',
-                            'Mi',
-                            'Do',
-                            'Fr',
-                            'Sa',
-                            'So',
-                          ][date.weekday - 1],
-                          style: TextStyle(
-                            color: isToday ? Colors.white : Colors.black54,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // --- ORIGINAL UI INHALT ---
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            const [
+                              'Mo',
+                              'Di',
+                              'Mi',
+                              'Do',
+                              'Fr',
+                              'Sa',
+                              'So',
+                            ][date.weekday - 1],
+                            style: TextStyle(
+                              color: isToday ? Colors.white : Colors.black54,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${date.day}.${date.month}',
+                            style: TextStyle(
+                              color: isToday ? Colors.white : Colors.black,
+                              fontSize: isSelected ? 16 : 14,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // --- MARKER UNTEN ---
+                      if (events.isNotEmpty)
+                        Positioned(
+                          bottom: 4,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: events.map((e) {
+                              final color = switch (e) {
+                                "symptom" => Colors.red,
+                                "stuhlgang" => Colors.orange,
+                                "mahlzeit" => Colors.blue,
+                                "stimmung" => Colors.green,
+                                _ => Colors.grey,
+                              };
+                              return Container(
+                                width: 5,
+                                height: 5,
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 1,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  shape: BoxShape.circle,
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${date.day}.${date.month}',
-                          style: TextStyle(
-                            color: isToday ? Colors.white : Colors.black,
-                            fontSize: isSelected ? 16 : 14,
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               ),
