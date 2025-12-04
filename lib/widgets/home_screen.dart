@@ -4,6 +4,7 @@ import 'package:cedmate/services/symptom_service.dart';
 import 'package:cedmate/widgets/CEDColors.dart';
 import 'package:cedmate/widgets/anamnese_screen.dart';
 import 'package:cedmate/widgets/ausloggen_button.dart';
+import 'package:cedmate/widgets/c_e_d_wissen_screen.dart';
 import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
 import 'package:cedmate/widgets/kalender_screen.dart';
 import 'package:cedmate/widgets/mahlzeit_eintragen.dart';
@@ -138,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: iconColor, size: 30),
+              Icon(icon, color: iconColor, size: 35),
               const SizedBox(height: 10),
               Text(text, style: Theme.of(context).textTheme.bodyMedium),
             ],
@@ -400,6 +401,19 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.bar_chart,
               text: 'Statistiken',
               onTap: () => _navigiereZurSeite(Statistiken()),
+              iconColor: CEDColors.iconPrimary,
+            ),
+          ],
+        ),
+
+        SizedBox(height: 10),
+
+        Row(
+          children: [
+            _homeTile(
+              icon: Icons.psychology_alt,
+              text: "CED Wissen",
+              onTap: () => _navigiereZurSeite(CEDWissenScreen()),
               iconColor: CEDColors.iconPrimary,
             ),
           ],
