@@ -1,21 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Repräsentiert eine Mahlzeit
-///
-/// Enthält:
-/// - Bezeichnung
-/// - Zutaten
-/// - optionale Notizen
-/// - optionale Unverträglichkeiten
-/// - Zeitpunkt (auto gesetzt, falls nicht übergeben)
+/// Modell für eine erfasste Mahlzeit.
+/// Enthält Angaben zu Bezeichnung, Zutaten, Notizen,
+/// möglichen Unverträglichkeiten sowie dem Zeitpunkt der Mahlzeit.
+/// Der Zeitpunkt wird automatisch gesetzt, falls keiner übergeben wurde.
 class Mahlzeit {
+  /// Firestore-Dokument-ID, optional.
   final String? id;
+
+  /// Bezeichnung der Mahlzeit, z. B. "Hähnchen mit Reis".
   final String bezeichnung;
+
+  /// Liste der Zutaten oder Bestandteile der Mahlzeit.
   final List<String>? zutaten;
+
+  /// Optionale Freitextnotiz zur Mahlzeit.
   final String? notiz;
+
+  /// Optionale Liste an Unverträglichkeiten, die mit der Mahlzeit verbunden sind.
   final List<String>? unvertraeglichkeiten;
+
+  /// Zeitpunkt, an dem die Mahlzeit eingenommen wurde.
+  /// Wird automatisch auf die aktuelle Zeit gesetzt, falls nicht übergeben.
   final DateTime mahlzeitZeitpunkt;
 
+  /// Konstruktor zum Erstellen eines Mahlzeit-Objekts.
   Mahlzeit({
     this.id,
     required this.bezeichnung,
@@ -25,10 +34,12 @@ class Mahlzeit {
     DateTime? mahlzeitZeitpunkt,
   }) : mahlzeitZeitpunkt = mahlzeitZeitpunkt ?? DateTime.now();
 
-  /// Firestore → Model
+  /// Erstellt ein Mahlzeit-Objekt aus einem Firestore-Dokument.
+  /// Enthält defensive Logik, um Listen und optionale Strings korrekt einzulesen.
   factory Mahlzeit.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
 
+    // Hilfsfunktion zur sicheren Umwandlung dynamischer Listen in String-Listen.
     List<String> toStringList(dynamic value) {
       if (value is List) {
         return value
@@ -51,7 +62,8 @@ class Mahlzeit {
     );
   }
 
-  /// Model → Firestore
+  /// Wandelt die Mahlzeit in eine Map um, um sie in Firestore zu speichern.
+  /// Es werden nur tatsächlich vorhandene Werte gespeichert.
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{
       'bezeichnung': bezeichnung,
@@ -71,15 +83,19 @@ class Mahlzeit {
     return map;
   }
 
-  // ─ Hilfsfunktionen ─
+  /// Bereinigt einen optionalen String und gibt null zurück, wenn er leer ist.
   static String? _bereinigeOptionalenString(dynamic value) {
     final str = (value as String?)?.trim();
     return (str == null || str.isEmpty) ? null : str;
   }
 
+  /// Prüft, ob ein optionaler String nicht leer ist.
   static bool _istNichtLeer(String? value) =>
       value != null && value.trim().isNotEmpty;
 
+  /// Parst verschiedene mögliche Zeitformate aus Firestore.
+  /// Unterstützt Timestamp, DateTime und ISO-Strings.
+  /// Fällt zurück auf die aktuelle Zeit, falls nichts gültig ist.
   static DateTime _parseZeitstempel(dynamic value) {
     if (value is Timestamp) {
       return value.toDate();
@@ -93,6 +109,7 @@ class Mahlzeit {
     return DateTime.now();
   }
 
+  /// Gibt eine neue Instanz zurück, bei der einzelne Felder optional überschrieben werden können.
   Mahlzeit copyWith({
     String? id,
     String? bezeichnung,

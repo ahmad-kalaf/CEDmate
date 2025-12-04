@@ -1,14 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Repräsentiert einen Stimmungseintrag (SeelenLog).
+/// Modell für einen Stimmungseintrag im SeelenLog.
+/// Enthält Angaben zu Stimmung, Stresslevel, optionalen Notizen,
+/// passenden Tags sowie dem Zeitpunkt der Eintragung.
 class Stimmung {
+  /// Firestore-Dokument-ID des Eintrags.
   final String? id;
-  final int level; // 1–5
-  final int stresslevel; // 1–10
+
+  /// Stimmungsausprägung auf einer Skala von 1 bis 5.
+  final int level;
+
+  /// Stresslevel auf einer Skala von 1 bis 10.
+  final int stresslevel;
+
+  /// Optionale Tagebuchnotiz des Nutzers.
   final String? notiz;
+
+  /// Optionale Liste von Tags zur besseren Einordnung.
   final List<String>? tags;
+
+  /// Zeitpunkt, an dem der Stimmungseintrag vorgenommen wurde.
   final DateTime stimmungsZeitpunkt;
 
+  /// Konstruktor für einen Stimmungseintrag.
+  /// Enthält Assertions zur Validierung der zulässigen Wertebereiche.
   Stimmung({
     this.id,
     required this.level,
@@ -20,10 +35,12 @@ class Stimmung {
        assert(stresslevel >= 1 && stresslevel <= 10),
        stimmungsZeitpunkt = stimmungsZeitpunkt ?? DateTime.now();
 
-  /// Firestore → Model
+  /// Erstellt ein Stimmung-Objekt aus einem Firestore-Dokument.
+  /// Beinhaltet defensive Datenverarbeitung für verschiedene Formate.
   factory Stimmung.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
 
+    /// Wandelt dynamische Werte sicher in int um.
     int parseInt(dynamic v, {int fallback = 0}) {
       if (v == null) return fallback;
       if (v is int) return v;
@@ -32,6 +49,7 @@ class Stimmung {
       return fallback;
     }
 
+    /// Wandelt dynamische Listen sicher in eine String-Liste um.
     List<String> toStringList(dynamic value) {
       if (value is List) {
         return value
@@ -42,6 +60,7 @@ class Stimmung {
       return <String>[];
     }
 
+    /// Parst verschiedene Zeitformate in ein DateTime-Objekt um.
     DateTime parseZeit(dynamic v) {
       if (v is Timestamp) return v.toDate();
       if (v is DateTime) return v;
@@ -53,6 +72,7 @@ class Stimmung {
       return DateTime.now();
     }
 
+    /// Bereinigt optionale Strings, gibt null zurück, wenn leer.
     String? cleanOptional(dynamic v) {
       final s = (v as String?)?.trim();
       return (s == null || s.isEmpty) ? null : s;
@@ -68,13 +88,15 @@ class Stimmung {
     );
   }
 
-  /// Model → Firestore
+  /// Wandelt das Objekt in eine Map um, um es in Firestore zu speichern.
+  /// Nur ausgefüllte optionale Werte werden gespeichert.
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{
       'stimmungsLevel': level,
       'stresslevel': stresslevel,
       'stimmungsZeitpunkt': Timestamp.fromDate(stimmungsZeitpunkt),
     };
+
     if (notiz != null && notiz!.trim().isNotEmpty) {
       map['tagebuch'] = notiz;
     }
@@ -84,6 +106,8 @@ class Stimmung {
     return map;
   }
 
+  /// Erstellt eine Kopie des aktuellen Eintrags,
+  /// bei der selektiv einzelne Felder überschrieben werden können.
   Stimmung copyWith({
     String? id,
     int? level,
