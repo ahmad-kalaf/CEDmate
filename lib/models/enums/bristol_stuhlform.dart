@@ -1,19 +1,36 @@
-/// Repräsentiert die Bristol-Stuhlformen-Skala (Typ 1 bis 7).
-///
+/// Enum für die Bristol-Stuhlformen-Skala (Typ 0 bis 7).
+/// Basiert auf der medizinischen Klassifikation der Stuhlform.
 /// Quelle: https://de.wikipedia.org/wiki/Bristol-Stuhlformen-Skala
 enum BristolStuhlform {
-  typ0, // Stuhlgang nicht möglich / kein Stuhlgang
-  typ1, // einzelne, harte Klumpen (Verstopfung)
-  typ2, // wurstförmig, aber klumpig
-  typ3, // wurstförmig mit Rissen
-  typ4, // wurstförmig, glatt und weich (normal)
-  typ5, // weiche Klümpchen mit klaren Kanten
-  typ6, // breiig, unregelmäßig
-  typ7, // flüssig, keine festen Bestandteile (Durchfall)
+  /// Kein Stuhlgang möglich oder kein Stuhlgang erfolgt.
+  typ0,
+
+  /// Einzelne harte Klumpen, Hinweis auf Verstopfung.
+  typ1,
+
+  /// Wurstförmig, jedoch klumpig.
+  typ2,
+
+  /// Wurstförmig mit Rissen auf der Oberfläche.
+  typ3,
+
+  /// Glatt und weich, gilt als normale Stuhlform.
+  typ4,
+
+  /// Weiche Klümpchen mit klaren Rändern.
+  typ5,
+
+  /// Breiig, unregelmäßige Konsistenz.
+  typ6,
+
+  /// Flüssig, keine festen Bestandteile, Hinweis auf Durchfall.
+  typ7,
 }
 
-/// Beschreibungen der Stuhlformen für UI-Anzeige.
+/// Erweiterung zur Bereitstellung zusätzlicher Informationen für die UI
+/// und zur Konvertierung zwischen Enum-Wert und Firestore-kompatiblen Strings.
 extension BristolBeschreibung on BristolStuhlform {
+  /// Liefert eine menschenlesbare Beschreibung zur jeweiligen Stuhlform.
   String get beschreibung {
     switch (this) {
       case BristolStuhlform.typ0:
@@ -35,13 +52,12 @@ extension BristolBeschreibung on BristolStuhlform {
     }
   }
 
-  /// Für Firestore: enum → String (z. B. "typ4")
+  /// Gibt den Enum-Namen ohne Präfix zurück (z. B. "typ4").
+  /// Wird für die Speicherung in Firestore verwendet.
   String get name => toString().split('.').last;
 
-  /// Für Firestore: String → enum
-  static BristolStuhlform fromName(String name) =>
-      BristolStuhlform.values.firstWhere(
-        (e) => e.name == name,
-        orElse: () => BristolStuhlform.typ4, // Standard: normal
-      );
+  /// Wandelt einen Firestore-String (z. B. "typ4") zurück in den passenden Enum-Wert.
+  /// Fällt im Fehlerfall auf die normale Stuhlform (typ4) zurück.
+  static BristolStuhlform fromName(String name) => BristolStuhlform.values
+      .firstWhere((e) => e.name == name, orElse: () => BristolStuhlform.typ4);
 }
