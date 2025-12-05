@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import 'CEDColors.dart';
+import 'c_e_d_colors.dart';
 
 class KalenderScreen extends StatefulWidget {
   final int ausgewaehlteSeite;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Future<bool> deleteEntry(
+Future<bool> loescheEintrag(
   BuildContext context, {
   required String titel,
   required String text,

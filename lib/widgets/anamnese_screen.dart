@@ -6,8 +6,8 @@ import 'package:cedmate/widgets/ced_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../utils/build_list_section.dart';
-import 'CEDColors.dart';
+import 'build_list_section.dart';
+import 'c_e_d_colors.dart';
 
 class AnamneseScreen extends StatefulWidget {
   const AnamneseScreen({super.key});
@@ -38,44 +38,44 @@ class _AnamneseScreenState extends State<AnamneseScreen> {
   Gender? _selectedGender;
   Diagnose? _selectedDiagnose;
 
-final List<String> vorschlaegeSymptomeImSchub = [
-  'Bauchschmerzen',
-  'Durchfall',
-  'Blut im Stuhl',
-  'Fieber',
-  'Müdigkeit',
-  'Gewichtsverlust',
-  'Übelkeit',
-  'Gelenkschmerzen',
-  'Hautausschlag',
-  'Appetitlosigkeit',
-  'Bauchkrämpfe',
-];
-final List<String> vorschlaegeSchubAusloeser = [
-  'Stress',
-  'Infektion',
-  'Ernährungsumstellung',
-  'Medikamentenwechsel',
-  'Schlafmangel',
-  'Nikotin',
-  'Alkohol',
-  'Reizende Lebensmittel',
-  'NSAID-Einnahme',
-  'Hormonelle Veränderungen',
-];
-final List<String> vorschlaegeWeitereErkrankungen = [
-  'Bluthochdruck',
-  'Diabetes mellitus',
-  'Arthritis',
-  'Osteoporose',
-  'Psoriasis',
-  'Asthma',
-  'Migräne',
-  'Depression',
-  'Schilddrüsenerkrankung',
-  'Reizdarmsyndrom',
-  'Herz-Kreislauf-Erkrankungen',
-];
+  final List<String> vorschlaegeSymptomeImSchub = [
+    'Bauchschmerzen',
+    'Durchfall',
+    'Blut im Stuhl',
+    'Fieber',
+    'Müdigkeit',
+    'Gewichtsverlust',
+    'Übelkeit',
+    'Gelenkschmerzen',
+    'Hautausschlag',
+    'Appetitlosigkeit',
+    'Bauchkrämpfe',
+  ];
+  final List<String> vorschlaegeSchubAusloeser = [
+    'Stress',
+    'Infektion',
+    'Ernährungsumstellung',
+    'Medikamentenwechsel',
+    'Schlafmangel',
+    'Nikotin',
+    'Alkohol',
+    'Reizende Lebensmittel',
+    'NSAID-Einnahme',
+    'Hormonelle Veränderungen',
+  ];
+  final List<String> vorschlaegeWeitereErkrankungen = [
+    'Bluthochdruck',
+    'Diabetes mellitus',
+    'Arthritis',
+    'Osteoporose',
+    'Psoriasis',
+    'Asthma',
+    'Migräne',
+    'Depression',
+    'Schilddrüsenerkrankung',
+    'Reizdarmsyndrom',
+    'Herz-Kreislauf-Erkrankungen',
+  ];
 
   @override
   void initState() {

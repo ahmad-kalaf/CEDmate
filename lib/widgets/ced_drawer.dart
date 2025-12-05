@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:cedmate/widgets/CEDColors.dart';
+import 'package:cedmate/widgets/c_e_d_colors.dart';
 
 class CEDDrawer extends StatelessWidget {
   const CEDDrawer({super.key});

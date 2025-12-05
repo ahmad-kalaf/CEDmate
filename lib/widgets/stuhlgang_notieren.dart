@@ -1,13 +1,13 @@
 import 'package:cedmate/models/stuhlgang.dart';
 import 'package:cedmate/services/stuhlgang_service.dart';
-import 'package:cedmate/utils/loesche_eintrag.dart';
+import 'package:cedmate/widgets/loesche_eintrag.dart';
 import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:cedmate/widgets/icon_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../cedmate_icons.dart';
 import '../models/enums/bristol_stuhlform.dart';
-import 'CEDColors.dart';
+import 'c_e_d_colors.dart';
 
 class StuhlgangNotieren extends StatefulWidget {
   final Stuhlgang? stuhlgang;
@@ -324,7 +324,7 @@ class _StuhlgangNotierenState extends State<StuhlgangNotieren> {
                   onPressed: () async {
                     final service = context.read<StuhlgangService>();
 
-                    await deleteEntry(
+                    await loescheEintrag(
                       context,
                       titel: 'Eintrag löschen',
                       text:

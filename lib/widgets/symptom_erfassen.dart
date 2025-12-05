@@ -1,12 +1,12 @@
 import 'package:cedmate/services/symptom_service.dart';
-import 'package:cedmate/utils/loesche_eintrag.dart';
+import 'package:cedmate/widgets/loesche_eintrag.dart';
 import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/symptom_intensitaet.dart';
 import '../models/symptom.dart';
-import 'CEDColors.dart';
+import 'c_e_d_colors.dart';
 
 class SymptomErfassen extends StatefulWidget {
   final Symptom? symptom;
@@ -364,7 +364,7 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
                         : () async {
                             final symptomService = context
                                 .read<SymptomService>();
-                            await deleteEntry(
+                            await loescheEintrag(
                               context,
                               titel: 'Eintrag löschen',
                               text:
