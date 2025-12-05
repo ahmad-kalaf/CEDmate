@@ -1,7 +1,7 @@
 import 'package:cedmate/models/app_user.dart';
 import 'package:cedmate/services/anamnese_service.dart';
 import 'package:cedmate/services/symptom_service.dart';
-import 'package:cedmate/widgets/CEDColors.dart';
+import 'package:cedmate/widgets/c_e_d_colors.dart';
 import 'package:cedmate/widgets/anamnese_screen.dart';
 import 'package:cedmate/widgets/ausloggen_button.dart';
 import 'package:cedmate/widgets/c_e_d_wissen_screen.dart';

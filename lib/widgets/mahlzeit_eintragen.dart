@@ -1,10 +1,10 @@
 import 'package:cedmate/models/mahlzeit.dart';
 import 'package:cedmate/services/mahlzeit_service.dart';
-import 'package:cedmate/utils/build_list_section.dart';
+import 'package:cedmate/widgets/build_list_section.dart';
 import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../utils/loesche_eintrag.dart';
+import 'loesche_eintrag.dart';
 
 class MahlzeitEintragen extends StatefulWidget {
   final Mahlzeit? mahlzeit;
@@ -294,7 +294,7 @@ class _MahlzeitEintragenState extends State<MahlzeitEintragen> {
                       : () async {
                           final service = context.read<MahlzeitService>();
 
-                          await deleteEntry(
+                          await loescheEintrag(
                             context,
                             titel: 'Eintrag löschen',
                             text:

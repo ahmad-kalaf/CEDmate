@@ -1,7 +1,7 @@
 import 'package:cedmate/widgets/ced_drawer.dart';
 import 'package:flutter/material.dart';
-import '../utils/monat_jahr_auswahl.dart';
-import 'CEDColors.dart';
+import 'monat_jahr_auswahl.dart';
+import 'c_e_d_colors.dart';
 
 class EintraegeFuerMonat<T> extends StatefulWidget {
   final String title;

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:cedmate/widgets/ced_layout.dart';
-import 'package:cedmate/widgets/CEDColors.dart';
+import 'package:cedmate/widgets/c_e_d_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

@@ -1,12 +1,12 @@
 import 'package:cedmate/services/stimmung_service.dart';
-import 'package:cedmate/utils/build_list_section.dart';
+import 'package:cedmate/widgets/build_list_section.dart';
 import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../cedmate_icons.dart';
 import '../models/stimmung.dart';
-import '../utils/loesche_eintrag.dart';
+import 'loesche_eintrag.dart';
 import 'icon_selector.dart';
 
 class StimmungNotieren extends StatefulWidget {
@@ -276,7 +276,7 @@ class _StimmungNotierenState extends State<StimmungNotieren> {
                         : () async {
                             final symptomService = context
                                 .read<StimmungService>();
-                            await deleteEntry(
+                            await loescheEintrag(
                               context,
                               titel: 'Eintrag löschen',
                               text:

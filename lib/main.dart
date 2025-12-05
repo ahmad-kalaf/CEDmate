@@ -43,7 +43,7 @@ import 'package:cedmate/services/mahlzeit_service.dart';
 // UI
 import 'widgets/auth_gate.dart';
 import 'widgets/home_screen.dart';
-import 'widgets/CEDColors.dart';
+import 'widgets/c_e_d_colors.dart';
 
 // -----------------------------------------------------------------------------
 //  APP ENTRY POINT

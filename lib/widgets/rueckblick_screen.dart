@@ -1,7 +1,7 @@
 import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:flutter/material.dart';
 
-import 'CEDColors.dart';
+import 'c_e_d_colors.dart';
 
 class RueckblickScreen extends StatelessWidget {
   const RueckblickScreen({super.key});

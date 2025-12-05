@@ -1,4 +1,4 @@
-import 'package:cedmate/widgets/CEDColors.dart';
+import 'package:cedmate/widgets/c_e_d_colors.dart';
 import 'package:flutter/material.dart';
 
 class IconSelector<T> extends StatelessWidget {
