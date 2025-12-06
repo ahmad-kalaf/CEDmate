@@ -2,6 +2,9 @@
 //  MAIN FILE — CLEAN, SAFE, MODERN
 // -----------------------------------------------------------------------------
 
+import 'package:cedmate/repositories/wissen_repository.dart';
+import 'package:cedmate/services/wissen_service.dart';
+import 'package:cedmate/widgets/c_e_d_wissen_screen.dart';
 import 'package:cedmate/widgets/daten_exportieren.dart';
 import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
 import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
@@ -100,6 +103,12 @@ class CEDmateApp extends StatelessWidget {
           update: (_, repo, auth, __) => MahlzeitService(repo, auth),
         ),
 
+        // CEDWissen
+        Provider<WissenRepository>(create: (_) => WissenRepository()),
+        ProxyProvider2<WissenRepository, AuthService, WissenService>(
+          update: (_, repo, auth, __) => WissenService(repo),
+        ),
+
         // USER STREAM
         StreamProvider<AppUser?>(
           create: (context) => context.read<AuthService>().userStream(),
@@ -135,6 +144,7 @@ class CEDmateApp extends StatelessWidget {
           '/export': (_) => const DatenExportieren(),
           '/kalender': (_) => const KalenderScreen(),
           '/statistiken': (_) => const Statistiken(),
+          '/wissen': (_) => const CEDWissenScreen(),
           '/credits': (_) => ImpressumCreditsScreen(),
         },
 
