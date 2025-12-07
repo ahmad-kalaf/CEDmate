@@ -16,6 +16,7 @@ class CEDWissen {
   final String? contentText; // Für Artikeltexte in der App
   final List<String>? fachgesellschaftLinks;
   final WissenSpecialIcon specialIcon;
+  final DateTime? createdAt;
 
   CEDWissen({
     required this.id,
@@ -27,6 +28,7 @@ class CEDWissen {
     this.contentText,
     this.fachgesellschaftLinks,
     this.specialIcon = WissenSpecialIcon.none,
+    this.createdAt,
   });
 
   factory CEDWissen.fromFirestore(DocumentSnapshot doc) {
@@ -48,6 +50,7 @@ class CEDWissen {
       specialIcon: WissenSpecialIcon.values.firstWhere(
         (e) => e.name == (data['specialIcon'] ?? 'none'),
       ),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
     );
   }
 

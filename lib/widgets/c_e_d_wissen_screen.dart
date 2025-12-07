@@ -1,5 +1,5 @@
 import 'package:cedmate/widgets/ced_layout.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/c_e_d_wissen.dart';
@@ -105,7 +105,12 @@ class _WissenCard extends StatelessWidget {
           child: Row(
             children: [
               CircleAvatar(
-                child: Icon(_iconForFormat(wissen.format), size: 20),
+                backgroundColor: CEDColors.background.withValues(alpha: 0.3),
+                child: Icon(
+                  _iconForFormat(wissen.format),
+                  size: 20,
+                  color: CEDColors.iconPrimary,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -117,6 +122,7 @@ class _WissenCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -130,12 +136,18 @@ class _WissenCard extends StatelessWidget {
                       spacing: 6,
                       runSpacing: 4,
                       children: [
-                        Chip(label: Text(wissen.kategorie.name)),
+                        Chip(
+                          label: Text(
+                            wissen.kategorie.name,
+                            style: TextStyle(color: CEDColors.surface),
+                          ),
+                        ),
                         if (wissen.fachgesellschaftLinks != null &&
                             wissen.fachgesellschaftLinks!.isNotEmpty)
                           Chip(
                             label: Text(
                               '${wissen.fachgesellschaftLinks!.length} Quelle(n)',
+                              style: TextStyle(color: CEDColors.surface),
                             ),
                           ),
                       ],
@@ -150,7 +162,7 @@ class _WissenCard extends StatelessWidget {
                     wissen.specialIcon == WissenSpecialIcon.communityFaq
                         ? Icons.forum
                         : Icons.local_hospital,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: CEDColors.iconPrimary,
                   ),
                 ),
             ],
@@ -164,21 +176,24 @@ class _WissenCard extends StatelessWidget {
 Future<void> _addDummyData(WissenService service) async {
   final d1 = CEDWissen(
     id: '',
-    titel: "Ernährung – Grundlagen",
+    titel: "Ein ganz langer Titel der Wissen Ein ganz langer Titel der Wissen",
     beschreibung: "Tipps zur Ernährung bei CED",
     kategorie: WissenKategorie.ernaehrung,
     format: WissenFormat.artikel,
     contentText: "Ballaststoffe, viel trinken...",
     fachgesellschaftLinks: ["https://dccv.de"],
+    specialIcon: WissenSpecialIcon.communityFaq,
   );
 
   final d2 = CEDWissen(
     id: '',
     titel: "Stress & Psyche",
-    beschreibung: "Warum Stress einen Einfluss auf CED hat",
+    beschreibung:
+        "lange Beschreibung über Psyche und Stress lange Beschreibung über Psyche und Stress lange Beschreibung über Psyche und Stress ",
     kategorie: WissenKategorie.psyche,
     format: WissenFormat.video,
     contentUrl: "https://youtube.com/xyz",
+    specialIcon: WissenSpecialIcon.arztAntwort,
   );
 
   await service.neuesWissenEintragen(d1);
