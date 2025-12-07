@@ -1,4 +1,5 @@
 import 'package:cedmate/widgets/ced_layout.dart';
+import 'package:cedmate/widgets/wissen_beitrag_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,19 +16,20 @@ class CEDWissenScreen extends StatelessWidget {
 
     return CEDLayout(
       title: 'CED Wissen',
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () async {
-            final service = context.read<WissenService>();
-            await _addDummyData(service);
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Beispielwissen hinzugefügt")),
-            );
-          },
-        ),
-      ],
+      // Nur zum Debugen
+      // actions: [
+      //   IconButton(
+      //     icon: const Icon(Icons.add),
+      //     onPressed: () async {
+      //       final service = context.read<WissenService>();
+      //       await _addDummyData(service);
+      //
+      //       ScaffoldMessenger.of(context).showSnackBar(
+      //         const SnackBar(content: Text("Beispielwissen hinzugefügt")),
+      //       );
+      //     },
+      //   ),
+      // ],
       child: StreamBuilder<List<CEDWissen>>(
         stream: service.alleWissen(),
         builder: (context, snapshot) {
@@ -52,27 +54,17 @@ class CEDWissenScreen extends StatelessWidget {
               final w = list[index];
               return _WissenCard(
                 wissen: w,
-                onTap: () => _showDetails(context, w),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WissenBeitragScreen(beitrag: w),
+                  ),
+                ),
               );
             },
           );
         },
       ),
-    );
-  }
-
-  void _showDetails(BuildContext context, CEDWissen w) {
-    showAboutDialog(
-      context: context,
-      children: [
-        Padding(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [Text('PLATZHALTER')],
-          ),
-        ),
-      ],
     );
   }
 }
