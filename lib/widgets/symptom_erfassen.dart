@@ -54,6 +54,8 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
       _dauerController.text = s.dauerInMinuten.toString();
       _notizenController.text = s.notizen ?? '';
       _startZeit = s.startZeit;
+    } else {
+      _intensitaetController.text = '5'; // Default Intensity
     }
     final initialIndex = _intensitaetController.text.isNotEmpty
         ? int.tryParse(_intensitaetController.text)! - 1
@@ -118,7 +120,7 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
       final symptom = Symptom(
         id: widget.symptom?.id,
         bezeichnung: _bezeichnungController.text.trim(),
-        intensitaet: int.parse(_intensitaetController.text),
+        intensitaet: int.tryParse(_intensitaetController.text.trim()) ?? 5,
         dauerInMinuten: int.parse(_dauerController.text),
         notizen: _notizenController.text.trim().isEmpty
             ? null
