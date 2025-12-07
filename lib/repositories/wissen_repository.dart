@@ -4,16 +4,22 @@ import '../models/c_e_d_wissen.dart';
 class WissenRepository {
   final _wissenRef = FirebaseFirestore.instance.collection('wissen');
 
-  /// Alle Wissensartikel streamen
+  /// Alle Wissensartikel sortiert nach Erstellungszeit streamen
   Stream<List<CEDWissen>> getWissen() {
-    return _wissenRef.snapshots().map(
-      (snap) => snap.docs.map((d) => CEDWissen.fromFirestore(d)).toList(),
-    );
+    return _wissenRef
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (snap) => snap.docs.map((d) => CEDWissen.fromFirestore(d)).toList(),
+        );
   }
 
   /// Einen Wissenseintrag hinzufügen
   Future<void> addWissen(CEDWissen wissen) async {
-    await _wissenRef.add(wissen.toFirestore());
+    await _wissenRef.add({
+      ...wissen.toFirestore(),
+      'createdAt': FieldValue.serverTimestamp(),
+    });
   }
 
   /// Einen Eintrag löschen
