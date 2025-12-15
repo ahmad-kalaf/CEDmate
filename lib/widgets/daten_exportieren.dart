@@ -1,15 +1,14 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:math';
 import 'package:cedmate/widgets/ced_layout.dart';
 import 'package:cedmate/widgets/c_e_d_colors.dart';
 import 'package:cedmate/models/app_user.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:cedmate/utils/open_file.dart';
+
+import '../utils/datei_handler.dart';
 
 class DatenExportieren extends StatefulWidget {
   const DatenExportieren({super.key});
@@ -54,48 +53,22 @@ class _DatenExportierenState extends State<DatenExportieren> {
 
       if (pdfUrl == null) {
         setState(() {
-          _status = "⚠️ Server hat kein PDF erzeugt.";
+          _status = "Server hat kein PDF erzeugt.";
         });
         return;
       }
-
-      // ---------------------------------------------------------
-      //  WEB → PDF im neuen Tab öffnen
-      // ---------------------------------------------------------
-      if (kIsWeb) {
-        openPdf(pdfUrl);
-        setState(() => _status = "📄 PDF geöffnet.");
-        return;
-      }
-
-      // ---------------------------------------------------------
-      //  MOBILE / DESKTOP → PDF herunterladen
-      // ---------------------------------------------------------
-      final saved = await _downloadPdf(pdfUrl);
-      setState(() {
-        _status = "📄 PDF gespeichert unter:\n${saved.path}";
-      });
+      final randomNumber = Random().nextInt(900000) + 100000;
+      await DateiHandler().dateiOeffnen(
+        url: pdfUrl,
+        dateiname: 'cedmate_export_$randomNumber.pdf',
+      );
     } catch (e) {
       setState(() {
-        _status = "⚠️ Export-Fehler: $e";
+        _status = "Fehler: $e";
       });
     } finally {
       setState(() => _isLoading = false);
     }
-  }
-
-  // -------------------------------------------------------------
-  //  PDF HERUNTERLADEN (Mobile + Desktop)
-  // -------------------------------------------------------------
-  Future<File> _downloadPdf(String url) async {
-    final response = await http.get(Uri.parse(url));
-
-    final dir = await getTemporaryDirectory();
-    final fileName = p.basename(url);
-    final file = File("${dir.path}/$fileName");
-
-    await file.writeAsBytes(response.bodyBytes);
-    return file;
   }
 
   // -------------------------------------------------------------
