@@ -64,7 +64,7 @@ class SymptomService {
       throw ArgumentError('Intensität muss zwischen 1 und 10 liegen.');
     }
     if (symptom.dauerInMinuten <= 0) {
-      throw ArgumentError('Dauer muss mind. 1 sein.');
+      throw ArgumentError('Dauer muss mind. 1  und ganzzahlig sein.');
     }
     if (symptom.startZeit.isAfter(DateTime.now())) {
       throw ArgumentError('Startzeit darf nicht in der Zukunft liegen.');

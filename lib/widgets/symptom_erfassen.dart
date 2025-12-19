@@ -121,7 +121,7 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
         id: widget.symptom?.id,
         bezeichnung: _bezeichnungController.text.trim(),
         intensitaet: int.tryParse(_intensitaetController.text.trim()) ?? 5,
-        dauerInMinuten: int.parse(_dauerController.text),
+        dauerInMinuten: int.tryParse(_dauerController.text) ?? 0,
         notizen: _notizenController.text.trim().isEmpty
             ? null
             : _notizenController.text,
@@ -329,7 +329,11 @@ class _SymptomErfassenState extends State<SymptomErfassen> {
                   ),
                   keyboardType: TextInputType.number,
                   validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Bitte eingeben' : null,
+                      v == null ||
+                          v.trim().isEmpty ||
+                          !(RegExp(r'\d+$').hasMatch(v.trim()))
+                      ? 'Bitte eine Zahl eingeben'
+                      : null,
                 ),
                 TextFormField(
                   controller: _notizenController,
