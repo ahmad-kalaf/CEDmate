@@ -16,7 +16,8 @@ class DateiHandler {
     if (kIsWeb) {
       final anchor = web.HTMLAnchorElement()
         ..href = url
-        ..download = dateiname
+        ..target = '_blank'
+        ..rel = 'noopener noreferrer'
         ..style.display = 'none';
 
       web.document.body!.append(anchor);
