@@ -55403,7 +55403,8 @@ var $async$wa=A.p(function(c,d){if(c===1){p.push(d)
 s=q}while(true)switch(s){case 0:k=v.G
 j=k.document.createElement("a")
 j.href=b
-j.download=a
+j.target="_blank"
+j.rel="noopener noreferrer"
 j.style.display="none"
 k.document.body.append(j)
 j.click()
