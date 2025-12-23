@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:web/web.dart' as web;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -11,6 +13,16 @@ class DateiHandler {
     required String url,
     required String dateiname,
   }) async {
+    if (kIsWeb) {
+      final anchor = web.HTMLAnchorElement()
+        ..href = url
+        ..download = dateiname
+        ..style.display = 'none';
+
+      web.document.body!.append(anchor);
+      anchor.click();
+      anchor.remove();
+    }
     try {
       final file = await _dateiHerunterladen(url, dateiname);
       print('Dateipfad: ${file.path}');
