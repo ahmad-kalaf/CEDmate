@@ -100,8 +100,11 @@ class _StatistikenState extends State<Statistiken> {
       itemCount: _imageUrls.length,
       itemBuilder: (context, index) {
         final url = _imageUrls[index];
-        final aktuelleZeit = DateTime.now().toString();
-        final fileName = '${p.basename(url)}_$aktuelleZeit';
+        final aktuelleZeit = DateTime.now()
+            .toIso8601String()
+            .replaceAll(':', '-')
+            .replaceAll('.', '-');
+        final fileName = '${aktuelleZeit}_${p.basename(url)}';
 
         return Card(
           elevation: 3,
