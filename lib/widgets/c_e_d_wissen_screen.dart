@@ -23,7 +23,7 @@ class CEDWissenScreen extends StatelessWidget {
       //     onPressed: () async {
       //       final service = context.read<WissenService>();
       //       await _addDummyData(service);
-      //
+
       //       ScaffoldMessenger.of(context).showSnackBar(
       //         const SnackBar(content: Text("Beispielwissen hinzugefügt")),
       //       );
@@ -138,7 +138,8 @@ class _WissenCard extends StatelessWidget {
                             wissen.fachgesellschaftLinks!.isNotEmpty)
                           Chip(
                             label: Text(
-                              '${wissen.fachgesellschaftLinks!.length} Quelle(n)',
+                              '${wissen.fachgesellschaftLinks!.length} '
+                              '${wissen.fachgesellschaftLinks!.length == 1 ? 'Quelle' : 'Quellen'}',
                               style: TextStyle(color: CEDColors.surface),
                             ),
                           ),
@@ -147,16 +148,6 @@ class _WissenCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (wissen.specialIcon != WissenSpecialIcon.none)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: Icon(
-                    wissen.specialIcon == WissenSpecialIcon.communityFaq
-                        ? Icons.forum
-                        : Icons.local_hospital,
-                    color: CEDColors.iconPrimary,
-                  ),
-                ),
             ],
           ),
         ),
@@ -166,28 +157,74 @@ class _WissenCard extends StatelessWidget {
 }
 
 Future<void> _addDummyData(WissenService service) async {
-  final d1 = CEDWissen(
+  final video1 = CEDWissen(
     id: '',
-    titel: "Ein ganz langer Titel der Wissen Ein ganz langer Titel der Wissen",
-    beschreibung: "Tipps zur Ernährung bei CED",
+    titel: 'CED & Ernährung – Grundlagen erklärt',
+    beschreibung:
+        'Kurzes Einführungsvideo zu Ernährungsempfehlungen bei Morbus Crohn und Colitis ulcerosa.',
     kategorie: WissenKategorie.ernaehrung,
-    format: WissenFormat.artikel,
-    contentText: "Ballaststoffe, viel trinken...",
-    fachgesellschaftLinks: ["https://dccv.de"],
-    specialIcon: WissenSpecialIcon.communityFaq,
+    format: WissenFormat.video,
+    contentUrl: 'https://example.com/video/ernaehrung',
+    contentText:
+        'In diesem Video werden grundlegende Zusammenhänge zwischen Ernährung und CED erklärt.',
+    fachgesellschaftLinks: ['https://www.dccv.de'],
   );
 
-  final d2 = CEDWissen(
+  final video2 = CEDWissen(
     id: '',
-    titel: "Stress & Psyche",
+    titel: 'Stress, Psyche und CED',
     beschreibung:
-        "lange Beschreibung über Psyche und Stress lange Beschreibung über Psyche und Stress lange Beschreibung über Psyche und Stress ",
+        'Warum Stress einen Einfluss auf den Krankheitsverlauf haben kann.',
     kategorie: WissenKategorie.psyche,
     format: WissenFormat.video,
-    contentUrl: "https://youtube.com/xyz",
-    specialIcon: WissenSpecialIcon.arztAntwort,
+    contentUrl: 'https://example.com/video/psyche',
+    contentText:
+        'Psychische Belastung kann Symptome verstärken. Das Video erklärt mögliche Mechanismen.',
+    fachgesellschaftLinks: ['https://www.dgvs.de'],
   );
 
-  await service.neuesWissenEintragen(d1);
-  await service.neuesWissenEintragen(d2);
+  final artikel = CEDWissen(
+    id: '',
+    titel: 'Bewegung im Alltag mit CED',
+    beschreibung:
+        'Wie viel Bewegung ist sinnvoll und worauf sollte man achten?',
+    kategorie: WissenKategorie.bewegung,
+    format: WissenFormat.artikel,
+    contentText: '''
+Regelmäßige, moderate Bewegung kann sich positiv auf das allgemeine Wohlbefinden auswirken.
+
+Empfohlen werden:
+- Spaziergänge
+- leichtes Krafttraining
+- Dehnübungen
+
+Wichtig ist, auf die eigenen Grenzen zu achten und Bewegung an den aktuellen Gesundheitszustand anzupassen.
+''',
+    fachgesellschaftLinks: [
+      'https://www.awmf.org',
+      'https://www.bundesgesundheitsministerium.de/service/publikationen/details/nationale-empfehlungen-fuer-bewegung-und-bewegungsfoerderung.html',
+    ],
+  );
+
+  final checkliste = CEDWissen(
+    id: '',
+    titel: 'Alltag im Schub – Checkliste',
+    beschreibung:
+        'Hilfreiche Punkte, die im Alltag während eines Schubs beachtet werden können.',
+    kategorie: WissenKategorie.alltag,
+    format: WissenFormat.checkliste,
+    contentText: '''
+□ Ausreichend trinken  
+□ Leicht verdauliche Nahrung wählen  
+□ Stress reduzieren  
+□ Medikamente regelmäßig einnehmen  
+□ Bei Verschlechterung ärztlichen Rat einholen
+''',
+    fachgesellschaftLinks: ['https://www.patienten-information.de'],
+  );
+
+  await service.neuesWissenEintragen(video1);
+  await service.neuesWissenEintragen(video2);
+  await service.neuesWissenEintragen(artikel);
+  await service.neuesWissenEintragen(checkliste);
 }
