@@ -22,6 +22,7 @@ import '../services/mahlzeit_service.dart';
 import '../services/stimmung_service.dart';
 import '../services/stuhlgang_service.dart';
 import 'daten_exportieren.dart';
+import 'medi_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -353,6 +354,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+
+        const SizedBox(height: 30),
+
+        Text(
+          'Medikation verwalten',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+
+        const SizedBox(height: 10),
+
+        Row(
+          children: [
+            _homeTile(
+              icon: Icons.vaccines,
+              text: 'MediManager',
+              onTap: () => _navigiereZurSeite(MediManager()),
+              iconColor: CEDColors.iconPrimary,
+            ),
+          ],
+        ),
 
         const SizedBox(height: 30),
 
