@@ -10,6 +10,7 @@ import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
 import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
 import 'package:cedmate/widgets/impressum_credits_screen.dart';
 import 'package:cedmate/widgets/kalender_screen.dart';
+import 'package:cedmate/widgets/medi_manager.dart';
 import 'package:cedmate/widgets/profil_screen.dart';
 import 'package:cedmate/widgets/rueckblick_screen.dart';
 import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
@@ -140,6 +141,7 @@ class CEDmateApp extends StatelessWidget {
           '/stuhlMonat': (_) => const StuhlgangEintraegeFuerMonat(),
           '/essenMonat': (_) => EssTagebuchFuerMonat(),
           '/stimmungMonat': (_) => StimmungFuerMonat(),
+          '/mediManager': (_) => MediManager(),
           '/hilfeUnterwegs': (_) => HilfeFuerUnterwegs(),
           '/export': (_) => const DatenExportieren(),
           '/kalender': (_) => const KalenderScreen(),

@@ -28,6 +28,9 @@ class CEDDrawer extends StatelessWidget {
                   _drawerItem(context, 'Rückblick', Icons.history_edu, () {
                     Navigator.pushNamed(context, '/rueckblick');
                   }),
+                  _drawerItem(context, 'MediManager', Icons.vaccines, () {
+                    Navigator.pushNamed(context, '/mediManager');
+                  }),
                   _drawerItem(context, 'Toiletten finden', Icons.map, () {
                     Navigator.pushNamed(context, '/hilfeUnterwegs');
                   }),
