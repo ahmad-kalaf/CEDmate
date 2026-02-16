@@ -4,19 +4,19 @@
 
 import 'package:cedmate/repositories/wissen_repository.dart';
 import 'package:cedmate/services/wissen_service.dart';
-import 'package:cedmate/widgets/c_e_d_wissen_screen.dart';
-import 'package:cedmate/widgets/daten_exportieren.dart';
-import 'package:cedmate/widgets/ess_tagebuch_fuer_monat.dart';
-import 'package:cedmate/widgets/hilfe_fuer_unterwegs.dart';
-import 'package:cedmate/widgets/impressum_credits_screen.dart';
-import 'package:cedmate/widgets/kalender_screen.dart';
-import 'package:cedmate/widgets/medi_manager.dart';
-import 'package:cedmate/widgets/profil_screen.dart';
-import 'package:cedmate/widgets/rueckblick_screen.dart';
-import 'package:cedmate/widgets/seelen_log_fuer_monat.dart';
-import 'package:cedmate/widgets/statistiken.dart';
-import 'package:cedmate/widgets/stuhlgang_eintraege_fuer_monat.dart';
-import 'package:cedmate/widgets/symptome_fuer_monat.dart';
+import 'package:cedmate/widgets/screens/c_e_d_wissen_screen.dart';
+import 'package:cedmate/widgets/screens/daten_exportieren.dart';
+import 'package:cedmate/widgets/sections/ess_tagebuch_fuer_monat.dart';
+import 'package:cedmate/widgets/screens/hilfe_fuer_unterwegs.dart';
+import 'package:cedmate/widgets/screens/impressum_credits_screen.dart';
+import 'package:cedmate/widgets/screens/kalender_screen.dart';
+import 'package:cedmate/widgets/screens/medi_manager.dart';
+import 'package:cedmate/widgets/screens/profil_screen.dart';
+import 'package:cedmate/widgets/screens/rueckblick_screen.dart';
+import 'package:cedmate/widgets/sections/seelen_log_fuer_monat.dart';
+import 'package:cedmate/widgets/screens/statistiken.dart';
+import 'package:cedmate/widgets/sections/stuhlgang_eintraege_fuer_monat.dart';
+import 'package:cedmate/widgets/sections/symptome_fuer_monat.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,8 +46,8 @@ import 'package:cedmate/services/mahlzeit_service.dart';
 
 // UI
 import 'widgets/auth_gate.dart';
-import 'widgets/home_screen.dart';
-import 'widgets/c_e_d_colors.dart';
+import 'widgets/screens/home_screen.dart';
+import 'cedmate_colors.dart';
 
 // -----------------------------------------------------------------------------
 //  APP ENTRY POINT
