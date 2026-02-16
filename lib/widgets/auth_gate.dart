@@ -1,9 +1,9 @@
-import 'package:cedmate/widgets/auth_form.dart';
-import 'package:cedmate/widgets/verifiziere_email_screen.dart';
+import 'package:cedmate/widgets/forms/auth_form.dart';
+import 'package:cedmate/widgets/screens/verifiziere_email_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
-import 'home_screen.dart';
+import 'screens/home_screen.dart';
 
 /// Schaltet zwischen Login-Form, Bestätigungsseite und Home um.
 class AuthGate extends StatelessWidget {
@@ -30,7 +30,10 @@ class AuthGate extends StatelessWidget {
           return const Scaffold(body: Center(child: AuthForm()));
         }
 
-        final String uid = auth.userStream().map((event) => event!.uid).toString();
+        final String uid = auth
+            .userStream()
+            .map((event) => event!.uid)
+            .toString();
 
         // Wenn eingeloggt, prüfen ob Email verifiziert
         return StreamBuilder<bool>(
