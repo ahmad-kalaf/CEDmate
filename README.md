@@ -79,19 +79,12 @@ CEDmate
          │  - z.B. DateiHandler
 ```
 
-Architektur-Layer:
-
-```
-models -> repositories -> services -> widgets
-```
-
 ---
 
-## Architekturdiagramm
+## Ordnerstruktur
 
-![CEDmate Architektur](../CEDmate/docs/cedmate_ordnerstruktur.png)
+![CEDmate Ordnerstruktur](docs/cedmate_ordnerstruktur.png)
 
-Der Pfad kann angepasst werden, falls das Bild an einer anderen Stelle liegt.
 
 ---
 
@@ -108,6 +101,6 @@ Afrane Kwame Berquin
 Miriam Schwarz  
 Aliena Glatzel  
 Larissa Pychlau  
-Benedict Löhn  
+Benedict Löhn
 
 Siehe LICENSE für den vollständigen Lizenztext.
