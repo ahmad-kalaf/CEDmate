@@ -1,259 +1,174 @@
-# CEDmate + cedmate_analytics_api
+﻿# CEDmate – Entwicklerdokumentation
 
-Kompakte Entwicklerdokumentation fuer das Gesamtprojekt (App + Analytics-Backend).
+## 1. Zweck und Verwendung
 
-## 1. Ziel dieser Doku
+Diese Dokumentation dient als kompakter Einstieg für neue Entwickler in das CEDmate-Projekt.
 
-Diese Datei ist fuer neue Entwickler gedacht, die beide Projekte schnell verstehen und lokal starten
-wollen:
+Wichtig für die Weitergabe:
+- Das CEDmate-Projekt wird **genau in der aktuellen Form** als ZIP geteilt.
+- Es gibt **keine zusätzliche Zielstruktur** oder Umverpackung.
+- Die Analytics API wird **separat als eigenes ZIP** geteilt.
+- Die zugehörige API-Dokumentation liegt in `docs/analytics-dokumentation.md`.
 
-- `CEDmate` (Flutter-App)
-- `cedmate_analytics_api` (Python/FastAPI fuer Statistiken + PDF-Export)
+## 2. Projektüberblick
 
-## 2. Zielstruktur im spaeteren ZIP-Paket
+CEDmate ist eine Flutter-App zur Begleitung von Menschen mit chronisch-entzündlichen Darmerkrankungen (CED).  
+Die App kombiniert Erfassung, Verlaufssicht und Exportfunktionen:
+- Symptome erfassen
+- Stuhlgang dokumentieren
+- Mahlzeiten dokumentieren
+- Stimmung/Stress dokumentieren
+- Kalender und Rückblick
+- Statistiken und PDF-Export (über die Analytics API)
+- Toilettenkarte für unterwegs
+- CED-Wissen
 
-```text
-CEDmate/                          <- Hauptordner (Gesamtpaket)
-  dokumentation.md                <- diese Datei
-  CEDmate/                        <- Flutter-Projekt
-    lib/
-    LICENSE
-    pubspec.yaml
-    README.md
-    ...
-  cedmate_analytics_api/          <- Python-API-Projekt
-    api.py
-    cedmate_analytics.py
-    export_pdf.py
-    requirements.txt
-    render.yaml
-    analytics-dokumentation.md
-    ...
-```
+## 3. Ordnerstruktur
 
-## 3. CEDmate: Ordnerstruktur (App)
-
-Dieses Bild zeigt die Ordnerstruktur des Projekts CEDmate
 ![CEDmate Ordnerstruktur](cedmate_ordnerstruktur.png)
 
-## 4. Gesamtarchitektur in Kurzform
+## 4. Technischer Aufbau
 
-- Frontend: Flutter-App mit Layer-Aufbau `models -> repositories -> services -> widgets`.
-- Datenhaltung: Firebase Auth + Cloud Firestore.
-- Externe Dienste:
-    - Analytics/PDF-Export via `cedmate_analytics_api` (Render-hosted).
-    - Toilettenkarte via Overpass API + OpenStreetMap Tiles.
-- UI-State: `provider` (MultiProvider, ProxyProvider, StreamProvider).
+### 4.1 Schichtenmodell
 
----
+CEDmate ist in `lib/` klar in Schichten getrennt:
+- `models/`  
+  Fachmodelle und Enums (z. B. `Symptom`, `Stuhlgang`, `Mahlzeit`, `Stimmung`, `Anamnese`).
+- `repositories/`  
+  Firestore-Zugriff (CRUD, Streams, Datumsfilter).
+- `services/`  
+  Business-Logik, Validierung, Auth-Kontext.
+- `widgets/`  
+  UI-Schicht (Screens, Formulare, Komponenten, Layouts).
 
-## 5. CEDmate (Flutter-App)
+### 4.2 App-Start und Auth-Flow
 
-## 5.1 Tech-Stack
+1. `main.dart` initialisiert Firebase.
+2. `AuthGate` entscheidet per Stream:
+   - nicht eingeloggt -> `AuthForm`
+   - eingeloggt, E-Mail noch nicht verifiziert -> `VerifiziereEmailScreen`
+   - eingeloggt und verifiziert -> `HomeScreen`
+3. Anmeldung erfolgt über Benutzername + Passwort, intern mit Firebase Auth + Firestore-Mapping.
 
-- Flutter/Dart (SDK-Version: `^3.9.2`)
-- Firebase Core/Auth/Firestore
-- Provider
-- Karten/Geodaten: `flutter_map`, `geolocator`, `connectivity_plus`
-- Export/Dateien: `http`, `dio`, `open_file`, `url_launcher`
-- Kalender: `table_calendar`
+### 4.3 State Management
 
-## 5.2 Start- und Login-Flow
+- `provider` mit `MultiProvider`, `ProxyProvider`, `StreamProvider`
+- Services beziehen ihre Repositories über DI
+- Nutzerzustand (`AppUser?`) wird global per Stream bereitgestellt
 
-1. `main.dart` initialisiert Firebase (`DefaultFirebaseOptions.currentPlatform`).
-2. `AuthGate` entscheidet per Streams:
-    - nicht eingeloggt -> `AuthForm`
-    - eingeloggt, aber E-Mail nicht verifiziert -> `VerifiziereEmailScreen`
-    - eingeloggt + verifiziert -> `HomeScreen`
-3. Registrierung/Login laufen ueber Benutzername + Firebase:
-    - Mapping in Firestore-Collection `usernames/{username}`
-    - Userprofil in `users/{uid}`
+## 5. Kernfunktionen nach Modulen
 
-## 5.3 Layer-Verantwortung
+- **Anamnese**  
+  Medizinisches Profil mit Geburtsdatum, Geschlecht, Diagnose und Listenfeldern.
+- **SymptomRadar**  
+  Erfassung von Bezeichnung, Intensität (1–10), Startzeit, Dauer, Notizen.
+- **Stuhl-Tagebuch**  
+  Bristol-Typ, Häufigkeit, Schmerzlevel, Notizen/Auffälligkeiten.
+- **Ess-Tagebuch**  
+  Bezeichnung, Zutaten, Unverträglichkeiten, Notizen.
+- **Seelen-Log**  
+  Stimmung (1–5), Stresslevel (1–10), Notizen, Tags.
+- **Kalender**  
+  Tagesbezogene Anzeige mit Event-Markern je Modultyp.
+- **Rückblick**  
+  Monatslisten mit Monat/Jahr-Filter pro Modul.
+- **Statistiken & Datenexport**  
+  Serverseitige Auswertung über die Analytics API.
+- **Hilfe für unterwegs**  
+  Toilettenkarte mit Overpass-API, OSM-Karte und Offline-Cache.
+- **CED Wissen**  
+  Wissensinhalte aus Firestore (`wissen`).
+- **MediManager**  
+  Aktuell prototypisch (Dummy-Daten, keine Firestore-Persistenz).
 
-- `models/`: Fachobjekte (Symptom, Stuhlgang, Mahlzeit, Stimmung, Anamnese, Wissen)
-- `repositories/`: Firestore-Zugriff (CRUD, Query, Streams)
-- `services/`: Validierung und Business-Regeln, Zugriff auf aktuelle `uid`
-- `widgets/`: Screens, Formulare, Layout, Komponenten
+## 6. Datenmodell in Firestore
 
-## 5.4 Kernmodule (Fachlich)
-
-- **Anamnese**: medizinisches Profil (Geburtsdatum, Geschlecht, Diagnose, Listenfelder)
-- **SymptomRadar**: Intensitaet 1-10, Startzeit, Dauer, Notizen
-- **Stuhl-Tagebuch**: Bristol-Typ, Haeufigkeit, Schmerzlevel, Notizen
-- **Ess-Tagebuch**: Mahlzeit, Zutaten, Unvertraeglichkeiten, Notizen
-- **Seelen-Log**: Stimmung 1-5, Stress 1-10, Notizen, Tags
-- **Kalender**: Tagesansicht / Monatsüberblick mit Event-Markern und Filter je Modul
-- **Rueckblick**: Monatslisten je Modul mit Monat/Jahr-Filter
-- **Statistiken**: Diagramm-Generierung ueber Analytics-API
-- **Datenexport**: PDF-Export ueber Analytics-API
-- **Hilfe fuer unterwegs**: Toilettenkarte (Overpass + OSM + Offline-Cache)
-- **CED Wissen**: Artikel/Video/Checklisten aus Firestore-Collection `wissen`
-- **MediManager**: aktuell Prototyp mit Dummy-Daten (keine Persistenz)
-
-## 5.5 Firestore-Datenmodell
-
-Top-Level:
+### 6.1 Top-Level Collections
 
 - `usernames/{username}` -> `{ uid, email }`
 - `users/{uid}` -> `{ email, username, displayName }`
-- `wissen/{docId}` -> Wissensbeitraege (global)
+- `wissen/{docId}` -> Wissensbeiträge
 
-User-Subcollections:
+### 6.2 Nutzerbezogene Subcollections
 
 - `users/{uid}/anamnesen/anamnese`
-    - `geburtsdatum`, `gender`, `diagnose`, `symptomeImSchub[]`, `schubausloeser[]`,
-      `weitereErkrankungen[]`
+  - `geburtsdatum`, `gender`, `diagnose`, `symptomeImSchub[]`, `schubausloeser[]`, `weitereErkrankungen[]`
 - `users/{uid}/symptoms/{id}`
-    - `bezeichnung`, `intensitaet`, `startZeit`, `dauerInMinuten`, optional `notizen`
+  - `bezeichnung`, `intensitaet`, `startZeit`, `dauerInMinuten`, optional `notizen`
 - `users/{uid}/stuhlgaenge/{id}`
-    - `konsistenz`, `haeufigkeit`, `schmerzLevel`, `eintragZeitpunkt`, optional `notizen`,
-      `auffaelligkeiten`
+  - `konsistenz`, `haeufigkeit`, `schmerzLevel`, `eintragZeitpunkt`, optional `notizen`, `auffaelligkeiten`
 - `users/{uid}/mahlzeiten/{id}`
-    - `bezeichnung`, `mahlzeitZeitpunkt`, optional `zutaten[]`, `unvertraeglichkeiten[]`, `notizen`
+  - `bezeichnung`, `mahlzeitZeitpunkt`, optional `zutaten[]`, `unvertraeglichkeiten[]`, `notizen`
 - `users/{uid}/stimmungen/{id}`
-    - `stimmungsLevel`, `stresslevel`, `stimmungsZeitpunkt`, optional `tagebuch`, `tags[]`
+  - `stimmungsLevel`, `stresslevel`, `stimmungsZeitpunkt`, optional `tagebuch`, `tags[]`
 
-## 5.6 Wichtige App-Routen (`main.dart`)
+## 7. Externe Schnittstellen
 
-- `/` AuthGate
-- `/home`, `/profil`, `/rueckblick`
-- `/kalender`, `/statistiken`, `/export`
-- `/hilfeUnterwegs`, `/wissen`, `/credits`
-- Monatsscreens: `/symptomeMonat`, `/stuhlMonat`, `/essenMonat`, `/stimmungMonat`
+### 7.1 Analytics API
 
-## 5.7 Externe Schnittstellen in der App
+Aufruf aus der App:
+- `GET https://cedmate-analytics-api.onrender.com/analytics?user=<uid>`
+- `GET https://cedmate-analytics-api.onrender.com/export?user=<uid>`
+- Header: `x-api-key`
 
-- Analytics:
-    - `GET https://cedmate-analytics-api.onrender.com/analytics?user=<uid>`
-    - `GET https://cedmate-analytics-api.onrender.com/export?user=<uid>`
-    - Header: `x-api-key`
-    - Implementiert in:
-        - `lib/widgets/screens/statistiken.dart`
-        - `lib/widgets/screens/daten_exportieren.dart`
-- Toilettendaten:
-    - `POST https://overpass-api.de/api/interpreter`
-    - OSM Tile Layer: `https://tile.openstreetmap.org/{z}/{x}/{y}.png`
-    - Lokaler Cache per `SharedPreferences`
+Relevante Dateien in CEDmate:
+- `lib/widgets/screens/statistiken.dart`
+- `lib/widgets/screens/daten_exportieren.dart`
+- `lib/widgets/utils/datei_handler.dart`
 
----
+### 7.2 Toilettenkarte
 
-## 6. cedmate_analytics_api (FastAPI-Service)
+- Overpass API: `https://overpass-api.de/api/interpreter`
+- OSM Tile Layer: `https://tile.openstreetmap.org/{z}/{x}/{y}.png`
+- Lokaler Cache über `SharedPreferences`
 
-Hinweis: Die ausführliche Dokumentation des Analytic-Backends ist unter
-`cedmate_analytics_api/analytics-dokumentation.md` zu finden.
+## 8. Lokale Entwicklung
 
-## 6.0 Tech-Stack
+### 8.1 Voraussetzungen
 
-- FastAPI + Uvicorn
-- Firebase Admin SDK (Firestore-Zugriff)
-- pandas (Datenaufbereitung)
-- matplotlib (Plots + PDF-Inhalte)
-- Deployment: Render (`render.yaml`)
+- Flutter SDK (kompatibel zu Dart `^3.9.2`)
+- Firebase-Projekt und gültige Konfiguration in `lib/firebase_options.dart`
 
-## 6.1 Zweck
+### 8.2 Start
 
-- **Statistiken generieren** (Diagramm-PNGs pro User)
-- **Datenexport als PDF** (Diagramme + Rohdaten)
-- Hosting in Produktion auf **Render**
+1. `flutter pub get`
+2. `flutter run`
 
-## 6.2 Erwartete Kern-Dateien
+Optional Web:
+- `flutter run -d chrome`
 
-- `api.py` -> FastAPI-App, Endpunkte, Security-Pruefung
-- `cedmate_analytics.py` -> Firestore-Datenzugriff + Plot-Logik
-- `export_pdf.py` -> PDF-Erstellung
-- `requirements.txt` -> Python-Dependencies
-- `render.yaml` -> Render Deployment
-- `output/` -> generierte PNG/PDF-Artefakte
+## 9. Schnelltest (Smoke Test)
 
-## 6.3 Endpunkte
+1. Registrierung -> E-Mail verifizieren -> Login
+2. Für jedes Kernmodul mindestens einen Eintrag anlegen
+3. Kalender und Rückblick prüfen
+4. Statistiken ausführen
+5. PDF-Export ausführen
+6. Toilettenkarte mit Standortfreigabe prüfen
 
-- `GET /` -> Healthcheck
-- `GET /analytics?user=<uid>` -> erzeugt PNG-Statistiken, Response mit URL-Feldern (typisch unter
-  `results`)
-- `GET /export?user=<uid>` -> erzeugt PDF, Response enthaelt `pdf`-URL
-
-## 6.4 Sicherheitskonzept
-
-- Header `x-api-key` erforderlich
-- Origin-/User-Agent-Pruefungen fuer erlaubte Clients
-- Relevante ENV-Variablen:
-    - `API_KEY`
-    - `SERVICE_ACCOUNT_PATH` (Firebase Service Account)
-
-## 6.5 Firestore-Annahmen der API
-
-Die API liest dieselben Subcollections wie die App:
-
-- `users/<uid>/stuhlgaenge`
-- `users/<uid>/stimmungen`
-- `users/<uid>/symptoms`
-- `users/<uid>/mahlzeiten`
-
----
-
-## 7. Integration App <-> Analytics API
-
-## 7.1 Aufrufpunkte in CEDmate
-
-- Statistiken-Screen:
-    - Request an `/analytics`
-    - Liest `results` und zeigt Bild-URLs in der App
-- Datenexport-Screen:
-    - Request an `/export`
-    - Liest `pdf`-URL und oeffnet/speichert Datei
-
-## 7.2 Dateiverarbeitung
-
-- Zentral ueber `DateiHandler`:
-    - Web: URL in neuem Browser-Tab
-    - Mobile/Desktop: Download in App-Dokumentenordner + `open_file`
-
-## 7.3 Wichtige Betriebsdetails
-
-- API-Key ist aktuell in der App hartkodiert (`statistiken.dart`, `daten_exportieren.dart`).
-- Bei lokaler API-Nutzung muessen `apiUrl` + `apiKey` im App-Code angepasst werden.
-
-## 7.4 End-to-End Datenfluss (vereinfacht)
-
-1. User erzeugt Eintraege in CEDmate (Firestore).
-2. App ruft Analytics-API mit `user=<uid>` + `x-api-key` auf.
-3. API liest Firestore-Subcollections und erzeugt Diagramme/PDF.
-4. API liefert Dateilinks zurueck.
-5. App zeigt Bilder an oder oeffnet PDF ueber `DateiHandler`.
-
----
-
-## 8 Kurz-Smoke-Tests
-
-- Demo-App unter https://ahmad-kalaf.github.io/CEDmate/ aufrufen
-- Registrieren -> E-Mail verifizieren -> Login -> Home
-- ODER Mit Demo-Zugangsdaten anmelden: Benutzername: ahmadkalaf Passwort: Passwort12345#
-- Je Modul einen Testeintrag anlegen
-- Weitere Funktionen testen ...
-
----
-
-## 9. Datei-Landkarte fuer Aenderungen
+## 10. Wichtige Dateien für Änderungen
 
 - Authentifizierung:
-    - `lib/repositories/auth_repository.dart`
-    - `lib/services/auth_service.dart`
-    - `lib/widgets/forms/auth_form.dart`
+  - `lib/repositories/auth_repository.dart`
+  - `lib/services/auth_service.dart`
+  - `lib/widgets/forms/auth_form.dart`
 - Firestore-Logik je Modul:
-    - `lib/repositories/*_repository.dart`
-    - `lib/services/*_service.dart`
+  - `lib/repositories/*_repository.dart`
+  - `lib/services/*_service.dart`
 - UI je Modul:
-    - Eingabe: `lib/widgets/forms/`
-    - Tagesansicht: `lib/widgets/sections/*_fuer_datum.dart`
-    - Monatsansicht: `lib/widgets/sections/*_fuer_monat.dart`
-- Analytics-Integration in der App:
-    - `lib/widgets/screens/statistiken.dart`
-    - `lib/widgets/screens/daten_exportieren.dart`
-    - `lib/widgets/utils/datei_handler.dart`
-- Kartenfunktion:
-    - `lib/widgets/screens/hilfe_fuer_unterwegs.dart`
-- App-Setup/Provider/Routing:
-    - `lib/main.dart`
+  - Eingabe: `lib/widgets/forms/`
+  - Tagesansicht: `lib/widgets/sections/*_fuer_datum.dart`
+  - Monatsansicht: `lib/widgets/sections/*_fuer_monat.dart`
+- App-Setup:
+  - `lib/main.dart`
 
----
+## 11. Bekannte Grenzen
+
+- `MediManager` ist derzeit nur prototypisch.
+- API-Key für Analytics ist aktuell im Client-Code hinterlegt.
+- Es gibt aktuell kein separates `test/`-Verzeichnis mit automatisierten Tests.
+
+## 12. Weiterführende Dokumente
+
+- Detaillierte App-Beschreibung: `Doku.md`
+- Analytics API Doku: `docs/analytics-dokumentation.md`
