@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 enum WissenKategorie { ernaehrung, bewegung, psyche, alltag }
 
 enum WissenFormat { artikel, video, checkliste }
@@ -36,11 +34,11 @@ class CEDWissen {
   static String? _stringOrNull(dynamic value) => value is String ? value : null;
 
   static DateTime? _dateTimeOrNull(dynamic value) {
-    if (value is Timestamp) {
-      return value.toDate();
-    }
     if (value is DateTime) {
       return value;
+    }
+    if (value is String) {
+      return DateTime.tryParse(value);
     }
     return null;
   }
@@ -56,11 +54,9 @@ class CEDWissen {
     return values.firstWhere((e) => e.name == name, orElse: () => fallback);
   }
 
-  factory CEDWissen.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>? ?? const <String, dynamic>{};
-
+  factory CEDWissen.fromMap(Map<String, dynamic> data, {String? id}) {
     return CEDWissen(
-      id: doc.id,
+      id: id ?? _stringOrEmpty(data['id']),
       titel: _stringOrEmpty(data['titel']),
       beschreibung: _stringOrEmpty(data['beschreibung']),
       kategorie: _enumOrDefault(

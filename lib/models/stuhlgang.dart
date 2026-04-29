@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'enums/bristol_stuhlform.dart';
 
 /// Modell für einen einzelnen Stuhlgang-Eintrag.
@@ -43,11 +41,9 @@ class Stuhlgang {
   /// Erstellt ein Stuhlgang-Objekt aus einem Firestore-Dokument.
   /// Enums werden anhand des Namens rekonstruiert.
   /// Optionale Strings werden bereinigt und leere Werte entfernt.
-  factory Stuhlgang.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? {};
-
+  factory Stuhlgang.fromMap(Map<String, dynamic> data, {String? id}) {
     return Stuhlgang(
-      id: doc.id,
+      id: id ?? _bereinigeOptionalenString(data['id']),
       konsistenz: BristolBeschreibung.fromName(
         (data['konsistenz'] as String?) ?? 'typ4',
       ),
@@ -65,7 +61,7 @@ class Stuhlgang {
     final map = <String, dynamic>{
       'konsistenz': konsistenz.name,
       'haeufigkeit': haeufigkeit,
-      'eintragZeitpunkt': Timestamp.fromDate(eintragZeitpunkt),
+      'eintragZeitpunkt': eintragZeitpunkt.toIso8601String(),
       'schmerzLevel': schmerzLevel,
     };
 
@@ -92,8 +88,10 @@ class Stuhlgang {
   /// Parst einen Firestore-Zeitwert.
   /// Unterstützt Timestamp und DateTime, ansonsten wird die aktuelle Zeit verwendet.
   static DateTime _parseZeitstempel(dynamic value) {
-    if (value is Timestamp) return value.toDate();
     if (value is DateTime) return value;
+    if (value is String) {
+      return DateTime.tryParse(value) ?? DateTime.now();
+    }
     return DateTime.now();
   }
 

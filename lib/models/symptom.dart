@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 /// Modell für ein einzelnes Symptom im SymptomRadar.
 /// Enthält Bezeichnung, Intensität, Startzeit, Dauer sowie optionale Notizen.
 /// Das Modell ist unveränderlich und vollständig Firestore-kompatibel.
@@ -34,16 +32,13 @@ class Symptom {
 
   /// Erzeugt ein Symptom-Objekt aus einem Firestore-Dokument.
   /// Alle Felder werden direkt aus der Map gelesen und korrekt konvertiert.
-  factory Symptom.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data()!;
+  factory Symptom.fromMap(Map<String, dynamic> data, {String? id}) {
     return Symptom(
-      id: doc.id,
+      id: id ?? (data['id'] as String?),
       bezeichnung: data['bezeichnung'] as String,
       intensitaet: data['intensitaet'] as int,
-      startZeit: (data['startZeit'] as Timestamp).toDate(),
+      startZeit: DateTime.tryParse(data['startZeit'] ?? '') ?? DateTime.now(),
       dauerInMinuten: data['dauerInMinuten'] as int,
-
-      // Leere Strings werden in null umgewandelt.
       notizen: (data['notizen'] as String?)?.isEmpty == true
           ? null
           : data['notizen'] as String?,
@@ -56,7 +51,7 @@ class Symptom {
     final map = <String, dynamic>{
       'bezeichnung': bezeichnung,
       'intensitaet': intensitaet,
-      'startZeit': Timestamp.fromDate(startZeit),
+      'startZeit': startZeit.toIso8601String(),
       'dauerInMinuten': dauerInMinuten,
     };
 

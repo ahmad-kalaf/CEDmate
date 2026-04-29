@@ -94,11 +94,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _ladeAnamneseDaten() async {
-    final anamnese = await anamneseService.ladeAnamnese();
-    if (!mounted) return;
+    // final anamnese = await anamneseService.ladeAnamnese();
+    // if (!mounted) return;
 
+    // setState(() {
+    //   _hatAnamnesedaten = anamnese != null;
+    //   _isLoading = false;
+    // });
     setState(() {
-      _hatAnamnesedaten = anamnese != null;
+      _hatAnamnesedaten = true; // Temporär auf true setzen
       _isLoading = false;
     });
   }

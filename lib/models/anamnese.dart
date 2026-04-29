@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cedmate/models/enums/diagnose.dart';
 import 'package:cedmate/models/enums/gender.dart';
 
@@ -51,7 +50,7 @@ class Anamnese {
   /// Wandelt das Objekt in eine Map um, sodass es in Firestore gespeichert werden kann.
   /// Enums werden als String abgelegt und das Datum als Firestore-Timestamp.
   Map<String, dynamic> toMap() => {
-    'geburtsdatum': Timestamp.fromDate(geburtsdatum),
+    'geburtsdatum': geburtsdatum.toIso8601String(),
     'gender': gender.name,
     'diagnose': diagnose.name,
     'symptomeImSchub': symptomeImSchub,
@@ -63,10 +62,8 @@ class Anamnese {
   /// Enthält defensive Programmierung gegen ungültige oder unerwartete Werte.
   factory Anamnese.fromMap(Map<String, dynamic> data) {
     return Anamnese(
-      geburtsdatum: (data['geburtsdatum'] is Timestamp)
-          ? (data['geburtsdatum'] as Timestamp).toDate()
-          : DateTime.tryParse(data['geburtsdatum'].toString()) ??
-                DateTime(2000, 1, 1),
+      geburtsdatum:
+          DateTime.tryParse(data['geburtsdatum'] ?? '') ?? DateTime(2000, 1, 1),
 
       // Falls der Enum-Wert nicht gefunden wird, wird ein Standardwert gesetzt.
       gender: Gender.values.firstWhere(

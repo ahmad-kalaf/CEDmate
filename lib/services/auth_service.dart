@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/app_user.dart';
 import '../repositories/auth_repository.dart';
@@ -52,7 +52,8 @@ class AuthService {
     });
   }
 
-  User? get currentUser => _repo.currentUser;
+  // User? get currentUser => _repo.currentUser;
+  AppUser? get currentUser => _repo.currentUser;
 
   String get currentUserId {
     final user = _repo.currentUser;
@@ -104,28 +105,32 @@ class AuthService {
 
   Future<void> sendPasswordReset(String username) async {
     _validateUsername(username);
-
-    try {
-      await _repo.sendPasswordResetEmailByUsername(username);
-    } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'invalid-email':
-          throw AuthFailure('Ungültige E-Mail-Adresse.');
-        case 'user-not-found':
-          throw AuthFailure('Kein Benutzer mit diesem Namen gefunden.');
-        case 'missing-email':
-          throw AuthFailure('E-Mail-Adresse fehlt im Profil.');
-        case 'network-request-failed':
-          throw AuthFailure('Netzwerkfehler. Bitte Internetverbindung prüfen.');
-        default:
-          throw AuthFailure(
-            'Fehler beim Senden der E-Mail: ${e.message ?? e.code}',
-          );
-      }
-    } catch (_) {
-      throw AuthFailure('Unbekannter Fehler beim Passwort-Reset.');
-    }
+    await _repo.sendPasswordResetEmailByUsername(username);
   }
+  // Future<void> sendPasswordReset(String username) async {
+  //   _validateUsername(username);
+
+  //   try {
+  //     await _repo.sendPasswordResetEmailByUsername(username);
+  //   } on FirebaseAuthException catch (e) {
+  //     switch (e.code) {
+  //       case 'invalid-email':
+  //         throw AuthFailure('Ungültige E-Mail-Adresse.');
+  //       case 'user-not-found':
+  //         throw AuthFailure('Kein Benutzer mit diesem Namen gefunden.');
+  //       case 'missing-email':
+  //         throw AuthFailure('E-Mail-Adresse fehlt im Profil.');
+  //       case 'network-request-failed':
+  //         throw AuthFailure('Netzwerkfehler. Bitte Internetverbindung prüfen.');
+  //       default:
+  //         throw AuthFailure(
+  //           'Fehler beim Senden der E-Mail: ${e.message ?? e.code}',
+  //         );
+  //     }
+  //   } catch (_) {
+  //     throw AuthFailure('Unbekannter Fehler beim Passwort-Reset.');
+  //   }
+  // }
 
   Future<void> logout() => _repo.signOut();
 
@@ -134,22 +139,28 @@ class AuthService {
       _repo.authStateChanges().map((u) => u != null);
 
   /// Stream für AuthGate: true = E-Mail bestätigt, sonst false
+  // Future<bool> isEmailVerified() async {
+  //   final user = _repo.currentUser;
+  //   if (user == null) return false;
+  //   await user.reload(); // 🔥 Hier wird der Zustand aus Firebase neu geholt
+  //   return user.emailVerified;
+  // }
   Future<bool> isEmailVerified() async {
-    final user = _repo.currentUser;
-    if (user == null) return false;
-    await user.reload(); // 🔥 Hier wird der Zustand aus Firebase neu geholt
-    return user.emailVerified;
+    return true;
   }
 
-  Stream<bool> isEmailVerifiedStream() async* {
-    await for (final u in _repo.authStateChanges()) {
-      if (u == null) {
-        yield false;
-      } else {
-        await u.reload(); // <-- wichtig, sonst alter Zustand!
-        yield u.emailVerified;
-      }
-    }
+  // Stream<bool> isEmailVerifiedStream() async* {
+  //   await for (final u in _repo.authStateChanges()) {
+  //     if (u == null) {
+  //       yield false;
+  //     } else {
+  //       await u.reload(); // <-- wichtig, sonst alter Zustand!
+  //       yield u.emailVerified;
+  //     }
+  //   }
+  // }
+  Stream<bool> isEmailVerifiedStream() {
+    return Stream.value(true);
   }
 
   // ---------- Fehlermapping (Firebase → deutsche Texte) ----------

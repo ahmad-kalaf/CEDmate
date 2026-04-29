@@ -1,29 +1,30 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/c_e_d_wissen.dart';
 
 class WissenRepository {
-  final _wissenRef = FirebaseFirestore.instance.collection('wissen');
+  // final _wissenRef = FirebaseFirestore.instance.collection('wissen');
 
   /// Alle Wissensartikel sortiert nach Erstellungszeit streamen
   Stream<List<CEDWissen>> getWissen() {
-    return _wissenRef
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snap) => snap.docs.map((d) => CEDWissen.fromFirestore(d)).toList(),
-        );
+    // return _wissenRef
+    //     .orderBy('createdAt', descending: true)
+    //     .snapshots()
+    //     .map(
+    //       (snap) => snap.docs.map((d) => CEDWissen.fromFirestore(d)).toList(),
+    //     );
+    return Stream.value([]); // Platzhalter, da Firestore nicht importiert ist
   }
 
   /// Einen Wissenseintrag hinzufügen
   Future<void> addWissen(CEDWissen wissen) async {
-    await _wissenRef.add({
-      ...wissen.toFirestore(),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    // await _wissenRef.add({
+    //   ...wissen.toFirestore(),
+    //   'createdAt': FieldValue.serverTimestamp(),
+    // });
   }
 
   /// Einen Eintrag löschen
   Future<void> deleteWissen(String id) async {
-    await _wissenRef.doc(id).delete();
+    // await _wissenRef.doc(id).delete();
   }
 }

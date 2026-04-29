@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:cedmate/widgets/layout/ced_layout.dart';
 import 'package:cedmate/cedmate_colors.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
@@ -21,8 +20,6 @@ class _StatistikenState extends State<Statistiken> {
   String _status = '';
   List<String> _imageUrls = [];
 
-  String? get _currentUserId => FirebaseAuth.instance.currentUser?.uid;
-
   static const String apiUrl =
       'https://cedmate-analytics-api.onrender.com/analytics';
   static const String apiKey = 'CEDmateHAWahmad1#';
@@ -31,7 +28,7 @@ class _StatistikenState extends State<Statistiken> {
   // CLOUD ANALYTICS
   // -------------------------------------------------------------
   Future<void> _runAnalytics() async {
-    final userId = _currentUserId ?? 'DemoUser';
+    final userId = 'DemoUser';
 
     setState(() {
       _isRunning = true;

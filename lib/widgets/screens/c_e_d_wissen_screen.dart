@@ -1,6 +1,5 @@
 import 'package:cedmate/widgets/layout/ced_layout.dart';
 import 'package:cedmate/widgets/screens/wissen_beitrag_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/c_e_d_wissen.dart';

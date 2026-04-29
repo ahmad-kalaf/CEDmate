@@ -1,5 +1,5 @@
 import 'package:cedmate/widgets/forms/auth_form.dart';
-import 'package:cedmate/widgets/screens/verifiziere_email_screen.dart';
+// import 'package:cedmate/widgets/screens/verifiziere_email_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
@@ -30,30 +30,31 @@ class AuthGate extends StatelessWidget {
           return const Scaffold(body: Center(child: AuthForm()));
         }
 
-        final String uid = auth
-            .userStream()
-            .map((event) => event!.uid)
-            .toString();
+        // final String uid = auth
+        //     .userStream()
+        //     .map((event) => event!.uid)
+        //     .toString();
 
-        // Wenn eingeloggt, prüfen ob Email verifiziert
-        return StreamBuilder<bool>(
-          stream: auth.isEmailVerifiedStream(),
-          builder: (context, emailSnap) {
-            if (!emailSnap.hasData) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
+        // // Wenn eingeloggt, prüfen ob Email verifiziert
+        // return StreamBuilder<bool>(
+        //   stream: auth.isEmailVerifiedStream(),
+        //   builder: (context, emailSnap) {
+        //     if (!emailSnap.hasData) {
+        //       return const Scaffold(
+        //         body: Center(child: CircularProgressIndicator()),
+        //       );
+        //     }
 
-            final isVerified = emailSnap.data ?? false;
+        //     final isVerified = emailSnap.data ?? false;
 
-            if (isVerified) {
-              return const HomeScreen();
-            } else {
-              return const VerifiziereEmailScreen();
-            }
-          },
-        );
+        //     if (isVerified) {
+        //       return const HomeScreen();
+        //     } else {
+        //       return const VerifiziereEmailScreen();
+        //     }
+        //   },
+        // );
+        return const HomeScreen();
       },
     );
   }
