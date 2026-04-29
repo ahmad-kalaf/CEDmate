@@ -103,36 +103,36 @@ class RueckblickScreen extends StatelessWidget {
     );
   }
 
-  Widget _drawerItem(
-    BuildContext context,
-    String title,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
-    return Container(
-      margin: EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            CEDColors.background.withValues(alpha: 0.65),
-            CEDColors.background.withValues(alpha: 0.15),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(8),
-        border: BoxBorder.all(color: CEDColors.border),
-      ),
-      child: ListTile(
-        leading: Icon(icon, color: CEDColors.iconPrimary),
-        title: Text(title, style: TextStyle(color: CEDColors.textPrimary)),
-        horizontalTitleGap: 12,
-        onTap: () {
-          onTap();
-        },
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        selectedTileColor: CEDColors.surface,
-      ),
-    );
-  }
+  // Widget _drawerItem(
+  //   BuildContext context,
+  //   String title,
+  //   IconData icon,
+  //   VoidCallback onTap,
+  // ) {
+  //   return Container(
+  //     margin: EdgeInsets.all(3),
+  //     decoration: BoxDecoration(
+  //       gradient: LinearGradient(
+  //         colors: [
+  //           CEDColors.background.withValues(alpha: 0.65),
+  //           CEDColors.background.withValues(alpha: 0.15),
+  //         ],
+  //         begin: Alignment.topLeft,
+  //         end: Alignment.bottomRight,
+  //       ),
+  //       borderRadius: BorderRadius.circular(8),
+  //       border: BoxBorder.all(color: CEDColors.border),
+  //     ),
+  //     child: ListTile(
+  //       leading: Icon(icon, color: CEDColors.iconPrimary),
+  //       title: Text(title, style: TextStyle(color: CEDColors.textPrimary)),
+  //       horizontalTitleGap: 12,
+  //       onTap: () {
+  //         onTap();
+  //       },
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  //       selectedTileColor: CEDColors.surface,
+  //     ),
+  //   );
+  // }
 }

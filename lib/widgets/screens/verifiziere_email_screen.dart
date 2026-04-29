@@ -2,9 +2,9 @@ import 'package:cedmate/widgets/layout/ced_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/app_user.dart';
+// import '../../models/app_user.dart';
 import '../../services/auth_service.dart';
-import '../components/ausloggen_button.dart';
+// import '../components/ausloggen_button.dart';
 
 class VerifiziereEmailScreen extends StatefulWidget {
   const VerifiziereEmailScreen({super.key});
@@ -54,8 +54,8 @@ class _VerifiziereEmailScreenState extends State<VerifiziereEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userAuth = auth.currentUser;
-    final AppUser? user = context.watch<AppUser?>();
+    // final userAuth = auth.currentUser;
+    // final AppUser? user = context.watch<AppUser?>();
 
     return StreamBuilder<bool>(
       stream: auth.isEmailVerifiedStream(),
