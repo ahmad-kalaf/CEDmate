@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'enums/bristol_stuhlform.dart';
 
 /// Modell für einen einzelnen Stuhlgang-Eintrag.
@@ -61,7 +63,7 @@ class Stuhlgang {
     final map = <String, dynamic>{
       'konsistenz': konsistenz.name,
       'haeufigkeit': haeufigkeit,
-      'eintragZeitpunkt': eintragZeitpunkt.toIso8601String(),
+      'eintragZeitpunkt': Timestamp.fromDate(eintragZeitpunkt),
       'schmerzLevel': schmerzLevel,
     };
 
@@ -88,6 +90,7 @@ class Stuhlgang {
   /// Parst einen Firestore-Zeitwert.
   /// Unterstützt Timestamp und DateTime, ansonsten wird die aktuelle Zeit verwendet.
   static DateTime _parseZeitstempel(dynamic value) {
+    if (value is Timestamp) return value.toDate();
     if (value is DateTime) return value;
     if (value is String) {
       return DateTime.tryParse(value) ?? DateTime.now();

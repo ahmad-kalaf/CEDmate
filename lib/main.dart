@@ -1,7 +1,3 @@
-// -----------------------------------------------------------------------------
-//  MAIN FILE — CLEAN, SAFE, MODERN
-// -----------------------------------------------------------------------------
-
 import 'package:cedmate/repositories/wissen_repository.dart';
 import 'package:cedmate/services/wissen_service.dart';
 import 'package:cedmate/widgets/screens/c_e_d_wissen_screen.dart';
@@ -17,6 +13,7 @@ import 'package:cedmate/widgets/sections/seelen_log_fuer_monat.dart';
 import 'package:cedmate/widgets/screens/statistiken.dart';
 import 'package:cedmate/widgets/sections/stuhlgang_eintraege_fuer_monat.dart';
 import 'package:cedmate/widgets/sections/symptome_fuer_monat.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -40,23 +37,21 @@ import 'package:cedmate/services/symptom_service.dart';
 import 'package:cedmate/services/stuhlgang_service.dart';
 import 'package:cedmate/services/stimmung_service.dart';
 import 'package:cedmate/services/mahlzeit_service.dart';
+import 'package:cedmate/firebase_options.dart';
 
 // UI
 import 'widgets/auth_gate.dart';
 import 'widgets/screens/home_screen.dart';
 import 'cedmate_colors.dart';
 
-// -----------------------------------------------------------------------------
-//  APP ENTRY POINT
-// -----------------------------------------------------------------------------
+// APP ENTRY POINT
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const CEDmateApp());
 }
 
-// -----------------------------------------------------------------------------
-//  ROOT APP WIDGET
-// -----------------------------------------------------------------------------
+// ROOT APP WIDGET
 class CEDmateApp extends StatelessWidget {
   const CEDmateApp({super.key});
 
@@ -67,43 +62,43 @@ class CEDmateApp extends StatelessWidget {
         // AUTH
         Provider<AuthRepository>(create: (_) => AuthRepository()),
         ProxyProvider<AuthRepository, AuthService>(
-          update: (_, repo, __) => AuthService(repo),
+          update: (_, repo, _) => AuthService(repo),
         ),
 
         // ANAMNESE
         Provider<AnamneseRepository>(create: (_) => AnamneseRepository()),
-        ProxyProvider<AnamneseRepository, AnamneseService>(
-          update: (_, repo, __) => AnamneseService(repo),
+        ProxyProvider2<AnamneseRepository, AuthService, AnamneseService>(
+          update: (_, repo, auth, _) => AnamneseService(repo, auth),
         ),
 
         // SYMPTOMS
         Provider<SymptomRepository>(create: (_) => SymptomRepository()),
         ProxyProvider2<SymptomRepository, AuthService, SymptomService>(
-          update: (_, repo, auth, __) => SymptomService(repo, auth),
+          update: (_, repo, auth, _) => SymptomService(repo, auth),
         ),
 
         // STOOL
         Provider<StuhlgangRepository>(create: (_) => StuhlgangRepository()),
         ProxyProvider2<StuhlgangRepository, AuthService, StuhlgangService>(
-          update: (_, repo, auth, __) => StuhlgangService(repo, auth),
+          update: (_, repo, auth, _) => StuhlgangService(repo, auth),
         ),
 
         // MOOD
         Provider<StimmungRepository>(create: (_) => StimmungRepository()),
         ProxyProvider2<StimmungRepository, AuthService, StimmungService>(
-          update: (_, repo, auth, __) => StimmungService(repo, auth),
+          update: (_, repo, auth, _) => StimmungService(repo, auth),
         ),
 
         // MEALS
         Provider<MahlzeitRepository>(create: (_) => MahlzeitRepository()),
         ProxyProvider2<MahlzeitRepository, AuthService, MahlzeitService>(
-          update: (_, repo, auth, __) => MahlzeitService(repo, auth),
+          update: (_, repo, auth, _) => MahlzeitService(repo, auth),
         ),
 
         // CEDWissen
         Provider<WissenRepository>(create: (_) => WissenRepository()),
-        ProxyProvider2<WissenRepository, AuthService, WissenService>(
-          update: (_, repo, auth, __) => WissenService(repo),
+        ProxyProvider<WissenRepository, WissenService>(
+          update: (_, repo, _) => WissenService(repo),
         ),
 
         // USER STREAM

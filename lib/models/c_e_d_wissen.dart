@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum WissenKategorie { ernaehrung, bewegung, psyche, alltag }
 
 enum WissenFormat { artikel, video, checkliste }
@@ -34,6 +36,9 @@ class CEDWissen {
   static String? _stringOrNull(dynamic value) => value is String ? value : null;
 
   static DateTime? _dateTimeOrNull(dynamic value) {
+    if (value is Timestamp) {
+      return value.toDate();
+    }
     if (value is DateTime) {
       return value;
     }

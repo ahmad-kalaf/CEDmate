@@ -8,7 +8,7 @@ class AppUser {
   /// Hinterlegte Login-E-Mail des Nutzers.
   final String email;
 
-  /// Öffentlicher, eindeutiger Benutzername.
+  /// Benutzername im privaten Benutzerprofil.
   final String username;
 
   /// Optionaler Anzeigename, der zusätzlich sichtbar sein kann.
@@ -32,11 +32,15 @@ class AppUser {
   /// Erzeugt ein AppUser-Objekt aus einer Map, die aus Firestore geladen wurde.
   /// Die UID wird separat übergeben, da sie nicht in der Map gespeichert ist.
   factory AppUser.fromMap(String uid, Map<String, dynamic> data) {
+    final email = data['email']?.toString() ?? '';
+    final fallbackUsername = email.contains('@')
+        ? email.split('@').first
+        : email;
     return AppUser(
       uid: uid,
-      email: data['email'] as String,
-      username: data['username'] as String,
-      displayName: data['displayName'] as String?,
+      email: email,
+      username: data['username']?.toString() ?? fallbackUsername,
+      displayName: data['displayName']?.toString(),
     );
   }
 }

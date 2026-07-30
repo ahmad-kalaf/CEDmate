@@ -1,6 +1,7 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 import '../models/anamnese.dart';
 import '../repositories/anamnese_repository.dart';
+import 'auth_service.dart';
 
 /// Fehlerklasse für lesbare Fehlermeldungen aus der Business-Logik.
 class AnamneseFailure implements Exception {
@@ -16,10 +17,9 @@ class AnamneseFailure implements Exception {
 /// - Fängt Repository-Fehler ab und wirft eigene Exception
 class AnamneseService {
   final AnamneseRepository _repo;
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
-  static const String _demoUid = 'demo-user';
+  final AuthService _auth;
 
-  AnamneseService(this._repo);
+  AnamneseService(this._repo, this._auth);
 
   // ------------------------------------------------------------
   // 1) Anamnese speichern
@@ -29,9 +29,7 @@ class AnamneseService {
       throw AnamneseFailure('Bitte ein gültiges Alter eingeben (1–200).');
     }
 
-    // final uid = _auth.currentUser?.uid;
-    // if (uid == null) throw AnamneseFailure('Kein Benutzer angemeldet.');
-    const uid = _demoUid;
+    final uid = _auth.currentUserId;
 
     try {
       await _repo.speichereAnamnese(uid: uid, anamneseDaten: anamnese.toMap());
@@ -43,9 +41,7 @@ class AnamneseService {
   /// Anamnese einmalig laden
   /// Gibt `null` zurück, wenn keine Anamnese-Daten vorhanden sind.
   Future<Anamnese?> ladeAnamnese() async {
-    // final uid = _auth.currentUser?.uid;
-    // if (uid == null) throw AnamneseFailure('Kein Benutzer angemeldet.');
-    const uid = _demoUid;
+    final uid = _auth.currentUserId;
 
     try {
       final data = await _repo.ladeAnamnese(uid: uid);
@@ -58,12 +54,7 @@ class AnamneseService {
   /// Anamnese live beobachten
   /// Gibt `null` zurück, wenn keine Anamnese-Daten vorhanden sind.
   Stream<Anamnese?> beobachteAnamnese() {
-    // final uid = _auth.currentUser?.uid;
-    // if (uid == null) {
-    //   // Fehler als Stream-Ereignis
-    //   return Stream.error(AnamneseFailure('Kein Benutzer angemeldet.'));
-    // }
-    const uid = _demoUid;
+    final uid = _auth.currentUserId;
 
     return _repo.beobachteAnamnese(uid: uid).map((data) {
       if (data == null) return null;

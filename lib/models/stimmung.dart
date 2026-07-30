@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 /// Modell für einen Stimmungseintrag im SeelenLog.
 class Stimmung {
   final String? id;
@@ -34,7 +36,7 @@ class Stimmung {
       'id': id,
       'stimmungsLevel': level,
       'stresslevel': stresslevel,
-      'stimmungsZeitpunkt': stimmungsZeitpunkt.toIso8601String(),
+      'stimmungsZeitpunkt': Timestamp.fromDate(stimmungsZeitpunkt),
     };
 
     if (notiz != null && notiz!.trim().isNotEmpty) {
@@ -67,6 +69,7 @@ class Stimmung {
   }
 
   static DateTime _parseZeit(dynamic v) {
+    if (v is Timestamp) return v.toDate();
     if (v is DateTime) return v;
     if (v is String) return DateTime.tryParse(v) ?? DateTime.now();
     return DateTime.now();

@@ -1,4 +1,4 @@
-// import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/app_user.dart';
 import '../repositories/auth_repository.dart';
@@ -12,15 +12,13 @@ class AuthFailure implements Exception {
   String toString() => message;
 }
 
-/// Service-Schicht für Authentifizierung:
+/// Anwendungslogik für E-Mail-/Passwort-Authentifizierung.
 class AuthService {
   final AuthRepository _repo;
 
   AuthService(this._repo);
 
-  // ---------- Eingabe-Validierungen ----------
   void _validateUsername(String username) {
-    // Richtlinie: 3–20 Zeichen, Buchstaben/Ziffern/Unterstrich, muss mit Buchstabe/Ziffer beginnen
     final ok = RegExp(r'^[A-Za-z0-9][A-Za-z0-9_]{2,19}$').hasMatch(username);
     if (!ok) {
       throw AuthFailure(
@@ -40,19 +38,8 @@ class AuthService {
     }
   }
 
-  // ---------- Anwendungsfälle ----------
+  Stream<AppUser?> userStream() => _repo.authStateChanges();
 
-  /// Stream zum Zugriff auf aktuelle Userdaten
-  Stream<AppUser?> userStream() {
-    return _repo.authStateChanges().asyncMap((user) async {
-      if (user == null) {
-        return null;
-      }
-      return await _repo.ladeUser(user.uid);
-    });
-  }
-
-  // User? get currentUser => _repo.currentUser;
   AppUser? get currentUser => _repo.currentUser;
 
   String get currentUserId {
@@ -69,114 +56,97 @@ class AuthService {
     required String password,
     String? displayName,
   }) async {
-    _validateUsername(username);
-    _validateEmail(email);
+    _validateUsername(username.trim());
+    _validateEmail(email.trim());
     _validatePassword(password);
 
     try {
       final user = await _repo.signUpWithUsernameEmail(
-        username: username,
-        email: email,
+        username: username.trim(),
+        email: email.trim(),
         password: password,
         displayName: displayName,
       );
-      await _repo.sendEmailVerification(); // optional
+      try {
+        await _repo.sendEmailVerification();
+      } on FirebaseAuthException {
+        // Das Konto ist bereits erstellt; die Verifizierung ist optional.
+      }
       return user;
-    } catch (e) {
-      throw AuthFailure(_mapError(e));
+    } catch (error) {
+      throw AuthFailure(_mapError(error));
     }
   }
 
+  Future<AppUser> loginWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    _validateEmail(email.trim());
+    if (password.isEmpty) {
+      throw AuthFailure('Passwort darf nicht leer sein.');
+    }
+
+    try {
+      return await _repo.signInWithEmail(
+        email: email.trim(),
+        password: password,
+      );
+    } catch (error) {
+      throw AuthFailure(_mapError(error));
+    }
+  }
+
+  /// Bestehende API bleibt erhalten; der Wert muss nun eine E-Mail sein.
   Future<AppUser> loginWithUsername({
     required String username,
     required String password,
-  }) async {
-    _validateUsername(username);
-    if (password.isEmpty) throw AuthFailure('Passwort darf nicht leer sein.');
+  }) {
+    return loginWithEmail(email: username, password: password);
+  }
+
+  /// Sendet den Reset-Link direkt an die angegebene Login-E-Mail.
+  Future<void> sendPasswordReset(String email) async {
+    _validateEmail(email.trim());
     try {
-      return await _repo.signInWithUsername(
-        username: username,
-        password: password,
-      );
-    } catch (e) {
-      throw AuthFailure(_mapError(e));
+      await _repo.sendPasswordResetEmail(email.trim());
+    } catch (error) {
+      throw AuthFailure(_mapError(error));
     }
   }
-
-  Future<void> sendPasswordReset(String username) async {
-    _validateUsername(username);
-    await _repo.sendPasswordResetEmailByUsername(username);
-  }
-  // Future<void> sendPasswordReset(String username) async {
-  //   _validateUsername(username);
-
-  //   try {
-  //     await _repo.sendPasswordResetEmailByUsername(username);
-  //   } on FirebaseAuthException catch (e) {
-  //     switch (e.code) {
-  //       case 'invalid-email':
-  //         throw AuthFailure('Ungültige E-Mail-Adresse.');
-  //       case 'user-not-found':
-  //         throw AuthFailure('Kein Benutzer mit diesem Namen gefunden.');
-  //       case 'missing-email':
-  //         throw AuthFailure('E-Mail-Adresse fehlt im Profil.');
-  //       case 'network-request-failed':
-  //         throw AuthFailure('Netzwerkfehler. Bitte Internetverbindung prüfen.');
-  //       default:
-  //         throw AuthFailure(
-  //           'Fehler beim Senden der E-Mail: ${e.message ?? e.code}',
-  //         );
-  //     }
-  //   } catch (_) {
-  //     throw AuthFailure('Unbekannter Fehler beim Passwort-Reset.');
-  //   }
-  // }
 
   Future<void> logout() => _repo.signOut();
 
-  /// Praktischer Stream für AuthGate: true = eingeloggt, false = nicht
-  Stream<bool> isLoggedInStream() =>
-      _repo.authStateChanges().map((u) => u != null);
+  Stream<bool> isLoggedInStream() => _repo.signedInChanges();
 
-  /// Stream für AuthGate: true = E-Mail bestätigt, sonst false
-  // Future<bool> isEmailVerified() async {
-  //   final user = _repo.currentUser;
-  //   if (user == null) return false;
-  //   await user.reload(); // 🔥 Hier wird der Zustand aus Firebase neu geholt
-  //   return user.emailVerified;
-  // }
-  Future<bool> isEmailVerified() async {
-    return true;
-  }
+  Future<bool> isEmailVerified() => _repo.isEmailVerified();
 
-  // Stream<bool> isEmailVerifiedStream() async* {
-  //   await for (final u in _repo.authStateChanges()) {
-  //     if (u == null) {
-  //       yield false;
-  //     } else {
-  //       await u.reload(); // <-- wichtig, sonst alter Zustand!
-  //       yield u.emailVerified;
-  //     }
-  //   }
-  // }
-  Stream<bool> isEmailVerifiedStream() {
-    return Stream.value(true);
-  }
+  Stream<bool> isEmailVerifiedStream() => _repo.emailVerifiedChanges();
 
-  // ---------- Fehlermapping (Firebase → deutsche Texte) ----------
-  String _mapError(Object e) {
-    final s = e.toString();
-    if (s.contains('username-taken')) {
-      return 'Benutzername ist bereits vergeben.';
+  String _mapError(Object error) {
+    final code = error is FirebaseAuthException ? error.code : '';
+    switch (code) {
+      case 'invalid-email':
+        return 'Ungültige E-Mail-Adresse.';
+      case 'user-not-found':
+      case 'wrong-password':
+      case 'invalid-credential':
+        return 'E-Mail oder Passwort ist falsch.';
+      case 'email-already-in-use':
+        return 'E-Mail wird bereits verwendet.';
+      case 'weak-password':
+        return 'Das Passwort ist zu schwach.';
+      case 'operation-not-allowed':
+        return 'E-Mail-/Passwort-Anmeldung ist nicht aktiviert.';
+      case 'network-request-failed':
+        return 'Netzwerkfehler. Bitte Internetverbindung prüfen.';
+      case 'too-many-requests':
+        return 'Zu viele Versuche. Bitte später erneut.';
     }
-    if (s.contains('invalid-email')) return 'Ungültige E-Mail-Adresse.';
-    if (s.contains('user-not-found')) return 'Benutzer nicht gefunden.';
-    if (s.contains('wrong-password')) return 'Falsches Passwort.';
-    if (s.contains('email-already-in-use')) {
-      return 'E-Mail wird bereits verwendet.';
-    }
-    if (s.contains('too-many-requests')) {
-      return 'Zu viele Versuche. Bitte später erneut.';
+
+    final text = error.toString();
+    if (text.contains('permission-denied')) {
+      return 'Keine Berechtigung zum Speichern des Benutzerprofils.';
     }
     return 'Anmeldung fehlgeschlagen. Bitte später erneut versuchen.';
   }

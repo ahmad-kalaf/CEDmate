@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 /// Modell für ein einzelnes Symptom im SymptomRadar.
 /// Enthält Bezeichnung, Intensität, Startzeit, Dauer sowie optionale Notizen.
 /// Das Modell ist unveränderlich und vollständig Firestore-kompatibel.
@@ -37,7 +39,7 @@ class Symptom {
       id: id ?? (data['id'] as String?),
       bezeichnung: data['bezeichnung'] as String,
       intensitaet: data['intensitaet'] as int,
-      startZeit: DateTime.tryParse(data['startZeit'] ?? '') ?? DateTime.now(),
+      startZeit: _parseZeitstempel(data['startZeit']),
       dauerInMinuten: data['dauerInMinuten'] as int,
       notizen: (data['notizen'] as String?)?.isEmpty == true
           ? null
@@ -51,7 +53,7 @@ class Symptom {
     final map = <String, dynamic>{
       'bezeichnung': bezeichnung,
       'intensitaet': intensitaet,
-      'startZeit': startZeit.toIso8601String(),
+      'startZeit': Timestamp.fromDate(startZeit),
       'dauerInMinuten': dauerInMinuten,
     };
 
@@ -60,5 +62,14 @@ class Symptom {
     }
 
     return map;
+  }
+
+  static DateTime _parseZeitstempel(dynamic value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) {
+      return DateTime.tryParse(value) ?? DateTime.now();
+    }
+    return DateTime.now();
   }
 }

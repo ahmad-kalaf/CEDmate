@@ -1,108 +1,91 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:cedmate/models/mahlzeit.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MahlzeitRepository {
-  // final FirebaseFirestore _firestore;
+  final FirebaseFirestore _firestore;
 
-  // MahlzeitRepository({FirebaseFirestore? firestore})
-  //   : _firestore = firestore ?? FirebaseFirestore.instance;
+  MahlzeitRepository({FirebaseFirestore? firestore})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  // CollectionReference<Map<String, dynamic>> _collectionReference(
-  //   String userId,
-  // ) => _firestore.collection('users').doc(userId).collection('mahlzeiten');
+  CollectionReference<Map<String, dynamic>> _collection(String userId) =>
+      _firestore.collection('users').doc(userId).collection('mahlzeiten');
 
   Future<String> add(String userId, Mahlzeit eintrag) async {
-    // final ref = await _collectionReference(userId).add(eintrag.toMap());
-    // return ref.id;
-    return Future.value(''); // Platzhalter, da Firestore nicht importiert ist
+    final document = await _collection(userId).add(_data(eintrag));
+    return document.id;
   }
 
   Stream<List<Mahlzeit>> getAll(String userId) {
-    // return _collectionReference(userId)
-    //     .orderBy('mahlzeitZeitpunkt', descending: true)
-    //     .snapshots()
-    //     .map(
-    //       (snapshot) =>
-    //           snapshot.docs.map((e) => Mahlzeit.fromFirestore(e)).toList(),
-    //     );
-    return Stream.value([]); // Platzhalter, da Firestore nicht importiert ist
+    return _collection(userId).snapshots().map((snapshot) {
+      final entries = snapshot.docs
+          .map((document) => Mahlzeit.fromMap(document.data(), id: document.id))
+          .toList();
+      entries.sort(
+        (a, b) => b.mahlzeitZeitpunkt.compareTo(a.mahlzeitZeitpunkt),
+      );
+      return entries;
+    });
   }
 
-  /// Stream aller Mahlzeiten eines Monats (neueste zuerst).
   Stream<List<Mahlzeit>> getByMonthYear(String userId, int month, int year) {
-    // assert(month >= 1 && month <= 12);
-    // final start = DateTime(year, month, 1);
-    // final end = (month == 12)
-    //     ? DateTime(year + 1, 1, 1)
-    //     : DateTime(year, month + 1, 1);
-
-    // return _collectionReference(userId)
-    //     .where(
-    //       'mahlzeitZeitpunkt',
-    //       isGreaterThanOrEqualTo: Timestamp.fromDate(start),
-    //     )
-    //     .where('mahlzeitZeitpunkt', isLessThan: Timestamp.fromDate(end))
-    //     .orderBy('mahlzeitZeitpunkt', descending: true)
-    //     .snapshots()
-    //     .map(
-    //       (snapshot) =>
-    //           snapshot.docs.map((doc) => Mahlzeit.fromFirestore(doc)).toList(),
-    //     );
-    return Stream.value([]); // Platzhalter, da Firestore nicht importiert ist
+    assert(month >= 1 && month <= 12);
+    return getAll(userId).map(
+      (entries) => entries
+          .where(
+            (entry) =>
+                entry.mahlzeitZeitpunkt.year == year &&
+                entry.mahlzeitZeitpunkt.month == month,
+          )
+          .toList(),
+    );
   }
 
-  /// Stream aller Mahlzeiten eines Datums (neueste zuerst).
   Stream<List<Mahlzeit>> getByDate(String userId, DateTime date) {
-    // final start = DateTime(date.year, date.month, date.day);
-    // final end = start.add(const Duration(days: 1));
-
-    // return _collectionReference(userId)
-    //     .where(
-    //       'mahlzeitZeitpunkt',
-    //       isGreaterThanOrEqualTo: Timestamp.fromDate(start),
-    //     )
-    //     .where('mahlzeitZeitpunkt', isLessThan: Timestamp.fromDate(end))
-    //     .orderBy('mahlzeitZeitpunkt', descending: true)
-    //     .snapshots()
-    //     .map(
-    //       (snapshot) =>
-    //           snapshot.docs.map((doc) => Mahlzeit.fromFirestore(doc)).toList(),
-    //     );
-    return Stream.value([]); // Platzhalter, da Firestore nicht importiert ist
+    return getAll(userId).map(
+      (entries) => entries
+          .where((entry) => _isSameDate(entry.mahlzeitZeitpunkt, date))
+          .toList(),
+    );
   }
 
-  /// Einzelne Mahlzeit per Dokument-ID.
   Future<Mahlzeit?> getById(String userId, String id) async {
-    // final doc = await _collectionReference(userId).doc(id).get();
-    // if (!doc.exists) return null;
-    // return Mahlzeit.fromFirestore(doc);
-    return Future.value(null); // Platzhalter, da Firestore nicht importiert ist
+    final document = await _collection(userId).doc(id).get();
+    final data = document.data();
+    return data == null ? null : Mahlzeit.fromMap(data, id: document.id);
   }
 
-  /// Aktualisiert eine bestehende Mahlzeit.
-  Future<void> update(String userId, String id, Mahlzeit mahlzeit) async {
-    // await _collectionReference(userId).doc(id).update(mahlzeit.toMap());
+  Future<void> update(String userId, String id, Mahlzeit mahlzeit) {
+    final data = _data(mahlzeit);
+    if (mahlzeit.zutaten?.isNotEmpty != true) {
+      data['zutaten'] = FieldValue.delete();
+    }
+    if (mahlzeit.notiz?.trim().isNotEmpty != true) {
+      data['notizen'] = FieldValue.delete();
+    }
+    if (mahlzeit.unvertraeglichkeiten?.isNotEmpty != true) {
+      data['unvertraeglichkeiten'] = FieldValue.delete();
+    }
+    return _collection(userId).doc(id).update(data);
   }
 
-  /// Löscht eine Mahlzeit.
-  Future<void> delete(String userId, String id) async {
-    // await _collectionReference(userId).doc(id).delete();
+  Future<void> delete(String userId, String id) {
+    return _collection(userId).doc(id).delete();
   }
 
-  /// Anzahl der Einträge für einen Benutzer an einem bestimmten Datum zählen
   Future<int> zaehleEintraegeFuerDatum(String userId, DateTime date) async {
-    // final start = DateTime(date.year, date.month, date.day);
-    // final ende = DateTime(date.year, date.month, date.day + 1);
-
-    // final snapshot = await _collectionReference(userId)
-    //     .where(
-    //       'mahlzeitZeitpunkt',
-    //       isGreaterThanOrEqualTo: Timestamp.fromDate(start),
-    //     )
-    //     .where('mahlzeitZeitpunkt', isLessThan: Timestamp.fromDate(ende))
-    //     .get();
-
-    // return snapshot.size;
-    return Future.value(0); // Platzhalter, da Firestore nicht importiert ist
+    final snapshot = await _collection(userId).get();
+    return snapshot.docs
+        .map((document) => Mahlzeit.fromMap(document.data(), id: document.id))
+        .where((entry) => _isSameDate(entry.mahlzeitZeitpunkt, date))
+        .length;
   }
+
+  Map<String, dynamic> _data(Mahlzeit mahlzeit) =>
+      Map<String, dynamic>.from(mahlzeit.toMap())..remove('id');
+
+  bool _isSameDate(DateTime first, DateTime second) =>
+      first.year == second.year &&
+      first.month == second.month &&
+      first.day == second.day;
 }

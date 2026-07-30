@@ -1,5 +1,6 @@
 import 'package:cedmate/models/enums/diagnose.dart';
 import 'package:cedmate/models/enums/gender.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Modell für die Anamnese eines Nutzers.
 /// Enthält grundlegende medizinische Angaben, die beim Erstellen eines Profils
@@ -50,7 +51,7 @@ class Anamnese {
   /// Wandelt das Objekt in eine Map um, sodass es in Firestore gespeichert werden kann.
   /// Enums werden als String abgelegt und das Datum als Firestore-Timestamp.
   Map<String, dynamic> toMap() => {
-    'geburtsdatum': geburtsdatum.toIso8601String(),
+    'geburtsdatum': Timestamp.fromDate(geburtsdatum),
     'gender': gender.name,
     'diagnose': diagnose.name,
     'symptomeImSchub': symptomeImSchub,
@@ -62,8 +63,7 @@ class Anamnese {
   /// Enthält defensive Programmierung gegen ungültige oder unerwartete Werte.
   factory Anamnese.fromMap(Map<String, dynamic> data) {
     return Anamnese(
-      geburtsdatum:
-          DateTime.tryParse(data['geburtsdatum'] ?? '') ?? DateTime(2000, 1, 1),
+      geburtsdatum: _parseDatum(data['geburtsdatum']),
 
       // Falls der Enum-Wert nicht gefunden wird, wird ein Standardwert gesetzt.
       gender: Gender.values.firstWhere(
@@ -83,5 +83,14 @@ class Anamnese {
         data['weitereErkrankungen'] ?? const [],
       ),
     );
+  }
+
+  static DateTime _parseDatum(dynamic value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) {
+      return DateTime.tryParse(value) ?? DateTime(2000, 1, 1);
+    }
+    return DateTime(2000, 1, 1);
   }
 }

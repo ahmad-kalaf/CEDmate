@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
-import '../../models/app_user.dart';
 
 /// Ein einziges Formular für Login + Registrierung.
 /// Umschaltbar mit _isLogin: true = Login, false = Registrieren.
-/// - Login nutzt Benutzername + Passwort.
-/// - Registrierung benötigt zusätzlich E-Mail (für Firebase Auth).
+/// - Login nutzt E-Mail + Passwort.
+/// - Bei der Registrierung wird zusätzlich ein Benutzername gespeichert.
 class AuthForm extends StatefulWidget {
   const AuthForm({super.key});
   @override
@@ -32,17 +31,11 @@ class _AuthFormState extends State<AuthForm> {
     final auth = context.read<AuthService>();
 
     try {
-      // ignore: unused_local_variable
-      AppUser user;
       if (_isLogin) {
-        // LOGIN: Benutzername + Passwort
-        user = await auth.loginWithUsername(
-          username: _username,
-          password: _password,
-        );
+        await auth.loginWithEmail(email: _email, password: _password);
       } else {
         // REGISTRIERUNG: Benutzername + E-Mail + Passwort (+ optional Anzeige)
-        user = await auth.register(
+        await auth.register(
           username: _username,
           email: _email,
           password: _password,
@@ -50,18 +43,15 @@ class _AuthFormState extends State<AuthForm> {
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Bestätigungs-E-Mail gesendet.')),
+            const SnackBar(content: Text('Registrierung erfolgreich.')),
           );
         }
       }
-
-      // Weiter zur Home-Seite
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
     } catch (e) {
       // Nutzerfreundliche Fehlermeldung anzeigen
-      setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
+      if (mounted) {
+        setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -84,36 +74,39 @@ class _AuthFormState extends State<AuthForm> {
                 spacing: 10,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Benutzername (immer)
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Benutzername',
-                    ),
-                    validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Benutzername angeben'
-                        : null,
-                    onChanged: (v) => _username = v,
-                    onSaved: (v) => _username = (v ?? ''),
-                    onFieldSubmitted: (_) => _submit(),
-                  ),
-                  // E-Mail nur bei Registrierung
+                  // Benutzername ist ausschließlich Teil des Profils.
                   if (!_isLogin)
                     TextFormField(
-                      decoration: const InputDecoration(labelText: 'E-Mail'),
-                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Benutzername',
+                      ),
                       validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'E-Mail angeben'
+                          ? 'Benutzername angeben'
                           : null,
-                      onChanged: (v) => _email = v,
-                      onSaved: (v) => _email = (v ?? ''),
+                      onChanged: (v) => _username = v,
+                      onSaved: (v) => _username = (v ?? ''),
                       onFieldSubmitted: (_) => _submit(),
                     ),
+                  // E-Mail ist für Login, Registrierung und Reset erforderlich.
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: 'E-Mail'),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'E-Mail angeben'
+                        : null,
+                    onChanged: (v) => _email = v,
+                    onSaved: (v) => _email = (v ?? ''),
+                    onFieldSubmitted: (_) => _submit(),
+                  ),
                   // Passwort (immer)
                   TextFormField(
                     decoration: const InputDecoration(labelText: 'Passwort'),
                     obscureText: true,
-                    validator: (v) =>
-                        (v == null || v.length < 8) ? 'Mind. 8 Zeichen' : null,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Passwort angeben';
+                      if (!_isLogin && v.length < 8) return 'Mind. 8 Zeichen';
+                      return null;
+                    },
                     onChanged: (v) => _password = v,
                     onSaved: (v) => _password = (v ?? ''),
                     onFieldSubmitted: (_) => _submit(),
@@ -146,6 +139,10 @@ class _AuthFormState extends State<AuthForm> {
                   TextButton(
                     onPressed: () => setState(() {
                       _isLogin = !_isLogin;
+                      _username = '';
+                      _email = '';
+                      _password = '';
+                      _displayName = '';
                       _formKey.currentState?.reset();
                     }),
                     child: Text(
@@ -155,37 +152,33 @@ class _AuthFormState extends State<AuthForm> {
                     ),
                   ),
 
-                  // Passwort-Reset: per Benutzername
+                  // Passwort-Reset: direkt per E-Mail
                   if (_isLogin)
                     TextButton(
                       onPressed: () async {
-                        if (_username.isEmpty) {
+                        if (_email.trim().isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                'Bitte oben Benutzername eingeben.',
-                              ),
+                              content: Text('Bitte oben E-Mail eingeben.'),
                             ),
                           );
                           return;
                         }
                         try {
-                          await auth.sendPasswordReset(_username);
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Passwort-Reset-E-Mail wurde gesendet.',
-                                ),
+                          await auth.sendPasswordReset(_email);
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Passwort-Reset-E-Mail wurde gesendet.',
                               ),
-                            );
-                          }
+                            ),
+                          );
                         } on AuthFailure catch (e) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(SnackBar(content: Text(e.message)));
-                          }
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(e.message)));
                         }
                       },
                       child: const Text('Passwort vergessen?'),

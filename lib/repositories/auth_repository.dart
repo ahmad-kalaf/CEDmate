@@ -1,167 +1,49 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import '../models/app_user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-// /// GREIFT AUF FIREBASE ZU (Auth + Firestore)
-// /// - keine UI-Logik, keine Validierung (das macht der Service)
-// class AuthRepository {
-//   final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase Auth SDK
-//   final FirebaseFirestore _db = FirebaseFirestore.instance; // Firestore SDK
-
-//   /// Stream liefert null/nicht-null je nach Login-Status
-//   Stream<User?> authStateChanges() => _auth.authStateChanges();
-
-//   /// 🔹 Aktuell eingeloggter Benutzer (kann null sein)
-//   User? get currentUser => _auth.currentUser;
-
-//   /// Registrierung:
-//   /// 1) Username atomar reservieren (Dokument `usernames/{username}` anlegen).
-//   /// 2) Auth-Account via E-Mail/Passwort anlegen.
-//   /// 3) Profil unter `users/{uid}` schreiben.
-//   /// -> Alles in einer Firestore-Transaktion, um Race-Conditions zu vermeiden.
-//   Future<AppUser> signUpWithUsernameEmail({
-//     required String username,
-//     required String email,
-//     required String password,
-//     String? displayName,
-//   }) async {
-//     return _db.runTransaction<AppUser>((tx) async {
-//       final unameRef = _db.collection('usernames').doc(username);
-
-//       // Prüfen, ob der Benutzername frei ist (innerhalb der Transaktion)
-//       final unameSnap = await tx.get(unameRef);
-//       if (unameSnap.exists) {
-//         // Wirf speziellen Fehler-String; Service mappt ihn später in User-Text.
-//         throw FirebaseException(plugin: 'firestore', message: 'username-taken');
-//       }
-
-//       // Firebase Auth Benutzer anlegen
-//       final cred = await _auth.createUserWithEmailAndPassword(
-//         email: email,
-//         password: password,
-//       );
-//       final uid = cred.user!.uid;
-
-//       // Optionalen Anzeigenamen im Auth-Profil setzen (nur kosmetisch)
-//       if (displayName != null && displayName.isNotEmpty) {
-//         await cred.user!.updateDisplayName(displayName);
-//       }
-
-//       // Domänenobjekt vorbereiten
-//       final appUser = AppUser(
-//         uid: uid,
-//         email: email,
-//         username: username,
-//         displayName: displayName,
-//       );
-
-//       // Firestore: Username-Mapping + Benutzerprofil schreiben (atomar)
-//       tx.set(unameRef, {'uid': uid, 'email': email});
-//       tx.set(
-//         _db.collection('users').doc(uid),
-//         appUser.toMap(),
-//         SetOptions(merge: true),
-//       );
-
-//       return appUser;
-//     });
-//   }
-
-//   /// Login mit Benutzername:
-//   /// 1) `usernames/{username}` lesen → email/uid ermitteln
-//   /// 2) Mit E-Mail/Passwort via Firebase Auth einloggen
-//   /// 3) Profil `users/{uid}` laden (falls neu, minimal anlegen)
-//   Future<AppUser> signInWithUsername({
-//     required String username,
-//     required String password,
-//   }) async {
-//     final unameRef = _db.collection('usernames').doc(username);
-//     final unameSnap = await unameRef.get();
-//     if (!unameSnap.exists) {
-//       throw FirebaseException(plugin: 'firestore', message: 'user-not-found');
-//     }
-
-//     final data = unameSnap.data()!;
-//     final email = (data['email'] as String).trim();
-
-//     // Authentifizieren
-//     final cred = await _auth.signInWithEmailAndPassword(
-//       email: email,
-//       password: password,
-//     );
-//     final uid = cred.user!.uid;
-
-//     // Profil laden oder minimal erzeugen
-//     final userDoc = _db.collection('users').doc(uid);
-//     final userSnap = await userDoc.get();
-//     if (userSnap.exists) {
-//       return AppUser.fromMap(uid, userSnap.data()!);
-//     } else {
-//       final fallback = AppUser(
-//         uid: uid,
-//         email: email,
-//         username: username,
-//         displayName: cred.user!.displayName,
-//       );
-//       await userDoc.set(fallback.toMap(), SetOptions(merge: true));
-//       return fallback;
-//     }
-//   }
-
-//   /// E-Mail mit Verifizierungslink schicken (optional nach Registrierung)
-//   Future<void> sendEmailVerification() async {
-//     final u = _auth.currentUser;
-//     if (u != null && !u.emailVerified) {
-//       await u.sendEmailVerification();
-//     }
-//   }
-
-//   /// Passwort-Reset über Benutzername:
-//   /// - holt E-Mail aus `usernames/{username}` und triggert Reset-Mail
-//   Future<void> sendPasswordResetEmailByUsername(String username) async {
-//     final snap = await _db.collection('usernames').doc(username).get();
-
-//     if (!snap.exists) {
-//       // Benutzername unbekannt → explizit Fehler werfen
-//       throw FirebaseAuthException(
-//         code: 'user-not-found',
-//         message: 'Kein Benutzer mit diesem Namen gefunden.',
-//       );
-//     }
-
-//     final email = (snap.data()?['email'] as String?)?.trim();
-//     if (email == null || email.isEmpty) {
-//       throw FirebaseAuthException(
-//         code: 'missing-email',
-//         message: 'E-Mail-Adresse im Profil fehlt.',
-//       );
-//     }
-
-//     // Diese Methode kann selbst FirebaseAuthExceptions werfen (z. B. user-not-found)
-//     await _auth.sendPasswordResetEmail(email: email);
-//   }
-
-//   /// Abmelden
-//   Future<void> signOut() => _auth.signOut();
-
-//   Future<AppUser?> ladeUser(String uid) async {
-//     final snap = await _db.collection('users').doc(uid).get();
-//     if (!snap.exists) {
-//       return null;
-//     }
-//     return AppUser.fromMap(uid, snap.data()!);
-//   }
-// }
 import '../models/app_user.dart';
 
+/// Zugriffsschicht für Firebase Authentication und Benutzerprofile.
 class AuthRepository {
-  AppUser? _currentUser;
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
+  AppUser? _currentProfile;
+
+  AuthRepository({FirebaseAuth? auth, FirebaseFirestore? firestore})
+    : _auth = auth ?? FirebaseAuth.instance,
+      _firestore = firestore ?? FirebaseFirestore.instance;
+
+  DocumentReference<Map<String, dynamic>> _userDocument(String uid) =>
+      _firestore.collection('users').doc(uid);
 
   Stream<AppUser?> authStateChanges() {
-    return Stream.value(_currentUser);
+    return _auth.userChanges().asyncMap((firebaseUser) async {
+      if (firebaseUser == null) {
+        _currentProfile = null;
+        return null;
+      }
+
+      final profile = await _loadProfile(firebaseUser);
+      _currentProfile = profile;
+      return profile;
+    });
   }
 
-  AppUser? get currentUser => _currentUser;
+  Stream<bool> signedInChanges() {
+    return _auth.authStateChanges().map((user) => user != null);
+  }
+
+  AppUser? get currentUser {
+    final firebaseUser = _auth.currentUser;
+    if (firebaseUser == null) {
+      _currentProfile = null;
+      return null;
+    }
+    if (_currentProfile?.uid == firebaseUser.uid) {
+      return _currentProfile;
+    }
+    return _fallbackProfile(firebaseUser);
+  }
 
   Future<AppUser> signUpWithUsernameEmail({
     required String username,
@@ -169,49 +51,181 @@ class AuthRepository {
     required String password,
     String? displayName,
   }) async {
-    _currentUser = AppUser(
-      uid: 'demo-user',
-      email: email,
-      username: username,
-      displayName: displayName,
+    final normalizedUsername = username.trim();
+    final normalizedEmail = email.trim();
+    final normalizedDisplayName = displayName?.trim();
+    final credential = await _auth.createUserWithEmailAndPassword(
+      email: normalizedEmail,
+      password: password,
     );
+    final firebaseUser = credential.user;
+    if (firebaseUser == null) {
+      throw StateError('Firebase hat keinen Benutzer zurückgegeben.');
+    }
 
-    return _currentUser!;
+    final profile = AppUser(
+      uid: firebaseUser.uid,
+      email: firebaseUser.email ?? normalizedEmail,
+      username: normalizedUsername,
+      displayName: normalizedDisplayName?.isEmpty == true
+          ? null
+          : normalizedDisplayName,
+    );
+    final userDocument = _userDocument(firebaseUser.uid);
+    var profileWritten = false;
+
+    try {
+      await userDocument.set(profile.toMap());
+      profileWritten = true;
+      await firebaseUser.updateDisplayName(
+        profile.displayName ?? profile.username,
+      );
+      _currentProfile = profile;
+      return profile;
+    } catch (_) {
+      if (profileWritten) {
+        try {
+          await userDocument.delete();
+        } catch (_) {
+          // Der ursprüngliche Fehler bleibt maßgeblich.
+        }
+      }
+      try {
+        await firebaseUser.delete();
+      } catch (_) {
+        // Der ursprüngliche Fehler bleibt maßgeblich.
+      }
+      try {
+        await _auth.signOut();
+      } catch (_) {
+        // Der ursprüngliche Fehler bleibt maßgeblich.
+      }
+      _currentProfile = null;
+      rethrow;
+    }
   }
 
+  Future<AppUser> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    var authenticated = false;
+    try {
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+      authenticated = true;
+      final firebaseUser = credential.user;
+      if (firebaseUser == null) {
+        throw StateError('Firebase hat keinen Benutzer zurückgegeben.');
+      }
+
+      final snapshot = await _userDocument(firebaseUser.uid).get();
+      final profile = snapshot.exists
+          ? _profileFromData(firebaseUser, snapshot.data()!)
+          : _fallbackProfile(firebaseUser);
+
+      if (!snapshot.exists) {
+        await _userDocument(firebaseUser.uid).set(profile.toMap());
+      }
+
+      _currentProfile = profile;
+      return profile;
+    } catch (_) {
+      if (authenticated) {
+        try {
+          await _auth.signOut();
+          _currentProfile = null;
+        } catch (_) {
+          // Der ursprüngliche Fehler bleibt maßgeblich.
+        }
+      }
+      rethrow;
+    }
+  }
+
+  /// Kompatibler Wrapper: Der Parameter enthält jetzt die Login-E-Mail.
   Future<AppUser> signInWithUsername({
     required String username,
     required String password,
-  }) async {
-    _currentUser = AppUser(
-      uid: 'demo-user',
-      email: '$username@example.com',
-      username: username,
-      displayName: username,
-    );
-
-    return _currentUser!;
+  }) {
+    return signInWithEmail(email: username, password: password);
   }
 
   Future<void> sendEmailVerification() async {
-    // Firebase entfernt: nichts tun
+    final firebaseUser = _auth.currentUser;
+    if (firebaseUser != null && !firebaseUser.emailVerified) {
+      await firebaseUser.sendEmailVerification();
+    }
   }
 
-  Future<void> sendPasswordResetEmailByUsername(String username) async {
-    // Firebase entfernt: nichts tun
+  Future<void> sendPasswordResetEmail(String email) {
+    return _auth.sendPasswordResetEmail(email: email.trim());
+  }
+
+  /// Kompatibler Wrapper: Der Parameter enthält jetzt die Login-E-Mail.
+  Future<void> sendPasswordResetEmailByUsername(String username) {
+    return sendPasswordResetEmail(username);
   }
 
   Future<void> signOut() async {
-    _currentUser = null;
+    await _auth.signOut();
+    _currentProfile = null;
   }
 
   Future<AppUser?> ladeUser(String uid) async {
-    return _currentUser ??
-        AppUser(
-          uid: 'demo-user',
-          email: 'demo@example.com',
-          username: 'demo',
-          displayName: 'Demo User',
-        );
+    final snapshot = await _userDocument(uid).get();
+    if (!snapshot.exists) {
+      final firebaseUser = _auth.currentUser;
+      return firebaseUser?.uid == uid ? _fallbackProfile(firebaseUser!) : null;
+    }
+
+    final firebaseUser = _auth.currentUser;
+    if (firebaseUser?.uid == uid) {
+      final profile = _profileFromData(firebaseUser!, snapshot.data()!);
+      _currentProfile = profile;
+      return profile;
+    }
+    return AppUser.fromMap(uid, snapshot.data()!);
+  }
+
+  Future<bool> isEmailVerified() async {
+    final firebaseUser = _auth.currentUser;
+    if (firebaseUser == null) return false;
+    await firebaseUser.reload();
+    return _auth.currentUser?.emailVerified ?? false;
+  }
+
+  Stream<bool> emailVerifiedChanges() {
+    return _auth.userChanges().map((user) => user?.emailVerified ?? false);
+  }
+
+  Future<AppUser> _loadProfile(User firebaseUser) async {
+    final snapshot = await _userDocument(firebaseUser.uid).get();
+    if (!snapshot.exists) return _fallbackProfile(firebaseUser);
+    return _profileFromData(firebaseUser, snapshot.data()!);
+  }
+
+  AppUser _profileFromData(User firebaseUser, Map<String, dynamic> data) {
+    final fallback = _fallbackProfile(firebaseUser);
+    return AppUser.fromMap(firebaseUser.uid, {
+      ...fallback.toMap(),
+      ...data,
+      'email': fallback.email,
+    });
+  }
+
+  AppUser _fallbackProfile(User firebaseUser) {
+    final email = firebaseUser.email ?? '';
+    final emailName = email.contains('@') ? email.split('@').first : email;
+    return AppUser(
+      uid: firebaseUser.uid,
+      email: email,
+      username: firebaseUser.displayName?.trim().isNotEmpty == true
+          ? firebaseUser.displayName!.trim()
+          : emailName,
+      displayName: firebaseUser.displayName,
+    );
   }
 }

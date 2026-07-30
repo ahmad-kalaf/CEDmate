@@ -13,6 +13,7 @@ class ProfilScreen extends StatelessWidget {
     final auth = context.read<AuthService>();
     final user = context.watch<AppUser?>();
     final userName = user?.username;
+    final userEmail = user?.email;
 
     return CEDLayout(
       title: 'Profil',
@@ -127,12 +128,14 @@ class ProfilScreen extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      if (userName == null) {
-                        // ausloggen, falls kein benutzername vorhanden
+                      if (userEmail == null || userEmail.isEmpty) {
                         await auth.logout();
                         if (context.mounted) {
-                          Navigator.of(context).pushReplacementNamed('/');
+                          Navigator.of(
+                            context,
+                          ).pushNamedAndRemoveUntil('/', (_) => false);
                         }
+                        return;
                       }
                       final bool? bestaetigt = await showDialog<bool>(
                         context: context,
@@ -159,7 +162,7 @@ class ProfilScreen extends StatelessWidget {
                         ),
                       );
                       if (bestaetigt != true) return;
-                      auth.sendPasswordReset(userName!);
+                      await auth.sendPasswordReset(userEmail);
                       if (!context.mounted) return;
                       showDialog(
                         context: context,
@@ -207,7 +210,9 @@ class ProfilScreen extends StatelessWidget {
                       if (userName == null) {
                         await auth.logout();
                         if (context.mounted) {
-                          Navigator.of(context).pushReplacementNamed('/');
+                          Navigator.of(
+                            context,
+                          ).pushNamedAndRemoveUntil('/', (_) => false);
                         }
                       }
                       if (!context.mounted) return;

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 /// Modell für eine erfasste Mahlzeit.
 class Mahlzeit {
   final String? id;
@@ -33,7 +35,7 @@ class Mahlzeit {
     final map = <String, dynamic>{
       'id': id,
       'bezeichnung': bezeichnung,
-      'mahlzeitZeitpunkt': mahlzeitZeitpunkt.toIso8601String(),
+      'mahlzeitZeitpunkt': Timestamp.fromDate(mahlzeitZeitpunkt),
     };
 
     if (zutaten != null && zutaten!.isNotEmpty) {
@@ -68,6 +70,10 @@ class Mahlzeit {
       value != null && value.trim().isNotEmpty;
 
   static DateTime _parseZeitstempel(dynamic value) {
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+
     if (value is DateTime) {
       return value;
     }

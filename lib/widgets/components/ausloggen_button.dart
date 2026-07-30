@@ -22,9 +22,13 @@ class AusloggenButton extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () async {
+                    final navigator = Navigator.of(
+                      context,
+                      rootNavigator: true,
+                    );
                     await auth.logout();
                     if (context.mounted) {
-                      Navigator.of(context).pushReplacementNamed('/');
+                      navigator.pushNamedAndRemoveUntil('/', (_) => false);
                     }
                   },
                   child: Text('Bestätigen'),

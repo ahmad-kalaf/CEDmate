@@ -30,6 +30,9 @@ dependencies:
   open_file: ^4.0.0
   url_launcher: ^6.3.2
   path: ^1.9.1
+  firebase_core: ^4.12.1
+  firebase_auth: ^6.5.6
+  cloud_firestore: ^6.7.1
 
 dev_dependencies:
   flutter_test:
