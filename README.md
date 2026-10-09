@@ -22,7 +22,7 @@ Der **MediManager** ist bislang ein UI-Prototyp mit Beispieldaten. Medikamente w
 
 ### Im Browser
 
-Für die Webversion ist ein GitHub-Pages-Deployment unter folgender Adresse vorgesehen:
+Für die Webversion ist ein GitHub-Pages-Deployment unter folgender Adresse vorgesehen (Aktuell nicht verfügbar, da das Projekt bereits abgeschlossen ist):
 
 **[CEDmate öffnen](https://ahmad-kalaf.github.io/CEDmate/)**
 
